@@ -4,6 +4,7 @@ import Header from '@/components/layout/Header';
 import BottomNav from '@/components/layout/BottomNav';
 import Sidebar from '@/components/layout/Sidebar';
 import OfflineBanner from '@/components/layout/OfflineBanner';
+import QuickReportFAB from '@/components/report/QuickReportFAB';
 
 export default function ProtectedLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -21,6 +22,9 @@ export default function ProtectedLayout({ children }: { children: React.ReactNod
         {/* Mobile bottom nav — hidden on desktop */}
         <BottomNav />
       </div>
+
+      {/* Quick Report FAB — accessible from any screen */}
+      <QuickReportFAB />
     </div>
   );
 }

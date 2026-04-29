@@ -1,204 +1,148 @@
-// ─── Admin Security Dashboard ───────────────────────────────
-
+// ─── Moderator Review Dashboard ─────────────────────────────
 'use client';
 
-import { useState } from 'react';
-import { useAuthStore } from '@/stores/auth.store';
-import { useIncidentsStore } from '@/stores/incidents.store';
-import { useAlertsStore } from '@/stores/alerts.store';
-import Card from '@/components/ui/Card';
-import Badge from '@/components/ui/Badge';
-import Button from '@/components/ui/Button';
-import { useRouter } from 'next/navigation';
+import { useState, useMemo } from 'react';
+import { MOCK_INCIDENTS, type MockIncident } from '@/lib/mock-data';
+import { INCIDENT_CATEGORIES, SEVERITY_LEVELS, STATUS_LABELS } from '@/lib/utils/constants';
+import { OKHLA_AREAS, type OkhlaArea } from '@/types/location.types';
+import type { IncidentStatus } from '@/types/incident.types';
 
-export default function AdminDashboardPage() {
-  const router = useRouter();
-  const { role } = useAuthStore();
-  const incidents = useIncidentsStore((s) => s.incidents);
-  const alerts = useAlertsStore((s) => s.activeAlerts);
-  const [selectedTab, setSelectedTab] = useState<'overview' | 'incidents' | 'security'>('overview');
+type ReviewAction = 'verify' | 'reject' | 'escalate';
 
-  // Gate: only moderators and admins
-  if (role !== 'admin' && role !== 'moderator') {
-    return (
-      <div className="text-center py-16">
-        <span className="text-5xl">🔒</span>
-        <h1 className="text-xl font-bold text-white mt-4">Access Denied</h1>
-        <p className="text-sm text-zinc-400 mt-2">This page requires moderator or admin privileges.</p>
-        <Button className="mt-6" onClick={() => router.push('/dashboard')}>Back to Dashboard</Button>
-      </div>
-    );
-  }
+export default function AdminPage() {
+  const [incidents, setIncidents] = useState(MOCK_INCIDENTS);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [filter, setFilter] = useState<'all' | 'reported' | 'verified'>('all');
+  const [note, setNote] = useState('');
 
-  const stats = {
-    totalIncidents: incidents.length,
-    criticalActive: incidents.filter((i) => i.severity === 'critical' && i.status === 'reported').length,
-    unverified: incidents.filter((i) => i.status === 'reported').length,
-    verified: incidents.filter((i) => i.status === 'verified').length,
-    resolved: incidents.filter((i) => i.status === 'resolved').length,
-    activeAlerts: alerts.length,
-    categoryBreakdown: Object.entries(
-      incidents.reduce<Record<string, number>>((acc, i) => { acc[i.category] = (acc[i.category] || 0) + 1; return acc; }, {})
-    ),
+  const filtered = useMemo(() => {
+    if (filter === 'all') return incidents;
+    return incidents.filter(i => i.status === filter);
+  }, [incidents, filter]);
+
+  const selected = selectedId ? incidents.find(i => i.id === selectedId) : null;
+
+  const stats = useMemo(() => ({
+    total: incidents.length,
+    pending: incidents.filter(i => i.status === 'reported').length,
+    verified: incidents.filter(i => i.status === 'verified').length,
+    critical: incidents.filter(i => i.severity === 'critical').length,
+  }), [incidents]);
+
+  const handleAction = (action: ReviewAction) => {
+    if (!selectedId) return;
+    setIncidents(prev => prev.map(i => {
+      if (i.id !== selectedId) return i;
+      if (action === 'verify') return { ...i, status: 'verified' as const, verificationCount: i.verificationCount + 1 };
+      if (action === 'reject') return { ...i, status: 'false_positive' as const };
+      return { ...i, severity: 'critical' as const };
+    }));
+    setSelectedId(null);
+    setNote('');
   };
 
   return (
-    <div className="space-y-5 max-w-4xl mx-auto">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-xl font-bold text-white">Security Dashboard</h1>
-          <p className="text-xs text-zinc-500">Administration & threat overview</p>
-        </div>
-        <Badge variant={role === 'admin' ? 'danger' : 'warning'} size="md">{role}</Badge>
+    <div className="space-y-4">
+      {/* Header */}
+      <div>
+        <h1 className="text-xl font-bold text-white flex items-center gap-2"><span>🛡️</span> Moderator Dashboard</h1>
+        <p className="text-xs text-zinc-500 mt-0.5">Review, verify, and manage incident reports</p>
       </div>
 
-      {/* Tab switcher */}
-      <div className="flex gap-1 bg-zinc-900 border border-zinc-800 rounded-xl p-1">
-        {(['overview', 'incidents', 'security'] as const).map((tab) => (
-          <button
-            key={tab}
-            onClick={() => setSelectedTab(tab)}
-            className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors capitalize ${
-              selectedTab === tab ? 'bg-zinc-800 text-white' : 'text-zinc-500 hover:text-zinc-300'
-            }`}
-          >
-            {tab}
-          </button>
+      {/* Stats */}
+      <div className="grid grid-cols-4 gap-2">
+        {[
+          { v: stats.total, l: 'Total', c: 'text-white' },
+          { v: stats.pending, l: 'Pending', c: 'text-amber-400' },
+          { v: stats.verified, l: 'Verified', c: 'text-green-400' },
+          { v: stats.critical, l: 'Critical', c: 'text-red-400' },
+        ].map(s => (
+          <div key={s.l} className="bg-zinc-900/60 border border-zinc-800/50 rounded-xl p-2.5 text-center">
+            <p className={`text-lg font-bold ${s.c}`}>{s.v}</p>
+            <p className="text-[9px] text-zinc-500 uppercase">{s.l}</p>
+          </div>
         ))}
       </div>
 
-      {/* Overview Tab */}
-      {selectedTab === 'overview' && (
-        <div className="space-y-4">
-          {/* Key metrics */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            {[
-              { label: 'Total Incidents', value: stats.totalIncidents, icon: '📋', variant: 'default' as const },
-              { label: 'Critical Active', value: stats.criticalActive, icon: '🚨', variant: 'danger' as const },
-              { label: 'Unverified', value: stats.unverified, icon: '⏳', variant: 'warning' as const },
-              { label: 'Active Alerts', value: stats.activeAlerts, icon: '🔔', variant: 'info' as const },
-            ].map((stat) => (
-              <Card key={stat.label} padding="sm" variant={stat.variant === 'danger' && stat.value > 0 ? 'danger' : 'default'}>
-                <div className="flex items-start justify-between">
-                  <span className="text-lg">{stat.icon}</span>
-                  <Badge variant={stat.variant} size="sm">{stat.value}</Badge>
-                </div>
-                <p className="text-2xl font-bold text-white mt-2">{stat.value}</p>
-                <p className="text-[10px] text-zinc-500">{stat.label}</p>
-              </Card>
-            ))}
-          </div>
+      {/* Filter tabs */}
+      <div className="flex gap-1 bg-zinc-900/60 rounded-xl p-1">
+        {(['all', 'reported', 'verified'] as const).map(f => (
+          <button key={f} onClick={() => setFilter(f)}
+            className={`flex-1 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+              filter === f ? 'bg-zinc-800 text-white' : 'text-zinc-500'
+            }`}>{f === 'all' ? 'All' : f === 'reported' ? '⏳ Pending' : '✓ Verified'}</button>
+        ))}
+      </div>
 
-          {/* Status distribution */}
-          <Card padding="md">
-            <h3 className="text-xs font-semibold text-zinc-500 uppercase mb-3">Status Distribution</h3>
-            <div className="space-y-2">
-              {[
-                { label: 'Reported', count: stats.unverified, color: 'bg-blue-500', total: stats.totalIncidents },
-                { label: 'Verified', count: stats.verified, color: 'bg-green-500', total: stats.totalIncidents },
-                { label: 'Resolved', count: stats.resolved, color: 'bg-zinc-500', total: stats.totalIncidents },
-              ].map((bar) => (
-                <div key={bar.label} className="flex items-center gap-3">
-                  <span className="text-xs text-zinc-400 w-20">{bar.label}</span>
-                  <div className="flex-1 h-2 bg-zinc-800 rounded-full overflow-hidden">
-                    <div
-                      className={`h-full ${bar.color} rounded-full transition-all duration-500`}
-                      style={{ width: `${bar.total > 0 ? (bar.count / bar.total) * 100 : 0}%` }}
-                    />
-                  </div>
-                  <span className="text-xs text-zinc-500 w-8 text-right">{bar.count}</span>
-                </div>
-              ))}
-            </div>
-          </Card>
+      {/* Incident queue */}
+      <div className="space-y-2">
+        {filtered.map(inc => {
+          const cat = INCIDENT_CATEGORIES[inc.category as keyof typeof INCIDENT_CATEGORIES];
+          const sev = SEVERITY_LEVELS[inc.severity as keyof typeof SEVERITY_LEVELS];
+          const isActive = selectedId === inc.id;
 
-          {/* Category breakdown */}
-          <Card padding="md">
-            <h3 className="text-xs font-semibold text-zinc-500 uppercase mb-3">By Category</h3>
-            {stats.categoryBreakdown.length > 0 ? (
-              <div className="grid grid-cols-2 gap-2">
-                {stats.categoryBreakdown.map(([cat, count]) => (
-                  <div key={cat} className="flex items-center justify-between bg-zinc-800/50 rounded-lg px-3 py-2">
-                    <span className="text-xs text-zinc-300 capitalize">{cat}</span>
-                    <Badge variant="default" size="sm">{count}</Badge>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p className="text-xs text-zinc-500 text-center py-4">No data available</p>
-            )}
-          </Card>
-        </div>
-      )}
-
-      {/* Incidents Tab */}
-      {selectedTab === 'incidents' && (
-        <div className="space-y-3">
-          <h3 className="text-xs font-semibold text-zinc-500 uppercase">Recent Unverified ({stats.unverified})</h3>
-          {incidents
-            .filter((i) => i.status === 'reported')
-            .slice(0, 10)
-            .map((incident) => (
-              <Card key={incident.$id} interactive padding="sm" onClick={() => router.push(`/incidents/${incident.$id}`)}>
-                <div className="flex items-center justify-between">
-                  <div className="min-w-0">
-                    <p className="text-sm font-medium text-white truncate">{incident.title}</p>
-                    <p className="text-[10px] text-zinc-500">{incident.category} · {incident.severity}</p>
-                  </div>
-                  <Badge variant={incident.severity === 'critical' ? 'danger' : 'default'} size="sm" pulse={incident.severity === 'critical'}>
-                    {incident.severity}
-                  </Badge>
-                </div>
-              </Card>
-            ))}
-          {stats.unverified === 0 && (
-            <Card padding="md"><p className="text-xs text-zinc-500 text-center py-4">All caught up ✓</p></Card>
-          )}
-        </div>
-      )}
-
-      {/* Security Tab */}
-      {selectedTab === 'security' && (
-        <div className="space-y-4">
-          <Card padding="md">
-            <h3 className="text-xs font-semibold text-zinc-500 uppercase mb-3">Security Posture</h3>
-            <div className="space-y-3">
-              {[
-                { label: 'End-to-End Encryption', status: 'Active', ok: true },
-                { label: 'Rate Limiting', status: '60 req/min', ok: true },
-                { label: 'Security Headers', status: 'CSP + HSTS', ok: true },
-                { label: 'Input Sanitization', status: 'Enabled', ok: true },
-                { label: 'Device Fingerprinting', status: 'Tracking', ok: true },
-                { label: 'Session Management', status: 'httpOnly cookies', ok: true },
-              ].map((item) => (
-                <div key={item.label} className="flex items-center justify-between">
-                  <span className="text-sm text-zinc-300">{item.label}</span>
-                  <Badge variant={item.ok ? 'success' : 'danger'} size="sm">
-                    {item.status}
-                  </Badge>
-                </div>
-              ))}
-            </div>
-          </Card>
-
-          <Card padding="md" variant="danger">
-            <h3 className="text-xs font-semibold text-zinc-500 uppercase mb-3">Threat Assessment</h3>
-            <div className="flex items-center gap-3">
-              <div className={`w-16 h-16 rounded-2xl flex items-center justify-center text-2xl font-bold ${
-                stats.criticalActive > 0 ? 'bg-red-500/20 text-red-400' : 'bg-green-500/20 text-green-400'
+          return (
+            <button key={inc.id} onClick={() => setSelectedId(isActive ? null : inc.id)}
+              className={`w-full text-left p-3 rounded-xl border transition-all ${
+                isActive ? 'border-red-500/40 bg-red-500/5' : 'border-zinc-800/40 bg-zinc-900/30 hover:border-zinc-700'
               }`}>
-                {stats.criticalActive > 0 ? '⚠️' : '✅'}
+              <div className="flex items-start justify-between gap-2">
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-sm">{cat?.icon}</span>
+                    <span className="text-xs font-semibold text-white truncate">{inc.title}</span>
+                  </div>
+                  <p className="text-[10px] text-zinc-500 mt-0.5">{OKHLA_AREAS[inc.area as OkhlaArea]?.label} · {inc.timestamp}</p>
+                </div>
+                <div className="flex flex-col items-end gap-1">
+                  <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full ${sev?.bg} ${sev?.text}`}>{sev?.label}</span>
+                  <span className={`text-[9px] ${inc.status === 'verified' ? 'text-green-400' : inc.status === 'reported' ? 'text-amber-400' : 'text-zinc-500'}`}>
+                    {inc.status === 'verified' ? '✓ Verified' : inc.status === 'reported' ? '⏳ Pending' : inc.status}
+                  </span>
+                </div>
               </div>
-              <div>
-                <p className="text-sm font-semibold text-white">
-                  {stats.criticalActive > 0 ? `${stats.criticalActive} Critical Threat${stats.criticalActive !== 1 ? 's' : ''}` : 'No Active Threats'}
-                </p>
-                <p className="text-xs text-zinc-400 mt-0.5">
-                  {stats.criticalActive > 0 ? 'Immediate attention required' : 'All monitored areas are clear'}
-                </p>
-              </div>
-            </div>
-          </Card>
+
+              {/* Expanded review panel */}
+              {isActive && (
+                <div className="mt-3 pt-3 border-t border-zinc-800/40 space-y-3" onClick={e => e.stopPropagation()}>
+                  <p className="text-xs text-zinc-400 leading-relaxed">{inc.description}</p>
+
+                  <div className="flex items-center gap-2 text-[10px] text-zinc-500">
+                    <span>📍 {OKHLA_AREAS[inc.area as OkhlaArea]?.label}</span>
+                    <span>· ✓{inc.verificationCount} verifications</span>
+                    <span>· {inc.isAnonymous ? '🕶️ Anonymous' : '👤 Identified'}</span>
+                  </div>
+
+                  {/* Moderator note */}
+                  <textarea value={note} onChange={e => setNote(e.target.value)} placeholder="Add review note..."
+                    rows={2} className="w-full bg-zinc-800 border border-zinc-700 text-white placeholder-zinc-500 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-red-500/50 resize-none" />
+
+                  {/* Action buttons */}
+                  <div className="flex gap-2">
+                    <button onClick={() => handleAction('verify')}
+                      className="flex-1 py-2 bg-green-500/15 border border-green-500/30 text-green-400 text-xs font-semibold rounded-xl hover:bg-green-500/25 transition-colors active:scale-[0.97]">
+                      ✓ Verify
+                    </button>
+                    <button onClick={() => handleAction('escalate')}
+                      className="flex-1 py-2 bg-red-500/15 border border-red-500/30 text-red-400 text-xs font-semibold rounded-xl hover:bg-red-500/25 transition-colors active:scale-[0.97]">
+                      🚨 Escalate
+                    </button>
+                    <button onClick={() => handleAction('reject')}
+                      className="flex-1 py-2 bg-zinc-800 border border-zinc-700 text-zinc-500 text-xs font-semibold rounded-xl hover:bg-zinc-700 transition-colors active:scale-[0.97]">
+                      ✕ Reject
+                    </button>
+                  </div>
+                </div>
+              )}
+            </button>
+          );
+        })}
+      </div>
+
+      {filtered.length === 0 && (
+        <div className="text-center py-12">
+          <span className="text-4xl">🎉</span>
+          <p className="text-sm text-zinc-400 mt-3">All clear — no {filter === 'reported' ? 'pending' : ''} reports to review</p>
         </div>
       )}
     </div>

@@ -9,9 +9,10 @@ import { useAlertsStore } from '@/stores/alerts.store';
 
 const NAV_ITEMS = [
   { key: 'feed', label: 'Feed', icon: '📡', path: '/dashboard', isAction: false },
-  { key: 'map', label: 'Map', icon: '🗺️', path: '/map', isAction: false },
+  { key: 'profiles', label: 'Intel', icon: '🕵️', path: '/profiles', isAction: false },
   { key: 'report', label: 'Report', icon: '➕', path: '/incidents/report', isAction: true },
   { key: 'alerts', label: 'Alerts', icon: '🔔', path: '/alerts', isAction: false },
+  { key: 'more', label: 'More', icon: '☰', path: '/settings', isAction: false },
 ] as const;
 
 export default function BottomNav() {
@@ -51,7 +52,7 @@ export default function BottomNav() {
             <button
               key={item.key}
               onClick={() => {
-                setActiveTab(item.key as 'feed' | 'map' | 'alerts');
+                setActiveTab(item.key as 'feed' | 'map' | 'alerts' | 'profiles' | 'more');
                 router.push(item.path);
               }}
               className={`

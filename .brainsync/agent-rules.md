@@ -34,3 +34,11 @@ Example:
 - Always validate data on the SERVER — client validation is for UX only
 - Don't expose database errors to clients — map to user-friendly messages
 - Agent: check existing code before creating utility functions — avoid duplicates
+
+## 📚 Comprehensive Expert Skills (READ THESE)
+> **CRITICAL:** BrainSync has pre-compiled full expert rulebooks for this project. If you are working on any of the following domains, you MUST read the corresponding `SKILL.md` file BEFORE writing code to instantly learn all proper default skills:
+
+- **config**: Read `.agent/skills/auto/config/SKILL.md`
+- **project**: Read `.agent/skills/auto/project/SKILL.md`
+- **typescript**: Read `.agent/skills/auto/typescript/SKILL.md`
+- **typescript-react**: Read `.agent/skills/auto/typescript-react/SKILL.md`

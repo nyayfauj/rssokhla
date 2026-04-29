@@ -12,6 +12,7 @@ const NAV_LINKS = [
   { path: '/dashboard', label: 'Dashboard', icon: '📡' },
   { path: '/incidents', label: 'Incidents', icon: '📋' },
   { path: '/incidents/report', label: 'New Report', icon: '➕' },
+  { path: '/profiles', label: 'Profiles', icon: '🕵️' },
   { path: '/map', label: 'Area Map', icon: '🗺️' },
   { path: '/alerts', label: 'Alerts', icon: '🔔' },
   { path: '/settings', label: 'Settings', icon: '⚙️' },

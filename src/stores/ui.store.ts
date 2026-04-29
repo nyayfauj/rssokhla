@@ -19,7 +19,7 @@ interface UIState {
   // Navigation
   isSidebarOpen: boolean;
   isMobileMenuOpen: boolean;
-  activeTab: 'feed' | 'map' | 'report' | 'alerts';
+  activeTab: 'feed' | 'map' | 'report' | 'alerts' | 'profiles' | 'more';
 
   // Connectivity
   isOnline: boolean;

@@ -9,12 +9,16 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@turf/turf": "^7.3.5",
     "appwrite": "^25.0.0",
+    "chart.js": "^4.5.1",
+    "mapbox-gl": "^3.22.0",
     "next": "16.2.4",
     "node-appwrite": "^24.0.0",
     "otpauth": "^9.5.1",
     "qrcode": "^1.5.4",
     "react": "19.2.4",
+    "react-chartjs-2": "^5.3.1",
     "react-dom": "19.2.4",
     "uuid": "^14.0.0",
     "zustand": "^5.0.12"
