@@ -193,3 +193,27 @@ body {
   0% { box-shadow: 0 0 10px rgba(220, 38, 38, 0.1); }
   100% { box-shadow: 0 0 20px rgba(220, 38, 38, 0.3); }
 }
+
+.text-gradient-white {
+  background: linear-gradient(135deg, #ffffff 0%, #a1a1aa 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.glass-panel {
+  @apply bg-zinc-900/30 backdrop-blur-xl border border-zinc-800/40 rounded-2xl;
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+::selection {
+  @apply bg-red-500/30 text-white;
+}

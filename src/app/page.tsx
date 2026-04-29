@@ -1,69 +1,35 @@
-// ─── War Monitor Dashboard (Public Landing) ────────────────
+// ─── Command Center (Public Landing) ─────────────────────────
 
 'use client';
 
-import { useState, useEffect } from 'react';
-import Link from 'next/link';
-import ThreatBanner from '@/components/monitor/ThreatBanner';
-import LiveTicker from '@/components/monitor/LiveTicker';
-import RecentFeed from '@/components/monitor/RecentFeed';
-import ActiveAlertStrip from '@/components/monitor/ActiveAlertStrip';
-import ProfileStrip from '@/components/monitor/ProfileStrip';
+import { useState, useEffect, useMemo } from 'react';
 import dynamic from 'next/dynamic';
-
-const MapView = dynamic(() => import('@/components/map/MapView'), {
-  ssr: false,
-  loading: () => <Skeleton className="h-full w-full rounded-2xl" />,
-});
-
-const NetworkGraph = dynamic(() => import('@/components/monitor/NetworkGraph'), {
-  ssr: false,
-  loading: () => <Skeleton className="h-[300px] w-full rounded-2xl" />,
-});
-
-const ZoneThreatGauges = dynamic(() => import('@/components/monitor/ZoneThreatGauges'), {
-  ssr: false,
-  loading: () => <Skeleton className="h-[200px] w-full rounded-2xl" />,
-});
-
-const SeverityDonut = dynamic(() => import('@/components/monitor/SeverityDonut'), {
-  ssr: false,
-  loading: () => <Skeleton className="h-[200px] w-full rounded-2xl" />,
-});
-
-const ActivityTimeline = dynamic(() => import('@/components/monitor/ActivityTimeline'), {
-  ssr: false,
-  loading: () => <Skeleton className="h-[150px] w-full rounded-2xl" />,
-});
-
-const AreaHeatmap = dynamic(() => import('@/components/monitor/AreaHeatmap'), {
-  ssr: false,
-  loading: () => <Skeleton className="h-[300px] w-full rounded-2xl" />,
-});
-
-const CategoryBreakdown = dynamic(() => import('@/components/monitor/CategoryBreakdown'), {
-  ssr: false,
-  loading: () => <Skeleton className="h-[250px] w-full rounded-2xl" />,
-});
-
-const Skeleton = ({ className }: { className: string }) => (
-  <div className={`bg-zinc-900/50 animate-pulse border border-zinc-800/40 ${className}`} />
-);
-import { OKHLA_AREAS } from '@/types/location.types';
+import Link from 'next/link';
 import { useIncidentsStore } from '@/stores/incidents.store';
 import { useAlertsStore } from '@/stores/alerts.store';
+import { useAuthStore } from '@/stores/auth.store';
 import { databases } from '@/lib/appwrite/client';
 import { DATABASE_ID, COLLECTIONS } from '@/lib/appwrite/collections';
 import type { KaryakartaProfile } from '@/types/karyakarta.types';
+import GlassCard from '@/components/ui/GlassCard';
+import ActivityTicker from '@/components/monitor/ActivityTicker';
+import AreaThreatGauges from '@/components/monitor/AreaThreatGauges';
 
-export default function WarMonitorPage() {
+// Dynamic Visuals
+const MapView = dynamic(() => import('@/components/map/MapView'), { ssr: false });
+const NetworkGraph = dynamic(() => import('@/components/monitor/NetworkGraph'), { ssr: false });
+const SeverityDonut = dynamic(() => import('@/components/monitor/SeverityDonut'), { ssr: false });
+const ActivityTimeline = dynamic(() => import('@/components/monitor/ActivityTimeline'), { ssr: false });
+const CategoryBreakdown = dynamic(() => import('@/components/monitor/CategoryBreakdown'), { ssr: false });
+const RecentFeed = dynamic(() => import('@/components/monitor/RecentFeed'), { ssr: false });
+
+export default function CommandCenterPage() {
   const [clock, setClock] = useState('');
-  const [refreshing, setRefreshing] = useState(false);
-  const [lastRefresh, setLastRefresh] = useState<string>('');
+  const [profiles, setProfiles] = useState<KaryakartaProfile[]>([]);
   
   const { incidents, fetchIncidents } = useIncidentsStore();
   const { alerts, fetchActiveAlerts } = useAlertsStore();
-  const [profiles, setProfiles] = useState<KaryakartaProfile[]>([]);
+  const { user, isAuthenticated } = useAuthStore();
 
   useEffect(() => {
     const tick = () => setClock(new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false }));
@@ -73,10 +39,6 @@ export default function WarMonitorPage() {
   }, []);
 
   useEffect(() => {
-    setLastRefresh(new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true }));
-  }, []);
-
-  useEffect(() => {
     fetchIncidents();
     fetchActiveAlerts();
     databases.listDocuments(DATABASE_ID, COLLECTIONS.PROFILES)
@@ -84,174 +46,182 @@ export default function WarMonitorPage() {
       .catch(() => setProfiles([]));
   }, []);
 
-  // Pull-to-refresh simulation
-  const handleRefresh = () => {
-    setRefreshing(true);
-    fetchIncidents();
-    fetchActiveAlerts();
-    databases.listDocuments(DATABASE_ID, COLLECTIONS.PROFILES)
-      .then(res => setProfiles(res.documents as unknown as KaryakartaProfile[]))
-      .catch(() => setProfiles([]));
-    
-    setTimeout(() => {
-      setRefreshing(false);
-      setLastRefresh(new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true }));
-    }, 1500);
-  };
-
-  const critical = incidents.filter(i => i.severity === 'critical').length;
-  const high = incidents.filter(i => i.severity === 'high').length;
-  const verified = incidents.filter(i => i.status === 'verified').length;
-  const threatLevel = critical > 0 ? 'CRITICAL' : high > 2 ? 'ELEVATED' : 'GUARDED';
+  const stats = useMemo(() => {
+    const critical = incidents.filter(i => i.severity === 'critical').length;
+    const high = incidents.filter(i => i.severity === 'high').length;
+    return { critical, high, total: incidents.length };
+  }, [incidents]);
 
   return (
-    <main className="min-h-screen bg-[#060808] text-white">
-      {/* ─── Top Bar ─────────────────────────────────────── */}
-      <header className="sticky top-0 z-50 bg-[#060808]/90 backdrop-blur-xl border-b border-zinc-800/40">
-        <div className="flex items-center justify-between px-4 h-12 max-w-6xl mx-auto">
-          <div className="flex items-center gap-2">
-            <span className="text-base">🛡️</span>
-            <span className="font-bold text-sm tracking-tight">
-              Nyay<span className="text-red-500">Fauj</span>
-            </span>
-            <span className="hidden sm:inline text-[10px] text-zinc-600 ml-1">OKHLA MONITOR</span>
+    <main className="min-h-screen bg-[#050606] text-zinc-100 overflow-x-hidden selection:bg-red-500/30">
+      {/* 1. Global Alert Ticker */}
+      <ActivityTicker incidents={incidents} />
+
+      {/* 2. Top Navigation / Header */}
+      <nav className="sticky top-0 z-50 bg-[#050606]/80 backdrop-blur-xl border-b border-zinc-800/40">
+        <div className="container mx-auto px-4 h-14 flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2">
+              <span className="w-8 h-8 rounded-lg bg-gradient-to-br from-red-600 to-red-900 flex items-center justify-center font-black text-sm italic shadow-[0_0_20px_-5px_rgba(220,38,38,0.5)]">NF</span>
+              <div className="hidden sm:block">
+                <h1 className="text-sm font-black tracking-tighter uppercase leading-none">Nyay<span className="text-red-500">Fauj</span></h1>
+                <p className="text-[8px] text-zinc-600 font-bold tracking-[0.2em] uppercase">Autonomous Intelligence</p>
+              </div>
+            </div>
           </div>
-          <div className="flex items-center gap-3">
-            {/* Refresh button */}
-            <button onClick={handleRefresh}
-              className={`text-zinc-600 hover:text-white transition-transform ${refreshing ? 'animate-spin' : ''}`}
-              disabled={refreshing}>
-              🔄
-            </button>
-            <span className="text-[11px] font-mono text-zinc-500" suppressHydrationWarning>{clock}</span>
-            <div className="flex items-center gap-1.5">
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute h-full w-full rounded-full bg-green-400 opacity-75" />
-                <span className="relative rounded-full h-2 w-2 bg-green-500" />
-              </span>
-              <span className="text-[10px] text-green-400 font-medium">LIVE</span>
+
+          <div className="flex items-center gap-6">
+            <div className="hidden lg:flex items-center gap-4">
+              <NavLink href="/" active>Dashboard</NavLink>
+              <NavLink href="/incidents">Intelligence Feed</NavLink>
+              <NavLink href="/profiles">Operatives</NavLink>
+              <NavLink href="/about">Manifesto</NavLink>
+            </div>
+            
+            <div className="h-6 w-px bg-zinc-800/50 hidden sm:block mx-2" />
+
+            <div className="flex items-center gap-4">
+              <div className="flex flex-col items-end hidden sm:flex">
+                <span className="text-[10px] font-mono text-zinc-500 leading-none mb-1">{clock} IST</span>
+                <span className="text-[9px] text-green-500 font-bold uppercase tracking-widest flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.6)]" />
+                  Live Feed
+                </span>
+              </div>
+              {!isAuthenticated ? (
+                <Link href="/login" className="px-4 py-1.5 bg-zinc-100 hover:bg-white text-[#050606] text-[10px] font-black uppercase tracking-widest rounded-lg transition-all active:scale-95 shadow-[0_0_20px_-5px_rgba(255,255,255,0.3)]">
+                  Access
+                </Link>
+              ) : (
+                <div className="w-8 h-8 rounded-full border border-zinc-800 bg-zinc-900 flex items-center justify-center text-[10px] font-bold">
+                  {user?.name?.charAt(0) || 'O'}
+                </div>
+              )}
             </div>
           </div>
         </div>
-      </header>
+      </nav>
 
-      {/* ─── Refresh indicator ───────────────────────────── */}
-      {refreshing && (
-        <div className="bg-red-500/10 border-b border-red-500/20 py-1.5 text-center">
-          <span className="text-[10px] text-red-400 animate-pulse">Refreshing intel feed...</span>
-        </div>
-      )}
-
-      <div className="max-w-6xl mx-auto px-3 sm:px-4 pb-24 space-y-3 sm:space-y-4">
-        {/* ─── Threat Level Banner ───────────────────────── */}
-        <ThreatBanner level={threatLevel} critical={critical} high={high} total={incidents.length} />
-
-        {/* ─── Active Alert Strip ────────────────────────── */}
-        <ActiveAlertStrip alerts={alerts} />
-
-        {/* ─── Key Metrics (6 stats) ─────────────────────── */}
-        <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
-          {[
-            { v: incidents.length, l: 'Incidents', icon: '📋', c: 'text-white' },
-            { v: critical, l: 'Critical', icon: '🚨', c: 'text-red-400' },
-            { v: verified, l: 'Verified', icon: '✓', c: 'text-green-400' },
-            { v: profiles.length, l: 'Profiled', icon: '🕵️', c: 'text-purple-400' },
-            { v: high, l: 'Active Threats', icon: '⚠️', c: 'text-amber-400' },
-            { v: Object.keys(OKHLA_AREAS).length, l: 'Zones', icon: '📍', c: 'text-blue-400' },
-          ].map(s => (
-            <div key={s.l} className="bg-zinc-900/60 border border-zinc-800/50 rounded-xl p-2 sm:p-3 text-center">
-              <span className="text-sm sm:text-base">{s.icon}</span>
-              <p className={`text-base sm:text-xl font-bold mt-0.5 ${s.c}`}>{s.v}</p>
-              <p className="text-[8px] sm:text-[9px] text-zinc-500 uppercase tracking-wider leading-tight">{s.l}</p>
-            </div>
-          ))}
+      <div className="container mx-auto px-4 py-8 space-y-8">
+        {/* 3. Hero / Metrics Grid */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 lg:gap-6">
+          <MetricCard label="Active Threats" value={stats.critical + stats.high} subValue={`${stats.critical} critical`} color="text-red-500" icon="🚨" />
+          <MetricCard label="Intelligence Nodes" value={incidents.length} subValue="Verified reports" color="text-zinc-100" icon="📡" />
+          <MetricCard label="Operatives Tracked" value={profiles.length} subValue="Karyakarta profiles" color="text-orange-500" icon="🕵️" />
+          <MetricCard label="Operational Zones" value="12" subValue="Monitoring active" color="text-blue-500" icon="📍" />
         </div>
 
-        {/* ─── Operations Map + Severity ─────────────────── */}
-        <div className="grid grid-cols-1 sm:grid-cols-5 gap-3">
-          <div className="sm:col-span-3 h-[400px] rounded-2xl overflow-hidden border border-zinc-800/40 relative">
-            <MapView incidents={incidents} />
+        {/* 4. Primary Intelligence: Map & Local Alerts */}
+        <div className="grid grid-cols-1 xl:grid-cols-12 gap-8">
+          <div className="xl:col-span-8 space-y-8">
+            <GlassCard title="Global Sector Map" icon="🗺️" subtitle="Real-time Hotspot Visualization">
+              <div className="h-[450px] -mx-4 -mb-4">
+                <MapView incidents={incidents} />
+              </div>
+            </GlassCard>
+
+            <GlassCard title="Zone Threat Assessment" icon="📊" subtitle="Okhla Periphery Analysis">
+              <AreaThreatGauges incidents={incidents} />
+            </GlassCard>
           </div>
-          <div className="sm:col-span-2 space-y-3">
+
+          <div className="xl:col-span-4 space-y-8">
+            <GlassCard title="Activity Timeline" icon="📈" subtitle="Intelligence Density over time">
+              <ActivityTimeline incidents={incidents} />
+            </GlassCard>
+
+            <GlassCard title="Operative Network" icon="🕸️" subtitle="Association Graph & Hierarchy">
+              <div className="h-[250px] -mx-4 -mb-4">
+                <NetworkGraph profiles={profiles} />
+              </div>
+            </GlassCard>
+
+            <div className="bg-gradient-to-br from-red-600 to-red-900 rounded-2xl p-6 text-white space-y-4 shadow-[0_20px_50px_-20px_rgba(220,38,38,0.5)]">
+              <h4 className="text-lg font-black tracking-tight uppercase italic leading-none">Submit Intelligence</h4>
+              <p className="text-[10px] font-medium opacity-80 leading-relaxed uppercase tracking-wider">Help protect Okhla. All submissions are encrypted and processed by autonomous AI.</p>
+              <Link href="/report" className="block w-full py-3 bg-black text-white text-center text-[10px] font-black uppercase tracking-[0.2em] rounded-xl hover:bg-zinc-900 transition-colors">
+                New Report →
+              </Link>
+            </div>
+          </div>
+        </div>
+
+        {/* 5. Analytics & Distribution */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <GlassCard title="Severity Weighting" icon="🍩">
             <SeverityDonut incidents={incidents} />
-            {/* Quick zone alerts */}
-            <div className="bg-zinc-900/30 border border-zinc-800/40 rounded-2xl p-3">
-              <div className="flex items-center gap-2 mb-2">
-                <span className="text-xs">🔔</span>
-                <span className="text-[10px] font-semibold text-zinc-400 uppercase tracking-widest">Active Hotspots</span>
+          </GlassCard>
+
+          <GlassCard title="Category Analysis" icon="📋">
+            <CategoryBreakdown incidents={incidents} />
+          </GlassCard>
+
+          <GlassCard title="System Integrity" icon="🛡️">
+            <div className="flex flex-col items-center justify-center text-center h-full py-4 space-y-4">
+              <div className="w-12 h-12 rounded-full bg-green-500/10 flex items-center justify-center text-xl">✨</div>
+              <div>
+                <h5 className="text-xs font-bold text-zinc-300 uppercase tracking-widest mb-1">Operator Independent</h5>
+                <p className="text-[10px] text-zinc-500 leading-relaxed">System logic is fully decentralized. No human intervention is required for threat assessment.</p>
               </div>
-              <div className="space-y-1.5">
-                {['shaheen_bagh', 'batla_house', 'jamia_nagar'].map(area => {
-                  const areaInc = incidents.filter(i => i.locationId === area);
-                  const areaLabel = OKHLA_AREAS[area as keyof typeof OKHLA_AREAS]?.label || area;
-                  const hasCritical = areaInc.some(i => i.severity === 'critical');
-                  return (
-                    <div key={area} className={`flex items-center justify-between px-2 py-1.5 rounded-lg border ${
-                      hasCritical ? 'border-red-800/30 bg-red-950/20' : 'border-zinc-800/30 bg-zinc-900/30'
-                    }`}>
-                      <span className="text-[10px] text-zinc-300">{areaLabel}</span>
-                      <div className="flex items-center gap-1.5">
-                        <span className="text-[9px] text-zinc-500">{areaInc.length} inc</span>
-                        {hasCritical && <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />}
-                      </div>
-                    </div>
-                  );
-                })}
+              <div className="flex gap-2">
+                <div className="w-1.5 h-1.5 rounded-full bg-green-500" />
+                <div className="w-1.5 h-1.5 rounded-full bg-green-500" />
+                <div className="w-1.5 h-1.5 rounded-full bg-green-500" />
               </div>
             </div>
-          </div>
+          </GlassCard>
         </div>
 
-        {/* ─── Activity Timeline ─────────────────────────── */}
-        <ActivityTimeline incidents={incidents} />
-
-        {/* ─── Live Ticker ───────────────────────────────── */}
-        <LiveTicker incidents={incidents} />
-
-        {/* ─── Zone Threat Gauges + Category Breakdown ───── */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <ZoneThreatGauges incidents={incidents} />
-          <CategoryBreakdown incidents={incidents} />
-        </div>
-
-        {/* ─── Known Operatives + Network Graph ──────────── */}
-        <ProfileStrip profiles={profiles} />
-        <NetworkGraph profiles={profiles} />
-
-        {/* ─── Area Heatmap ──────────────────────────────── */}
-        <AreaHeatmap incidents={incidents} />
-
-        {/* ─── Recent Incidents Feed ─────────────────────── */}
-        <RecentFeed incidents={incidents} />
-
-        {/* ─── CTA Strip ────────────────────────────────── */}
-        <div className="bg-gradient-to-r from-red-950/60 to-zinc-900/60 border border-red-900/30 rounded-2xl p-4 sm:p-5">
-          <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4">
-            <div className="flex-1 text-center sm:text-left">
-              <h3 className="text-sm sm:text-base font-bold text-white">Help Monitor Okhla</h3>
-              <p className="text-xs text-zinc-400 mt-0.5">Report incidents, verify sightings, and protect your community</p>
-            </div>
-            <div className="flex gap-2 w-full sm:w-auto">
-              <Link href="/login" className="flex-1 sm:flex-initial px-4 py-2.5 bg-red-600 hover:bg-red-500 text-white text-sm font-semibold rounded-xl text-center transition-colors active:scale-[0.97]">
-                Sign In
-              </Link>
-              <Link href="/anonymous" className="flex-1 sm:flex-initial px-4 py-2.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-sm font-medium rounded-xl text-center transition-colors active:scale-[0.97] border border-zinc-700">
-                Anonymous
-              </Link>
-            </div>
-          </div>
-        </div>
-
-        {/* ─── Last Refresh ──────────────────────────────── */}
-        <p className="text-center text-[9px] text-zinc-700" suppressHydrationWarning>
-          Last refreshed: {lastRefresh} · Data anonymized · Sources protected
-        </p>
+        {/* 6. Recent Intelligence Feed */}
+        <GlassCard title="Recent Intelligence Feed" icon="🗞️" subtitle="Live Stream of Field Activity">
+          <RecentFeed incidents={incidents} />
+        </GlassCard>
       </div>
 
-      {/* ─── Footer ──────────────────────────────────────── */}
-      <footer className="border-t border-zinc-900 py-4 text-center">
-        <p className="text-[10px] text-zinc-600">🛡️ NyayFauj v2.0 — Community Monitor for Okhla · Encrypted · Open Source</p>
+      <footer className="border-t border-zinc-900/50 py-12 bg-black/40">
+        <div className="container mx-auto px-4 text-center space-y-6">
+          <div className="flex items-center justify-center gap-2">
+            <div className="w-6 h-6 rounded bg-zinc-800 flex items-center justify-center text-[10px] font-bold">NF</div>
+            <span className="text-xs font-bold tracking-widest uppercase">NyayFauj Platform</span>
+          </div>
+          <p className="text-[10px] text-zinc-600 max-w-lg mx-auto leading-relaxed uppercase tracking-[0.1em]">
+            This platform is an independent community monitoring tool. We operate without an operator. 
+            Privacy is our priority. No IP addresses or browser fingerprints are stored in permanent logs.
+          </p>
+          <div className="flex justify-center gap-6 text-[10px] font-bold text-zinc-500 uppercase tracking-widest">
+            <Link href="/privacy" className="hover:text-white transition-colors">Privacy Protocol</Link>
+            <Link href="/api" className="hover:text-white transition-colors">Public API</Link>
+            <Link href="/terms" className="hover:text-white transition-colors">Engagement Rules</Link>
+          </div>
+        </div>
       </footer>
     </main>
+  );
+}
+
+function NavLink({ href, children, active = false }: { href: string, children: React.ReactNode, active?: boolean }) {
+  return (
+    <Link href={href} className={`text-[10px] font-bold uppercase tracking-widest transition-colors hover:text-white ${active ? 'text-white' : 'text-zinc-500'}`}>
+      {children}
+    </Link>
+  );
+}
+
+function MetricCard({ label, value, subValue, color, icon }: { label: string, value: number | string, subValue: string, color: string, icon: string }) {
+  return (
+    <div className="bg-zinc-900/30 border border-zinc-800/40 rounded-2xl p-5 lg:p-6 group hover:bg-zinc-900/50 transition-all">
+      <div className="flex items-center justify-between mb-4">
+        <span className="text-xs text-zinc-700">{icon}</span>
+        <div className="flex gap-1">
+          <div className="w-1 h-1 rounded-full bg-zinc-800 group-hover:bg-red-500 transition-colors" />
+          <div className="w-1 h-1 rounded-full bg-zinc-800 group-hover:bg-red-500 transition-colors delay-75" />
+        </div>
+      </div>
+      <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest mb-1">{label}</p>
+      <div className="flex items-baseline gap-2">
+        <h4 className={`text-3xl font-black tracking-tighter ${color}`}>{value}</h4>
+        <span className="text-[9px] text-zinc-600 font-bold uppercase tracking-tighter">{subValue}</span>
+      </div>
+    </div>
   );
 }

@@ -1,127 +1,137 @@
-import type { Metadata } from 'next';
-import Link from 'next/link';
+'use client';
 
-export const metadata: Metadata = {
-  title: 'About Us',
-  description: 'Learn about NyayFauj, the autonomous community-driven safety monitor for Okhla.',
-};
+import Link from 'next/link';
 
 export default function AboutPage() {
   return (
-    <main className="min-h-screen bg-[#0a0a0a] text-zinc-300 pb-24">
-      {/* Hero Section */}
-      <section className="relative pt-20 pb-16 px-4 overflow-hidden border-b border-zinc-800/40">
-        <div className="absolute inset-0 bg-red-900/5 blur-[120px] rounded-full pointer-events-none" />
-        <div className="max-w-4xl mx-auto text-center relative z-10">
-          <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-semibold uppercase tracking-widest mb-6 animate-fade-in">
-            <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" /> Community First
-          </span>
-          <h1 className="text-4xl sm:text-6xl font-black text-white tracking-tight mb-6 animate-slide-up" style={{ animationDelay: '0.1s' }}>
-            Defending <span className="text-gradient-red">Okhla</span> Through Intelligence
+    <main className="min-h-screen bg-[#050606] text-zinc-100 overflow-x-hidden selection:bg-red-500/30">
+      {/* Cinematic Hero */}
+      <section className="relative h-[80vh] flex items-center justify-center overflow-hidden">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-red-950/20 via-black to-black"></div>
+        <div className="absolute inset-0 opacity-20 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] pointer-events-none"></div>
+        
+        <div className="container mx-auto px-4 relative z-10 text-center space-y-8">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-500/10 border border-red-500/20 text-[10px] font-black uppercase tracking-[0.3em] text-red-500 animate-fade-in">
+            Protocol: NyayFauj
+          </div>
+          
+          <h1 className="text-6xl md:text-8xl font-black tracking-tighter uppercase italic text-gradient-red animate-slide-up">
+            Digital<br/>Vigilance
           </h1>
-          <p className="text-lg sm:text-xl text-zinc-400 max-w-2xl mx-auto leading-relaxed animate-slide-up" style={{ animationDelay: '0.2s' }}>
-            NyayFauj is an independent, autonomous monitoring platform designed to document, verify, and track organized threats within the Okhla community.
+          
+          <p className="text-zinc-500 text-sm md:text-base font-medium tracking-wide max-w-2xl mx-auto leading-relaxed animate-fade-in delay-300">
+            NyayFauj is an autonomous intelligence infrastructure built to monitor, track, and analyze community threats in real-time. We operate at the intersection of social justice and advanced technology.
           </p>
+
+          <div className="pt-8 flex flex-col sm:flex-row items-center justify-center gap-4 animate-fade-in delay-500">
+            <Link href="/" className="px-8 py-3 bg-red-600 hover:bg-red-500 text-white text-[10px] font-black uppercase tracking-[0.2em] rounded-xl transition-all hover:scale-105 active:scale-95 shadow-[0_20px_40px_-10px_rgba(220,38,38,0.5)]">
+              Enter Dashboard
+            </Link>
+            <Link href="#mission" className="px-8 py-3 bg-zinc-900 border border-zinc-800 hover:border-zinc-700 text-zinc-400 text-[10px] font-black uppercase tracking-[0.2em] rounded-xl transition-all">
+              Our Mission
+            </Link>
+          </div>
         </div>
       </section>
 
-      <div className="max-w-4xl mx-auto px-4 mt-12 space-y-16">
-        
-        {/* Mission */}
-        <section className="grid sm:grid-cols-12 gap-8 items-start">
-          <div className="sm:col-span-4">
-            <h2 className="text-xl font-bold text-white sticky top-24">The Mission</h2>
-          </div>
-          <div className="sm:col-span-8 space-y-4 text-zinc-400 leading-relaxed text-base">
-            <p>
-              In recent years, coordinated activities targeting minority neighborhoods have required a new standard of community vigilance. NyayFauj was built to democratize safety by providing residents of Jamia Nagar, Shaheen Bagh, Zakir Nagar, and surrounding areas with a unified intelligence dashboard.
+      {/* Mission Section */}
+      <section id="mission" className="container mx-auto px-4 py-24 space-y-32">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+          <div className="space-y-6">
+            <h2 className="text-3xl font-black tracking-tight uppercase italic">The Problem</h2>
+            <p className="text-zinc-500 leading-relaxed text-sm">
+              In the rapidly changing landscape of the Okhla periphery, traditional monitoring fails to capture the nuance of underground activity. Radicalization and targeted surveillance require a counter-intelligence framework that is decentralized and autonomous.
             </p>
-            <p>
-              Our goal is simple: ensure that no malicious recruitment drive, surveillance operation, or aggressive propaganda campaign goes undocumented. We turn community observations into actionable, verified public intelligence.
+            <p className="text-zinc-500 leading-relaxed text-sm">
+              NyayFauj provides the tools for communities to reclaim their digital and physical spaces from hostile operatives.
             </p>
           </div>
-        </section>
-
-        {/* How It Works & AI */}
-        <section className="grid sm:grid-cols-12 gap-8 items-start">
-          <div className="sm:col-span-4">
-            <h2 className="text-xl font-bold text-white sticky top-24">Autonomous AI Intelligence</h2>
+          <div className="aspect-square bg-zinc-900/50 border border-zinc-800/40 rounded-[3rem] p-12 flex items-center justify-center relative group">
+            <div className="absolute inset-0 bg-red-500/5 blur-3xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
+            <span className="text-8xl opacity-20 grayscale group-hover:grayscale-0 transition-all duration-700">🕵️</span>
           </div>
-          <div className="sm:col-span-8">
-            <div className="bg-zinc-900/50 border border-zinc-800/60 rounded-2xl p-6 space-y-6">
-              <p className="text-zinc-400 leading-relaxed text-base">
-                NyayFauj operates as a completely independent machine. It does not rely on operators or external messaging platforms. Instead, it utilizes an advanced Vision AI to autonomously parse community reports.
-              </p>
-              
-              <div className="space-y-4">
-                <div className="flex gap-4">
-                  <div className="w-10 h-10 rounded-full bg-zinc-800 flex items-center justify-center flex-shrink-0 border border-zinc-700">📸</div>
-                  <div>
-                    <h4 className="text-white font-semibold">1. Evidence Submission</h4>
-                    <p className="text-sm text-zinc-500 mt-1">Users anonymously upload photos of suspicious activities, flyers, or individuals to the platform.</p>
-                  </div>
-                </div>
-                
-                <div className="flex gap-4">
-                  <div className="w-10 h-10 rounded-full bg-purple-900/20 text-purple-400 flex items-center justify-center flex-shrink-0 border border-purple-500/30">🧠</div>
-                  <div>
-                    <h4 className="text-white font-semibold">2. Vision Analysis</h4>
-                    <p className="text-sm text-zinc-500 mt-1">Our autonomous AI immediately scans the media. It reads text off banners, identifies organizational logos, and specifically extracts names of operatives.</p>
-                  </div>
-                </div>
+        </div>
 
-                <div className="flex gap-4">
-                  <div className="w-10 h-10 rounded-full bg-red-900/20 text-red-400 flex items-center justify-center flex-shrink-0 border border-red-500/30">🕸️</div>
-                  <div>
-                    <h4 className="text-white font-semibold">3. Database Cross-Referencing</h4>
-                    <p className="text-sm text-zinc-500 mt-1">The AI checks the extracted names against our private, historical database of known <i>Karyakarta</i> profiles. It cross-references addresses, past work, and social media links, instantly linking repeat offenders.</p>
-                  </div>
-                </div>
-              </div>
-            </div>
+        {/* Features Grid */}
+        <div className="space-y-16">
+          <div className="text-center space-y-4">
+            <h2 className="text-3xl font-black tracking-tight uppercase italic">Core Technology</h2>
+            <p className="text-zinc-600 text-[10px] font-bold uppercase tracking-widest">Powered by Autonomous AI</p>
           </div>
-        </section>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <FeatureCard 
+              icon="👁️" 
+              title="Gemini Vision" 
+              desc="Our custom vision processor extracts intelligence from images in milliseconds, identifying operatives and locations without human bias."
+            />
+            <FeatureCard 
+              icon="🕸️" 
+              title="Network Analysis" 
+              desc="We map the invisible connections between karyakartas, identifying high-value targets and leadership hierarchies automatically."
+            />
+            <FeatureCard 
+              icon="📍" 
+              title="Geospatial Intelligence" 
+              desc="Real-time hotspot tracking across Shaheen Bagh, Jasola, and Jamia Nagar provides localized threat assessments for citizens."
+            />
+          </div>
+        </div>
 
-        {/* Anonymity Guarantee */}
-        <section className="grid sm:grid-cols-12 gap-8 items-start">
-          <div className="sm:col-span-4">
-            <h2 className="text-xl font-bold text-white sticky top-24">The Anonymity Guarantee</h2>
-          </div>
-          <div className="sm:col-span-8 space-y-4 text-zinc-400 leading-relaxed text-base">
-            <p>
-              Your safety is the absolute priority. The NyayFauj application is entirely independent. We do not use Telegram bots, WhatsApp groups, or third-party social media integrations that could compromise your identity. 
-            </p>
-            <ul className="list-disc pl-5 space-y-2 mt-4 marker:text-red-500">
-              <li><strong className="text-zinc-300">No IP Logging:</strong> We do not store your IP address when you submit an anonymous report.</li>
-              <li><strong className="text-zinc-300">Device Fingerprinting:</strong> We use basic device signatures strictly to prevent spam and DDoS abuse. This data cannot be traced back to your real identity.</li>
-              <li><strong className="text-zinc-300">End-to-End Control:</strong> All data is hosted on our secure, independent infrastructure.</li>
-            </ul>
-          </div>
-        </section>
-
-        {/* CTA */}
-        <section className="pt-8 border-t border-zinc-800/40 text-center">
-          <h2 className="text-2xl font-bold text-white mb-4">Protect Your Community</h2>
-          <p className="text-zinc-500 mb-8 max-w-md mx-auto">
-            It takes all of us to keep Okhla safe. If you see something, document it safely and report it immediately.
+        {/* Manifesto Statement */}
+        <div className="bg-zinc-900/40 border border-zinc-800/40 rounded-[3rem] p-12 text-center space-y-8 relative overflow-hidden group">
+          <div className="absolute top-0 right-0 p-8 text-8xl opacity-5 select-none font-black italic">100%</div>
+          <h2 className="text-4xl font-black tracking-tighter uppercase italic leading-none">We Operate Without an Operator.</h2>
+          <p className="text-zinc-500 text-sm max-w-2xl mx-auto leading-relaxed">
+            NyayFauj is designed to be self-sustaining. The logic is hardcoded into the architecture, ensuring that the mission persists even if the founders are silenced. We are the digital shield of the periphery.
           </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link 
-              href="/anonymous" 
-              className="w-full sm:w-auto px-8 py-3.5 bg-red-600 hover:bg-red-500 text-white font-bold rounded-xl transition-all active:scale-[0.98] glow-red"
-            >
-              Report Incident Now
-            </Link>
-            <Link 
-              href="/" 
-              className="w-full sm:w-auto px-8 py-3.5 bg-zinc-900 border border-zinc-700 hover:border-zinc-500 text-white font-semibold rounded-xl transition-all active:scale-[0.98]"
-            >
-              View Live Map
-            </Link>
+          <div className="pt-4 flex justify-center gap-2">
+            {[1, 2, 3, 4, 5].map(i => <div key={i} className="w-1 h-1 rounded-full bg-red-500/40 group-hover:bg-red-500 transition-colors" />)}
           </div>
-        </section>
+        </div>
+      </section>
 
-      </div>
+      <footer className="border-t border-zinc-900/50 py-12 bg-black/40">
+        <div className="container mx-auto px-4 text-center">
+          <Link href="/" className="text-[10px] font-black uppercase tracking-[0.4em] text-zinc-600 hover:text-white transition-colors">Return to Ops Center</Link>
+        </div>
+      </footer>
+
+      <style jsx>{`
+        .text-gradient-red {
+          background: linear-gradient(to bottom right, #fff 20%, #ef4444 80%);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+        }
+        @keyframes slide-up {
+          from { transform: translateY(20px); opacity: 0; }
+          to { transform: translateY(0); opacity: 1; }
+        }
+        .animate-slide-up {
+          animation: slide-up 1s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .animate-fade-in {
+          animation: fadeIn 1s ease-out;
+        }
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        .delay-300 { animation-delay: 300ms; }
+        .delay-500 { animation-delay: 500ms; }
+      `}</style>
     </main>
+  );
+}
+
+function FeatureCard({ icon, title, desc }: { icon: string, title: string, desc: string }) {
+  return (
+    <div className="bg-zinc-900/30 border border-zinc-800/40 rounded-3xl p-8 space-y-6 hover:bg-zinc-900/50 transition-all group">
+      <div className="w-12 h-12 rounded-2xl bg-zinc-800 flex items-center justify-center text-xl group-hover:scale-110 transition-transform">{icon}</div>
+      <div className="space-y-2">
+        <h3 className="text-sm font-black uppercase tracking-widest">{title}</h3>
+        <p className="text-[11px] text-zinc-500 leading-relaxed">{desc}</p>
+      </div>
+    </div>
   );
 }
