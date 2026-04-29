@@ -12,6 +12,7 @@
     "@turf/turf": "^7.3.5",
     "appwrite": "^25.0.0",
     "chart.js": "^4.5.1",
+    "date-fns": "^4.1.0",
     "mapbox-gl": "^3.22.0",
     "next": "16.2.4",
     "node-appwrite": "^24.0.0",
