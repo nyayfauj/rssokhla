@@ -1,0 +1,7 @@
+{
+  "name": "social-broadcast",
+  "version": "1.0.0",
+  "description": "NyayFauj: Auto-broadcast verified incidents to Telegram",
+  "main": "index.js",
+  "dependencies": {}
+}

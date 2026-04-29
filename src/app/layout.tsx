@@ -4,6 +4,7 @@ import './globals.css';
 import ServiceWorkerRegistrar from '@/components/ServiceWorkerRegistrar';
 import ErrorBoundary from '@/components/ErrorBoundary';
 import ToastContainer from '@/components/ui/Toast';
+import AppwritePing from '@/components/AppwritePing';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -53,6 +54,7 @@ export default function RootLayout({
       <body className="font-sans bg-[#0a0a0a] text-zinc-100 antialiased overscroll-none">
         <ErrorBoundary>
           <ServiceWorkerRegistrar />
+          <AppwritePing />
           <ToastContainer />
           {children}
         </ErrorBoundary>

@@ -3,7 +3,7 @@
 import { NextResponse, type NextRequest } from 'next/server';
 
 // Routes that don't require authentication
-const PUBLIC_ROUTES = ['/', '/login', '/register', '/anonymous'];
+const PUBLIC_ROUTES = ['/', '/login', '/register', '/anonymous', '/p'];
 const AUTH_ROUTES = ['/login', '/register', '/anonymous'];
 
 // PWA assets that should always be accessible
@@ -53,7 +53,7 @@ export function middleware(request: NextRequest) {
   // ─── 4. Auth check for protected routes ─────────────────
   const sessionCookie = request.cookies.get('rssokhla-session');
   const isAuthenticated = !!sessionCookie?.value;
-  const isPublicRoute = PUBLIC_ROUTES.includes(pathname);
+  const isPublicRoute = PUBLIC_ROUTES.includes(pathname) || pathname.startsWith('/p/');
   const isAuthRoute = AUTH_ROUTES.includes(pathname);
 
   // Redirect authenticated users away from auth pages
@@ -89,8 +89,8 @@ export function middleware(request: NextRequest) {
         "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
         "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
         "font-src 'self' https://fonts.gstatic.com",
-        "img-src 'self' data: blob: https://cloud.appwrite.io",
-        "connect-src 'self' https://cloud.appwrite.io wss://cloud.appwrite.io",
+        "img-src 'self' data: blob: https://cloud.appwrite.io https://sgp.cloud.appwrite.io",
+        "connect-src 'self' https://cloud.appwrite.io wss://cloud.appwrite.io https://sgp.cloud.appwrite.io wss://sgp.cloud.appwrite.io",
         "frame-ancestors 'none'",
       ].join('; ')
     );

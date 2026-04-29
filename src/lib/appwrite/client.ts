@@ -3,7 +3,7 @@
 
 import { Client, Account, Databases, Storage, Functions } from 'appwrite';
 
-const endpoint = process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT ?? 'https://cloud.appwrite.io/v1';
+const endpoint = process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT ?? 'https://sgp.cloud.appwrite.io/v1';
 const projectId = process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID ?? '';
 
 if (!projectId) {
