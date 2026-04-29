@@ -14,29 +14,45 @@ interface Props { incidents: Incident[]; }
 type Range = '24h' | '7d' | '30d';
 
 function generateTimelineData(incidents: Incident[], range: Range) {
-  const bucketMs = range === '24h' ? 3600000 : range === '7d' ? 86400000 : 86400000;
   const count = range === '24h' ? 24 : range === '7d' ? 7 : 30;
   const labels: string[] = [];
-  const critical: number[] = [];
-  const high: number[] = [];
-  const other: number[] = [];
+  const critical: number[] = new Array(count).fill(0);
+  const high: number[] = new Array(count).fill(0);
+  const other: number[] = new Array(count).fill(0);
 
-  // Deterministic pseudo-random using a simple hash
-  const seed = (i: number) => ((i * 2654435761) >>> 0) % 100;
+  const now = new Date();
 
   for (let i = count - 1; i >= 0; i--) {
-    if (range === '24h') labels.push(`${24 - i}h`);
-    else if (range === '7d') labels.push(['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][(7 - i) % 7]);
-    else labels.push(`${((30 - i) % 28) + 1}/${((30 - i) < 28) ? 4 : 5}`);
-
-    // Deterministic distribution
-    const h1 = seed(i + 1);
-    const h2 = seed(i + 100);
-    const h3 = seed(i + 200);
-    critical.push(h1 < 15 ? 1 : 0);
-    high.push(h2 < 40 ? (h2 < 15 ? 2 : 1) : 0);
-    other.push(h3 < 60 ? (h3 < 20 ? 3 : h3 < 40 ? 2 : 1) : 0);
+    if (range === '24h') {
+      const d = new Date(now.getTime() - i * 3600000);
+      labels.push(`${d.getHours()}:00`);
+    } else if (range === '7d') {
+      const d = new Date(now.getTime() - i * 86400000);
+      labels.push(['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][d.getDay()]);
+    } else {
+      const d = new Date(now.getTime() - i * 86400000);
+      labels.push(`${d.getDate()}/${d.getMonth() + 1}`);
+    }
   }
+
+  // Bucket incidents
+  incidents.forEach(inc => {
+    const incDate = new Date(inc.timestamp);
+    const diffMs = now.getTime() - incDate.getTime();
+    
+    let index = -1;
+    if (range === '24h') {
+      index = count - 1 - Math.floor(diffMs / 3600000);
+    } else {
+      index = count - 1 - Math.floor(diffMs / 86400000);
+    }
+
+    if (index >= 0 && index < count) {
+      if (inc.severity === 'critical') critical[index]++;
+      else if (inc.severity === 'high') high[index]++;
+      else other[index]++;
+    }
+  });
 
   return { labels, critical, high, other };
 }

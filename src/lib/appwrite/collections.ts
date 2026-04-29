@@ -1,6 +1,6 @@
 // ─── Collection & Database ID Constants ─────────────────────
 
-export const DATABASE_ID = process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID ?? 'rssokhla_db';
+export const DATABASE_ID = process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID ?? '69f1a846000d7192b02e';
 
 export const COLLECTIONS = {
   INCIDENTS: process.env.NEXT_PUBLIC_COLLECTION_INCIDENTS ?? 'incidents',
