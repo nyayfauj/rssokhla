@@ -1,8 +1,8 @@
 {
   "project": {
     "enabled": true,
-    "lastGenerated": "2026-04-29T10:30:59.234Z",
-    "observationCount": 125,
+    "lastGenerated": "2026-04-29T11:50:59.756Z",
+    "observationCount": 126,
     "skillCount": 0,
     "domain": "project",
     "triggerGlobs": [
@@ -12,7 +12,7 @@
   },
   "typescript": {
     "enabled": true,
-    "lastGenerated": "2026-04-29T10:30:59.235Z",
+    "lastGenerated": "2026-04-29T11:50:59.757Z",
     "observationCount": 7,
     "skillCount": 0,
     "domain": "typescript",
@@ -24,7 +24,7 @@
   },
   "typescript-react": {
     "enabled": true,
-    "lastGenerated": "2026-04-29T10:30:59.236Z",
+    "lastGenerated": "2026-04-29T11:50:59.757Z",
     "observationCount": 25,
     "skillCount": 0,
     "domain": "typescript-react",
@@ -35,7 +35,7 @@
   },
   "config": {
     "enabled": true,
-    "lastGenerated": "2026-04-29T10:30:59.236Z",
+    "lastGenerated": "2026-04-29T11:50:59.758Z",
     "observationCount": 7,
     "skillCount": 0,
     "domain": "config",
