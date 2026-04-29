@@ -6,25 +6,49 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import ThreatBanner from '@/components/monitor/ThreatBanner';
 import LiveTicker from '@/components/monitor/LiveTicker';
-import AreaHeatmap from '@/components/monitor/AreaHeatmap';
-import CategoryBreakdown from '@/components/monitor/CategoryBreakdown';
 import RecentFeed from '@/components/monitor/RecentFeed';
 import ActiveAlertStrip from '@/components/monitor/ActiveAlertStrip';
 import ProfileStrip from '@/components/monitor/ProfileStrip';
-import ActivityTimeline from '@/components/monitor/ActivityTimeline';
 import dynamic from 'next/dynamic';
 
 const MapView = dynamic(() => import('@/components/map/MapView'), {
   ssr: false,
-  loading: () => (
-    <div className="h-full w-full flex items-center justify-center bg-zinc-900 rounded-2xl animate-pulse">
-      <span className="text-4xl opacity-50">🗺️</span>
-    </div>
-  ),
+  loading: () => <Skeleton className="h-full w-full rounded-2xl" />,
 });
-import NetworkGraph from '@/components/monitor/NetworkGraph';
-import ZoneThreatGauges from '@/components/monitor/ZoneThreatGauges';
-import SeverityDonut from '@/components/monitor/SeverityDonut';
+
+const NetworkGraph = dynamic(() => import('@/components/monitor/NetworkGraph'), {
+  ssr: false,
+  loading: () => <Skeleton className="h-[300px] w-full rounded-2xl" />,
+});
+
+const ZoneThreatGauges = dynamic(() => import('@/components/monitor/ZoneThreatGauges'), {
+  ssr: false,
+  loading: () => <Skeleton className="h-[200px] w-full rounded-2xl" />,
+});
+
+const SeverityDonut = dynamic(() => import('@/components/monitor/SeverityDonut'), {
+  ssr: false,
+  loading: () => <Skeleton className="h-[200px] w-full rounded-2xl" />,
+});
+
+const ActivityTimeline = dynamic(() => import('@/components/monitor/ActivityTimeline'), {
+  ssr: false,
+  loading: () => <Skeleton className="h-[150px] w-full rounded-2xl" />,
+});
+
+const AreaHeatmap = dynamic(() => import('@/components/monitor/AreaHeatmap'), {
+  ssr: false,
+  loading: () => <Skeleton className="h-[300px] w-full rounded-2xl" />,
+});
+
+const CategoryBreakdown = dynamic(() => import('@/components/monitor/CategoryBreakdown'), {
+  ssr: false,
+  loading: () => <Skeleton className="h-[250px] w-full rounded-2xl" />,
+});
+
+const Skeleton = ({ className }: { className: string }) => (
+  <div className={`bg-zinc-900/50 animate-pulse border border-zinc-800/40 ${className}`} />
+);
 import { OKHLA_AREAS } from '@/types/location.types';
 import { useIncidentsStore } from '@/stores/incidents.store';
 import { useAlertsStore } from '@/stores/alerts.store';

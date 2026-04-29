@@ -14,14 +14,42 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'https://rssokhla.site'),
   title: {
     default: 'NyayFauj — Okhla Community Monitor',
     template: '%s | NyayFauj',
   },
-  description: 'Community-driven safety monitoring platform for Okhla — track, report, and verify RSS activities in your neighborhood.',
-  keywords: ['okhla', 'safety', 'monitor', 'community', 'reporting', 'nyayfauj'],
-  authors: [{ name: 'NyayFauj' }],
+  description: 'Community-driven safety monitoring platform for Okhla — track, report, and verify activities in your neighborhood securely.',
+  keywords: ['okhla', 'safety', 'monitor', 'community', 'reporting', 'nyayfauj', 'jamia nagar', 'shaheen bagh'],
+  authors: [{ name: 'NyayFauj Community' }],
   applicationName: 'NyayFauj',
+  alternates: {
+    canonical: '/',
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
+  openGraph: {
+    title: 'NyayFauj — Okhla Community Monitor',
+    description: 'Autonomous community-driven safety monitoring platform for Okhla.',
+    url: '/',
+    siteName: 'NyayFauj',
+    locale: 'en_IN',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'NyayFauj — Okhla Community Monitor',
+    description: 'Autonomous community-driven safety monitoring platform for Okhla.',
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
