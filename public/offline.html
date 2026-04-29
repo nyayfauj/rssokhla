@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NyayFauj — Offline</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #0a0a0a;
+      color: #fafafa;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 2rem;
+      text-align: center;
+    }
+    .shield { font-size: 4rem; margin-bottom: 1.5rem; }
+    h1 { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.75rem; }
+    p { color: #a1a1aa; font-size: 0.95rem; line-height: 1.6; max-width: 320px; margin-bottom: 2rem; }
+    .retry-btn {
+      background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+      color: white;
+      border: none;
+      padding: 0.875rem 2rem;
+      border-radius: 0.75rem;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.15s;
+      touch-action: manipulation;
+    }
+    .retry-btn:active { transform: scale(0.97); }
+    .retry-btn:hover { box-shadow: 0 8px 24px rgba(220, 38, 38, 0.3); }
+    .status { margin-top: 2rem; font-size: 0.8rem; color: #52525b; }
+    .pulse { animation: pulse 2s infinite; }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shield">🛡️</div>
+  <h1>You're Offline</h1>
+  <p>NyayFauj needs an internet connection. Don't worry — any reports you submitted offline will be synced automatically when you reconnect.</p>
+  <button class="retry-btn" onclick="window.location.reload()">
+    Retry Connection
+  </button>
+  <div class="status pulse">
+    Waiting for network…
+  </div>
+  <script>
+    window.addEventListener('online', () => { window.location.reload(); });
+  </script>
+</body>
+</html>

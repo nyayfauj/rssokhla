@@ -1,0 +1,13 @@
+// ─── Collection & Database ID Constants ─────────────────────
+
+export const DATABASE_ID = process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID ?? 'rssokhla_db';
+
+export const COLLECTIONS = {
+  INCIDENTS: process.env.NEXT_PUBLIC_COLLECTION_INCIDENTS ?? 'incidents',
+  LOCATIONS: process.env.NEXT_PUBLIC_COLLECTION_LOCATIONS ?? 'locations',
+  USERS:     process.env.NEXT_PUBLIC_COLLECTION_USERS     ?? 'users',
+  REPORTS:   process.env.NEXT_PUBLIC_COLLECTION_REPORTS   ?? 'reports',
+  ALERTS:    process.env.NEXT_PUBLIC_COLLECTION_ALERTS    ?? 'alerts',
+} as const;
+
+export type CollectionId = (typeof COLLECTIONS)[keyof typeof COLLECTIONS];
