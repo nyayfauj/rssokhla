@@ -1,11 +1,11 @@
 // ─── Map GeoJSON Helpers ────────────────────────────────────
 
 import * as turf from '@turf/turf';
-import type { MockIncident } from '@/lib/mock-data';
+import type { Incident } from '@/types/incident.types';
 import { GEOFENCE_ZONES, CATEGORY_MARKERS, SEVERITY_COLORS, type GeoZone } from './config';
 
 /** Convert incidents to GeoJSON FeatureCollection for Mapbox source */
-export function incidentsToGeoJSON(incidents: MockIncident[]) {
+export function incidentsToGeoJSON(incidents: Incident[]) {
   // Generate mock coordinates near area centers for demo
   const AREA_COORDS: Record<string, [number, number]> = {
     shaheen_bagh:       [77.2940, 28.5440],
@@ -23,20 +23,27 @@ export function incidentsToGeoJSON(incidents: MockIncident[]) {
   return {
     type: 'FeatureCollection' as const,
     features: incidents.map((inc, i) => {
-      const base = AREA_COORDS[inc.area] || [77.2810, 28.5500];
-      // Deterministic jitter based on index
-      const jitter = (idx: number, offset: number) => (((idx * 2654435761 + offset * 1597334677) >>> 0) % 400 - 200) / 100000;
+      // Use real coordinates if available, otherwise fallback to area coordinates
+      const areaKey = inc.locationId || 'jamia_nagar';
+      const base = (inc.coordinates && inc.coordinates.length >= 2) 
+        ? [inc.coordinates[0], inc.coordinates[1]] 
+        : (AREA_COORDS[areaKey] || [77.2810, 28.5500]);
+        
+      // Only apply jitter if we're falling back to the center point
+      const hasRealCoords = inc.coordinates && inc.coordinates.length >= 2;
+      const jitter = (idx: number, offset: number) => hasRealCoords ? 0 : (((idx * 2654435761 + offset * 1597334677) >>> 0) % 400 - 200) / 100000;
+      
       return {
         type: 'Feature' as const,
         properties: {
-          id: inc.id,
+          id: inc.$id,
           title: inc.title,
           description: inc.description,
           category: inc.category,
           severity: inc.severity,
           status: inc.status,
-          area: inc.area,
-          timestamp: inc.timestamp,
+          area: areaKey,
+          timestamp: inc.timestamp || inc.$createdAt,
           verificationCount: inc.verificationCount,
           color: CATEGORY_MARKERS[inc.category]?.color || '#6b7280',
           severityColor: SEVERITY_COLORS[inc.severity] || '#6b7280',
@@ -108,7 +115,7 @@ export function checkPointInGeofences(lng: number, lat: number, zones: GeoZone[]
 }
 
 /** Generate heatmap-weight GeoJSON from incidents */
-export function incidentsToHeatmapGeoJSON(incidents: MockIncident[]) {
+export function incidentsToHeatmapGeoJSON(incidents: Incident[]) {
   const geojson = incidentsToGeoJSON(incidents);
   return {
     ...geojson,

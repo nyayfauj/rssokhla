@@ -17,7 +17,16 @@ const MapView = dynamic(() => import('@/components/map/MapView'), {
   ),
 });
 
+import { useEffect } from 'react';
+import { useIncidentsStore } from '@/stores/incidents.store';
+
 export default function MapPage() {
+  const { incidents, fetchIncidents } = useIncidentsStore();
+
+  useEffect(() => {
+    fetchIncidents();
+  }, [fetchIncidents]);
+
   return (
     <div className="flex flex-col h-[calc(100vh-4rem)] md:h-[calc(100vh-1rem)]">
       {/* Header */}
@@ -37,7 +46,7 @@ export default function MapPage() {
 
       {/* Map */}
       <div className="flex-1 rounded-2xl overflow-hidden border border-zinc-800/40 min-h-0">
-        <MapView />
+        <MapView incidents={incidents} />
       </div>
 
       {/* Legend (below map, mobile-friendly) */}

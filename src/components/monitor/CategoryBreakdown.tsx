@@ -2,9 +2,9 @@
 
 'use client';
 
-import type { MockIncident } from '@/lib/mock-data';
+import type { Incident } from '@/types/incident.types';
 
-interface Props { incidents: MockIncident[]; }
+interface Props { incidents: Incident[]; }
 
 const CAT_META: Record<string, { icon: string; label: string; color: string }> = {
   recruitment: { icon: '🎯', label: 'Recruitment', color: 'bg-red-500' },
@@ -55,3 +55,6 @@ export default function CategoryBreakdown({ incidents }: Props) {
     </div>
   );
 }
+
+
+

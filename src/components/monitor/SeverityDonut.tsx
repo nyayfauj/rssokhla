@@ -4,11 +4,11 @@
 
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 import { Doughnut } from 'react-chartjs-2';
-import type { MockIncident } from '@/lib/mock-data';
+import type { Incident } from '@/types/incident.types';
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
-interface Props { incidents: MockIncident[]; }
+interface Props { incidents: Incident[]; }
 
 export default function SeverityDonut({ incidents }: Props) {
   const counts = {
@@ -101,3 +101,6 @@ export default function SeverityDonut({ incidents }: Props) {
     </div>
   );
 }
+
+
+

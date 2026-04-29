@@ -3,10 +3,10 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import type { MockIncident } from '@/lib/mock-data';
-import { OKHLA_AREAS } from '@/types/location.types';
+import type { Incident } from '@/types/incident.types';
+import { OKHLA_AREAS, type OkhlaArea } from '@/types/location.types';
 
-interface Props { incidents: MockIncident[]; }
+interface Props { incidents: Incident[]; }
 
 const SEV_BADGE = {
   critical: 'bg-red-500/15 text-red-400 border-red-500/25',
@@ -48,10 +48,10 @@ export default function RecentFeed({ incidents }: Props) {
       </div>
       <div className="divide-y divide-zinc-800/20">
         {sorted.map((inc) => {
-          const area = OKHLA_AREAS[inc.area];
+          const area = OKHLA_AREAS[inc.locationId as OkhlaArea];
           const st = STATUS_BADGE[inc.status];
           return (
-            <div key={inc.id} className="px-3 sm:px-4 py-3 hover:bg-zinc-800/20 transition-colors">
+            <div key={inc.$id} className="px-3 sm:px-4 py-3 hover:bg-zinc-800/20 transition-colors">
               {/* Row 1: title + severity */}
               <div className="flex items-start gap-2">
                 <span className="text-sm sm:text-base mt-0.5 flex-shrink-0">{CAT_ICON[inc.category]}</span>
@@ -89,3 +89,6 @@ export default function RecentFeed({ incidents }: Props) {
     </div>
   );
 }
+
+
+

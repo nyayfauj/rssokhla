@@ -3,10 +3,10 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import type { MockIncident } from '@/lib/mock-data';
-import { OKHLA_AREAS } from '@/types/location.types';
+import type { Incident } from '@/types/incident.types';
+import { OKHLA_AREAS, type OkhlaArea } from '@/types/location.types';
 
-interface Props { incidents: MockIncident[]; }
+interface Props { incidents: Incident[]; }
 
 const SEV_DOT = { critical: 'bg-red-500', high: 'bg-amber-500', medium: 'bg-yellow-500', low: 'bg-green-500' };
 const CAT_ICON: Record<string, string> = { recruitment: '🎯', propaganda: '📢', meeting: '🤝', surveillance: '👁️', harassment: '⚠️', other: '📋' };
@@ -42,10 +42,10 @@ export default function LiveTicker({ incidents }: Props) {
       </div>
       <div className="divide-y divide-zinc-800/30">
         {sorted.map((inc, i) => {
-          const area = OKHLA_AREAS[inc.area];
+          const area = OKHLA_AREAS[inc.locationId as OkhlaArea];
           return (
             <div
-              key={inc.id}
+              key={inc.$id}
               className={`flex items-center gap-2.5 px-3 sm:px-4 py-2.5 transition-colors duration-500 ${
                 i === highlight ? 'bg-zinc-800/30' : ''
               }`}
@@ -66,3 +66,6 @@ export default function LiveTicker({ incidents }: Props) {
     </div>
   );
 }
+
+
+

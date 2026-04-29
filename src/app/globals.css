@@ -157,3 +157,39 @@ body {
     max-width: 1280px;
   }
 }
+
+/* ─── Premium UI Utilities ───────────────────────────────── */
+.text-gradient {
+  background: linear-gradient(to right, #ffffff, #a1a1aa);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.text-gradient-red {
+  background: linear-gradient(to right, #f87171, #dc2626);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.glow-red {
+  box-shadow: 0 0 20px rgba(220, 38, 38, 0.15);
+}
+
+.glow-red:hover {
+  box-shadow: 0 0 30px rgba(220, 38, 38, 0.25);
+}
+
+.glow-border {
+  border: 1px solid rgba(220, 38, 38, 0.3);
+}
+
+.animate-glow {
+  animation: pulseGlow 2s infinite alternate;
+}
+
+@keyframes pulseGlow {
+  0% { box-shadow: 0 0 10px rgba(220, 38, 38, 0.1); }
+  100% { box-shadow: 0 0 20px rgba(220, 38, 38, 0.3); }
+}

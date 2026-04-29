@@ -52,3 +52,6 @@ export default function ThreatBanner({ level, critical, high, total }: Props) {
     </div>
   );
 }
+
+
+

@@ -5,6 +5,7 @@ import ServiceWorkerRegistrar from '@/components/ServiceWorkerRegistrar';
 import ErrorBoundary from '@/components/ErrorBoundary';
 import ToastContainer from '@/components/ui/Toast';
 import AppwritePing from '@/components/AppwritePing';
+import PublicHeader from '@/components/layout/PublicHeader';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -56,6 +57,7 @@ export default function RootLayout({
           <ServiceWorkerRegistrar />
           <AppwritePing />
           <ToastContainer />
+          <PublicHeader />
           {children}
         </ErrorBoundary>
       </body>

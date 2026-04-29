@@ -13,7 +13,7 @@ import {
   incidentsToGeoJSON, geofenceToGeoJSON, geofenceLabelsGeoJSON,
   incidentsToHeatmapGeoJSON,
 } from '@/lib/map/geojson';
-import { MOCK_INCIDENTS } from '@/lib/mock-data';
+import type { Incident } from '@/types/incident.types';
 import MapControls from './MapControls';
 import IncidentPopup from './IncidentPopup';
 import LocationSearch from './LocationSearch';
@@ -27,7 +27,11 @@ export interface ActiveLayers {
   labels: boolean;
 }
 
-export default function MapView() {
+interface Props {
+  incidents: Incident[];
+}
+
+export default function MapView({ incidents }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
   const [mapLoaded, setMapLoaded] = useState(false);
@@ -72,7 +76,7 @@ export default function MapView() {
       // ─── Sources ──────────────────────────────────
       map.addSource('incidents', {
         type: 'geojson',
-        data: incidentsToGeoJSON(MOCK_INCIDENTS),
+        data: incidentsToGeoJSON(incidents),
         cluster: true,
         clusterMaxZoom: 15,
         clusterRadius: 50,
@@ -80,7 +84,7 @@ export default function MapView() {
 
       map.addSource('heatmap-data', {
         type: 'geojson',
-        data: incidentsToHeatmapGeoJSON(MOCK_INCIDENTS),
+        data: incidentsToHeatmapGeoJSON(incidents),
       });
 
       map.addSource('geofences', {
@@ -258,7 +262,23 @@ export default function MapView() {
     mapRef.current = map;
 
     return () => { map.remove(); mapRef.current = null; };
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // ─── Update Data Sources on Incidents Change ────────────
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !mapLoaded) return;
+
+    const incidentsSource = map.getSource('incidents') as mapboxgl.GeoJSONSource;
+    if (incidentsSource) {
+      incidentsSource.setData(incidentsToGeoJSON(incidents) as any);
+    }
+
+    const heatmapSource = map.getSource('heatmap-data') as mapboxgl.GeoJSONSource;
+    if (heatmapSource) {
+      heatmapSource.setData(incidentsToHeatmapGeoJSON(incidents) as any);
+    }
+  }, [incidents, mapLoaded]);
 
   // ─── Layer Visibility Toggle ────────────────────────────
   useEffect(() => {

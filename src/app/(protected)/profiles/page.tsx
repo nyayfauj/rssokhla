@@ -2,27 +2,35 @@
 
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
-import { MOCK_PROFILES } from '@/lib/mock-profiles';
 import { RANK_LABELS, AFFILIATION_LABELS, THREAT_COLORS, ACTIVITY_LABELS } from '@/types/karyakarta.types';
-import type { ThreatLevel, Affiliation, KaryakartaRank } from '@/types/karyakarta.types';
+import type { ThreatLevel, Affiliation, KaryakartaRank, KaryakartaProfile } from '@/types/karyakarta.types';
+import { databases } from '@/lib/appwrite/client';
+import { DATABASE_ID, COLLECTIONS } from '@/lib/appwrite/collections';
 
 export default function ProfilesPage() {
   const [search, setSearch] = useState('');
   const [threatFilter, setThreatFilter] = useState<ThreatLevel | ''>('');
   const [affFilter, setAffFilter] = useState<Affiliation | ''>('');
+  const [profiles, setProfiles] = useState<KaryakartaProfile[]>([]);
+
+  useEffect(() => {
+    databases.listDocuments(DATABASE_ID, COLLECTIONS.PROFILES)
+      .then(res => setProfiles(res.documents as unknown as KaryakartaProfile[]))
+      .catch(console.error);
+  }, []);
 
   const filtered = useMemo(() => {
-    return MOCK_PROFILES.filter(p => {
+    return profiles.filter(p => {
       const q = search.toLowerCase();
       const matchesSearch = !q || p.fullName.toLowerCase().includes(q) || p.aliases.some(a => a.toLowerCase().includes(q))
         || p.primaryArea.toLowerCase().includes(q) || p.tags.some(t => t.toLowerCase().includes(q));
       const matchesThreat = !threatFilter || p.threatLevel === threatFilter;
-      const matchesAff = !affFilter || p.affiliations.includes(affFilter);
+      const matchesAff = !affFilter || p.affiliations.includes(affFilter as any);
       return matchesSearch && matchesThreat && matchesAff;
     });
-  }, [search, threatFilter, affFilter]);
+  }, [search, threatFilter, affFilter, profiles]);
 
   return (
     <div className="max-w-5xl mx-auto px-3 sm:px-4 py-4 pb-24 space-y-4">
@@ -30,7 +38,7 @@ export default function ProfilesPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-xl font-bold text-white">Karyakarta Profiles</h1>
-          <p className="text-xs text-zinc-500 mt-0.5">{MOCK_PROFILES.length} profiles tracked</p>
+          <p className="text-xs text-zinc-500 mt-0.5">{profiles.length} profiles tracked</p>
         </div>
         <Link href="/profiles/new" className="px-3 py-2 bg-red-600 hover:bg-red-500 text-white text-xs font-semibold rounded-xl transition-colors">
           + Add Profile

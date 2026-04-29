@@ -3,15 +3,35 @@
 'use client';
 
 import { useParams, useRouter } from 'next/navigation';
-import { MOCK_PROFILES } from '@/lib/mock-profiles';
 import { RANK_LABELS, AFFILIATION_LABELS, THREAT_COLORS, ACTIVITY_LABELS } from '@/types/karyakarta.types';
+import type { KaryakartaProfile } from '@/types/karyakarta.types';
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
+import { databases } from '@/lib/appwrite/client';
+import { DATABASE_ID, COLLECTIONS } from '@/lib/appwrite/collections';
 
 export default function ProfileDetailPage() {
   const params = useParams();
   const router = useRouter();
   const id = params.id as string;
-  const p = MOCK_PROFILES.find(pr => pr.$id === id);
+  const [p, setProfile] = useState<KaryakartaProfile | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    databases.getDocument(DATABASE_ID, COLLECTIONS.PROFILES, id)
+      .then(res => setProfile(res as unknown as KaryakartaProfile))
+      .catch(console.error)
+      .finally(() => setLoading(false));
+  }, [id]);
+
+  if (loading) {
+    return (
+      <div className="max-w-lg mx-auto text-center py-16">
+        <span className="text-5xl animate-pulse">🕵️</span>
+        <h1 className="text-xl font-bold text-white mt-4">Loading Profile...</h1>
+      </div>
+    );
+  }
 
   if (!p) {
     return (

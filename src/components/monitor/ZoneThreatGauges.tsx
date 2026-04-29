@@ -2,13 +2,13 @@
 
 'use client';
 
-import type { MockIncident } from '@/lib/mock-data';
+import type { Incident } from '@/types/incident.types';
 import { OKHLA_AREAS, type OkhlaArea } from '@/types/location.types';
 
-interface Props { incidents: MockIncident[]; }
+interface Props { incidents: Incident[]; }
 
-function getThreatScore(area: OkhlaArea, incidents: MockIncident[]): number {
-  const areaInc = incidents.filter(i => i.area === area);
+function getThreatScore(area: OkhlaArea, incidents: Incident[]): number {
+  const areaInc = incidents.filter(i => i.locationId === area);
   let score = 0;
   areaInc.forEach(i => {
     if (i.severity === 'critical') score += 40;
@@ -73,3 +73,6 @@ export default function ZoneThreatGauges({ incidents }: Props) {
     </div>
   );
 }
+
+
+

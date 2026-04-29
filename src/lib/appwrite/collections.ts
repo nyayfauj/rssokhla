@@ -8,6 +8,7 @@ export const COLLECTIONS = {
   USERS:     process.env.NEXT_PUBLIC_COLLECTION_USERS     ?? 'users',
   REPORTS:   process.env.NEXT_PUBLIC_COLLECTION_REPORTS   ?? 'reports',
   ALERTS:    process.env.NEXT_PUBLIC_COLLECTION_ALERTS    ?? 'alerts',
+  PROFILES:  process.env.NEXT_PUBLIC_COLLECTION_PROFILES  ?? 'profiles',
 } as const;
 
 export type CollectionId = (typeof COLLECTIONS)[keyof typeof COLLECTIONS];

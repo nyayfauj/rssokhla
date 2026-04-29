@@ -3,7 +3,6 @@
 'use client';
 
 import { useRef, useEffect, useState, useCallback } from 'react';
-import { MOCK_PROFILES } from '@/lib/mock-profiles';
 import { THREAT_COLORS, RANK_LABELS, AFFILIATION_LABELS } from '@/types/karyakarta.types';
 import type { KaryakartaProfile } from '@/types/karyakarta.types';
 
@@ -60,13 +59,22 @@ function buildGraph(profiles: KaryakartaProfile[]) {
   return { nodes, edges };
 }
 
-export default function NetworkGraph() {
+interface Props {
+  profiles: KaryakartaProfile[];
+}
+
+export default function NetworkGraph({ profiles }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [selected, setSelected] = useState<KaryakartaProfile | null>(null);
   const [dimensions, setDimensions] = useState({ w: 400, h: 350 });
-  const graphRef = useRef(buildGraph(MOCK_PROFILES));
+  const graphRef = useRef(buildGraph(profiles));
   const animRef = useRef<number>(0);
+
+  // Update graph if profiles change
+  useEffect(() => {
+    graphRef.current = buildGraph(profiles);
+  }, [profiles]);
 
   // Resize observer
   useEffect(() => {
@@ -263,7 +271,7 @@ export default function NetworkGraph() {
           <span className="text-xs">🕸️</span>
           <span className="text-[10px] sm:text-xs font-semibold text-zinc-400 uppercase tracking-widest">Network Map</span>
         </div>
-        <span className="text-[10px] text-zinc-600">{MOCK_PROFILES.length} operatives</span>
+        <span className="text-[10px] text-zinc-600">{profiles.length} operatives</span>
       </div>
 
       <div ref={containerRef} className="relative">
@@ -302,3 +310,6 @@ export default function NetworkGraph() {
     </div>
   );
 }
+
+
+

@@ -3,10 +3,10 @@
 'use client';
 
 import { useState } from 'react';
-import type { MockIncident } from '@/lib/mock-data';
+import type { Incident } from '@/types/incident.types';
 import { OKHLA_AREAS, type OkhlaArea } from '@/types/location.types';
 
-interface Props { incidents: MockIncident[]; }
+interface Props { incidents: Incident[]; }
 
 // Normalized positions (0-100 scale) for each Okhla area on the SVG canvas
 const AREA_POS: Record<OkhlaArea, { x: number; y: number }> = {
@@ -22,8 +22,8 @@ const AREA_POS: Record<OkhlaArea, { x: number; y: number }> = {
   jasola:             { x: 18, y: 55 },
 };
 
-function getAreaThreat(area: OkhlaArea, incidents: MockIncident[]): { level: string; count: number; color: string } {
-  const areaInc = incidents.filter(i => i.area === area);
+function getAreaThreat(area: OkhlaArea, incidents: Incident[]): { level: string; count: number; color: string } {
+  const areaInc = incidents.filter(i => i.locationId === area);
   const count = areaInc.length;
   const hasCritical = areaInc.some(i => i.severity === 'critical');
   const hasHigh = areaInc.some(i => i.severity === 'high');
@@ -193,3 +193,6 @@ export default function OkhlaMapSVG({ incidents }: Props) {
     </div>
   );
 }
+
+
+

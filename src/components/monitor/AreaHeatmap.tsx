@@ -2,10 +2,10 @@
 
 'use client';
 
-import type { MockIncident } from '@/lib/mock-data';
+import type { Incident } from '@/types/incident.types';
 import { OKHLA_AREAS, type OkhlaArea } from '@/types/location.types';
 
-interface Props { incidents: MockIncident[]; }
+interface Props { incidents: Incident[]; }
 
 function getAreaRisk(count: number, hasCritical: boolean): { bg: string; border: string; dot: string; label: string } {
   if (hasCritical) return { bg: 'bg-red-950/50', border: 'border-red-800/60', dot: 'bg-red-500', label: 'CRITICAL' };
@@ -18,10 +18,11 @@ export default function AreaHeatmap({ incidents }: Props) {
   const areaMap = new Map<OkhlaArea, { count: number; hasCritical: boolean }>();
 
   for (const inc of incidents) {
-    const entry = areaMap.get(inc.area) || { count: 0, hasCritical: false };
+    const locId = inc.locationId as OkhlaArea;
+    const entry = areaMap.get(locId) || { count: 0, hasCritical: false };
     entry.count++;
     if (inc.severity === 'critical') entry.hasCritical = true;
-    areaMap.set(inc.area, entry);
+    areaMap.set(locId, entry);
   }
 
   return (
@@ -58,3 +59,6 @@ export default function AreaHeatmap({ incidents }: Props) {
     </div>
   );
 }
+
+
+

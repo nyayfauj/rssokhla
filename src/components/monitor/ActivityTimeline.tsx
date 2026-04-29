@@ -5,15 +5,15 @@
 import { useState, useMemo, useEffect } from 'react';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, BarElement, Filler, Tooltip, Legend } from 'chart.js';
 import { Line } from 'react-chartjs-2';
-import type { MockIncident } from '@/lib/mock-data';
+import type { Incident } from '@/types/incident.types';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, Filler, Tooltip, Legend);
 
-interface Props { incidents: MockIncident[]; }
+interface Props { incidents: Incident[]; }
 
 type Range = '24h' | '7d' | '30d';
 
-function generateTimelineData(incidents: MockIncident[], range: Range) {
+function generateTimelineData(incidents: Incident[], range: Range) {
   const bucketMs = range === '24h' ? 3600000 : range === '7d' ? 86400000 : 86400000;
   const count = range === '24h' ? 24 : range === '7d' ? 7 : 30;
   const labels: string[] = [];
@@ -181,3 +181,6 @@ export default function ActivityTimeline({ incidents }: Props) {
     </div>
   );
 }
+
+
+

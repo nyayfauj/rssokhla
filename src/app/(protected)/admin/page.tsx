@@ -1,26 +1,32 @@
 // ─── Moderator Review Dashboard ─────────────────────────────
 'use client';
 
-import { useState, useMemo } from 'react';
-import { MOCK_INCIDENTS, type MockIncident } from '@/lib/mock-data';
+import { useState, useMemo, useEffect } from 'react';
 import { INCIDENT_CATEGORIES, SEVERITY_LEVELS, STATUS_LABELS } from '@/lib/utils/constants';
 import { OKHLA_AREAS, type OkhlaArea } from '@/types/location.types';
-import type { IncidentStatus } from '@/types/incident.types';
+import type { IncidentStatus, IncidentSeverity } from '@/types/incident.types';
+import { useIncidentsStore } from '@/stores/incidents.store';
+import { databases } from '@/lib/appwrite/client';
+import { DATABASE_ID, COLLECTIONS } from '@/lib/appwrite/collections';
 
 type ReviewAction = 'verify' | 'reject' | 'escalate';
 
 export default function AdminPage() {
-  const [incidents, setIncidents] = useState(MOCK_INCIDENTS);
+  const { incidents, fetchIncidents, verifyIncident, isLoading } = useIncidentsStore();
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [filter, setFilter] = useState<'all' | 'reported' | 'verified'>('all');
   const [note, setNote] = useState('');
+
+  useEffect(() => {
+    fetchIncidents();
+  }, [fetchIncidents]);
 
   const filtered = useMemo(() => {
     if (filter === 'all') return incidents;
     return incidents.filter(i => i.status === filter);
   }, [incidents, filter]);
 
-  const selected = selectedId ? incidents.find(i => i.id === selectedId) : null;
+  const selected = selectedId ? incidents.find(i => i.$id === selectedId) : null;
 
   const stats = useMemo(() => ({
     total: incidents.length,
@@ -29,14 +35,27 @@ export default function AdminPage() {
     critical: incidents.filter(i => i.severity === 'critical').length,
   }), [incidents]);
 
-  const handleAction = (action: ReviewAction) => {
+  const handleAction = async (action: ReviewAction) => {
     if (!selectedId) return;
-    setIncidents(prev => prev.map(i => {
-      if (i.id !== selectedId) return i;
-      if (action === 'verify') return { ...i, status: 'verified' as const, verificationCount: i.verificationCount + 1 };
-      if (action === 'reject') return { ...i, status: 'false_positive' as const };
-      return { ...i, severity: 'critical' as const };
-    }));
+    try {
+      if (action === 'verify') {
+        // Just use a mock user ID for admin for now or fetch the current user
+        await verifyIncident(selectedId, 'admin_user');
+      } else if (action === 'reject') {
+        await databases.updateDocument(DATABASE_ID, COLLECTIONS.INCIDENTS, selectedId, {
+          status: 'false_positive' as IncidentStatus
+        });
+        await fetchIncidents();
+      } else if (action === 'escalate') {
+        await databases.updateDocument(DATABASE_ID, COLLECTIONS.INCIDENTS, selectedId, {
+          severity: 'critical' as IncidentSeverity
+        });
+        await fetchIncidents();
+      }
+    } catch (e) {
+      console.error('Failed to update incident:', e);
+    }
+    
     setSelectedId(null);
     setNote('');
   };
@@ -79,10 +98,10 @@ export default function AdminPage() {
         {filtered.map(inc => {
           const cat = INCIDENT_CATEGORIES[inc.category as keyof typeof INCIDENT_CATEGORIES];
           const sev = SEVERITY_LEVELS[inc.severity as keyof typeof SEVERITY_LEVELS];
-          const isActive = selectedId === inc.id;
+          const isActive = selectedId === inc.$id;
 
           return (
-            <button key={inc.id} onClick={() => setSelectedId(isActive ? null : inc.id)}
+            <button key={inc.$id} onClick={() => setSelectedId(isActive ? null : inc.$id)}
               className={`w-full text-left p-3 rounded-xl border transition-all ${
                 isActive ? 'border-red-500/40 bg-red-500/5' : 'border-zinc-800/40 bg-zinc-900/30 hover:border-zinc-700'
               }`}>
@@ -92,7 +111,7 @@ export default function AdminPage() {
                     <span className="text-sm">{cat?.icon}</span>
                     <span className="text-xs font-semibold text-white truncate">{inc.title}</span>
                   </div>
-                  <p className="text-[10px] text-zinc-500 mt-0.5">{OKHLA_AREAS[inc.area as OkhlaArea]?.label} · {inc.timestamp}</p>
+                  <p className="text-[10px] text-zinc-500 mt-0.5">{OKHLA_AREAS[inc.locationId as OkhlaArea]?.label || inc.locationId} · {new Date(inc.timestamp || inc.$createdAt).toLocaleDateString()}</p>
                 </div>
                 <div className="flex flex-col items-end gap-1">
                   <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full ${sev?.bg} ${sev?.text}`}>{sev?.label}</span>
@@ -108,7 +127,7 @@ export default function AdminPage() {
                   <p className="text-xs text-zinc-400 leading-relaxed">{inc.description}</p>
 
                   <div className="flex items-center gap-2 text-[10px] text-zinc-500">
-                    <span>📍 {OKHLA_AREAS[inc.area as OkhlaArea]?.label}</span>
+                    <span>📍 {OKHLA_AREAS[inc.locationId as OkhlaArea]?.label || inc.locationId}</span>
                     <span>· ✓{inc.verificationCount} verifications</span>
                     <span>· {inc.isAnonymous ? '🕶️ Anonymous' : '👤 Identified'}</span>
                   </div>

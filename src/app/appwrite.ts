@@ -1,7 +1,7 @@
 import { Client, Account } from 'appwrite';
 
-const endpoint = 'https://sgp.cloud.appwrite.io/v1';
-const projectId = '69f1097f000ad36f6b04';
+const endpoint = process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT ?? '';
+const projectId = process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID ?? '';
 
 if (!endpoint || !projectId) throw new Error('Missing Appwrite endpoint and project ID');
 

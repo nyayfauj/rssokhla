@@ -12,18 +12,34 @@ import RecentFeed from '@/components/monitor/RecentFeed';
 import ActiveAlertStrip from '@/components/monitor/ActiveAlertStrip';
 import ProfileStrip from '@/components/monitor/ProfileStrip';
 import ActivityTimeline from '@/components/monitor/ActivityTimeline';
-import OkhlaMapSVG from '@/components/monitor/OkhlaMapSVG';
+import dynamic from 'next/dynamic';
+
+const MapView = dynamic(() => import('@/components/map/MapView'), {
+  ssr: false,
+  loading: () => (
+    <div className="h-full w-full flex items-center justify-center bg-zinc-900 rounded-2xl animate-pulse">
+      <span className="text-4xl opacity-50">🗺️</span>
+    </div>
+  ),
+});
 import NetworkGraph from '@/components/monitor/NetworkGraph';
 import ZoneThreatGauges from '@/components/monitor/ZoneThreatGauges';
 import SeverityDonut from '@/components/monitor/SeverityDonut';
-import { MOCK_INCIDENTS, MOCK_ALERTS } from '@/lib/mock-data';
-import { MOCK_PROFILES } from '@/lib/mock-profiles';
 import { OKHLA_AREAS } from '@/types/location.types';
+import { useIncidentsStore } from '@/stores/incidents.store';
+import { useAlertsStore } from '@/stores/alerts.store';
+import { databases } from '@/lib/appwrite/client';
+import { DATABASE_ID, COLLECTIONS } from '@/lib/appwrite/collections';
+import type { KaryakartaProfile } from '@/types/karyakarta.types';
 
 export default function WarMonitorPage() {
   const [clock, setClock] = useState('');
   const [refreshing, setRefreshing] = useState(false);
   const [lastRefresh, setLastRefresh] = useState<string>('');
+  
+  const { incidents, fetchIncidents } = useIncidentsStore();
+  const { alerts, fetchActiveAlerts } = useAlertsStore();
+  const [profiles, setProfiles] = useState<KaryakartaProfile[]>([]);
 
   useEffect(() => {
     const tick = () => setClock(new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false }));
@@ -36,18 +52,32 @@ export default function WarMonitorPage() {
     setLastRefresh(new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true }));
   }, []);
 
+  useEffect(() => {
+    fetchIncidents();
+    fetchActiveAlerts();
+    databases.listDocuments(DATABASE_ID, COLLECTIONS.PROFILES)
+      .then(res => setProfiles(res.documents as unknown as KaryakartaProfile[]))
+      .catch(() => setProfiles([]));
+  }, []);
+
   // Pull-to-refresh simulation
   const handleRefresh = () => {
     setRefreshing(true);
+    fetchIncidents();
+    fetchActiveAlerts();
+    databases.listDocuments(DATABASE_ID, COLLECTIONS.PROFILES)
+      .then(res => setProfiles(res.documents as unknown as KaryakartaProfile[]))
+      .catch(() => setProfiles([]));
+    
     setTimeout(() => {
       setRefreshing(false);
       setLastRefresh(new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true }));
     }, 1500);
   };
 
-  const critical = MOCK_INCIDENTS.filter(i => i.severity === 'critical').length;
-  const high = MOCK_INCIDENTS.filter(i => i.severity === 'high').length;
-  const verified = MOCK_INCIDENTS.filter(i => i.status === 'verified').length;
+  const critical = incidents.filter(i => i.severity === 'critical').length;
+  const high = incidents.filter(i => i.severity === 'high').length;
+  const verified = incidents.filter(i => i.status === 'verified').length;
   const threatLevel = critical > 0 ? 'CRITICAL' : high > 2 ? 'ELEVATED' : 'GUARDED';
 
   return (
@@ -90,18 +120,18 @@ export default function WarMonitorPage() {
 
       <div className="max-w-6xl mx-auto px-3 sm:px-4 pb-24 space-y-3 sm:space-y-4">
         {/* ─── Threat Level Banner ───────────────────────── */}
-        <ThreatBanner level={threatLevel} critical={critical} high={high} total={MOCK_INCIDENTS.length} />
+        <ThreatBanner level={threatLevel} critical={critical} high={high} total={incidents.length} />
 
         {/* ─── Active Alert Strip ────────────────────────── */}
-        <ActiveAlertStrip alerts={MOCK_ALERTS} />
+        <ActiveAlertStrip alerts={alerts} />
 
         {/* ─── Key Metrics (6 stats) ─────────────────────── */}
         <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
           {[
-            { v: MOCK_INCIDENTS.length, l: 'Incidents', icon: '📋', c: 'text-white' },
+            { v: incidents.length, l: 'Incidents', icon: '📋', c: 'text-white' },
             { v: critical, l: 'Critical', icon: '🚨', c: 'text-red-400' },
             { v: verified, l: 'Verified', icon: '✓', c: 'text-green-400' },
-            { v: MOCK_PROFILES.length, l: 'Profiled', icon: '🕵️', c: 'text-purple-400' },
+            { v: profiles.length, l: 'Profiled', icon: '🕵️', c: 'text-purple-400' },
             { v: high, l: 'Active Threats', icon: '⚠️', c: 'text-amber-400' },
             { v: Object.keys(OKHLA_AREAS).length, l: 'Zones', icon: '📍', c: 'text-blue-400' },
           ].map(s => (
@@ -115,11 +145,11 @@ export default function WarMonitorPage() {
 
         {/* ─── Operations Map + Severity ─────────────────── */}
         <div className="grid grid-cols-1 sm:grid-cols-5 gap-3">
-          <div className="sm:col-span-3">
-            <OkhlaMapSVG incidents={MOCK_INCIDENTS} />
+          <div className="sm:col-span-3 h-[400px] rounded-2xl overflow-hidden border border-zinc-800/40 relative">
+            <MapView incidents={incidents} />
           </div>
           <div className="sm:col-span-2 space-y-3">
-            <SeverityDonut incidents={MOCK_INCIDENTS} />
+            <SeverityDonut incidents={incidents} />
             {/* Quick zone alerts */}
             <div className="bg-zinc-900/30 border border-zinc-800/40 rounded-2xl p-3">
               <div className="flex items-center gap-2 mb-2">
@@ -128,7 +158,7 @@ export default function WarMonitorPage() {
               </div>
               <div className="space-y-1.5">
                 {['shaheen_bagh', 'batla_house', 'jamia_nagar'].map(area => {
-                  const areaInc = MOCK_INCIDENTS.filter(i => i.area === area);
+                  const areaInc = incidents.filter(i => i.locationId === area);
                   const areaLabel = OKHLA_AREAS[area as keyof typeof OKHLA_AREAS]?.label || area;
                   const hasCritical = areaInc.some(i => i.severity === 'critical');
                   return (
@@ -149,26 +179,26 @@ export default function WarMonitorPage() {
         </div>
 
         {/* ─── Activity Timeline ─────────────────────────── */}
-        <ActivityTimeline incidents={MOCK_INCIDENTS} />
+        <ActivityTimeline incidents={incidents} />
 
         {/* ─── Live Ticker ───────────────────────────────── */}
-        <LiveTicker incidents={MOCK_INCIDENTS} />
+        <LiveTicker incidents={incidents} />
 
         {/* ─── Zone Threat Gauges + Category Breakdown ───── */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <ZoneThreatGauges incidents={MOCK_INCIDENTS} />
-          <CategoryBreakdown incidents={MOCK_INCIDENTS} />
+          <ZoneThreatGauges incidents={incidents} />
+          <CategoryBreakdown incidents={incidents} />
         </div>
 
         {/* ─── Known Operatives + Network Graph ──────────── */}
-        <ProfileStrip profiles={MOCK_PROFILES} />
-        <NetworkGraph />
+        <ProfileStrip profiles={profiles} />
+        <NetworkGraph profiles={profiles} />
 
         {/* ─── Area Heatmap ──────────────────────────────── */}
-        <AreaHeatmap incidents={MOCK_INCIDENTS} />
+        <AreaHeatmap incidents={incidents} />
 
         {/* ─── Recent Incidents Feed ─────────────────────── */}
-        <RecentFeed incidents={MOCK_INCIDENTS} />
+        <RecentFeed incidents={incidents} />
 
         {/* ─── CTA Strip ────────────────────────────────── */}
         <div className="bg-gradient-to-r from-red-950/60 to-zinc-900/60 border border-red-900/30 rounded-2xl p-4 sm:p-5">
