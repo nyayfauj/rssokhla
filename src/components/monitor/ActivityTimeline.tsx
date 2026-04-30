@@ -36,23 +36,25 @@ function generateTimelineData(incidents: Incident[], range: Range) {
   }
 
   // Bucket incidents
-  incidents.forEach(inc => {
-    const incDate = new Date(inc.timestamp);
-    const diffMs = now.getTime() - incDate.getTime();
-    
-    let index = -1;
-    if (range === '24h') {
-      index = count - 1 - Math.floor(diffMs / 3600000);
-    } else {
-      index = count - 1 - Math.floor(diffMs / 86400000);
-    }
+  if (incidents && Array.isArray(incidents)) {
+    incidents.forEach(inc => {
+      const incDate = new Date(inc.timestamp);
+      const diffMs = now.getTime() - incDate.getTime();
+      
+      let index = -1;
+      if (range === '24h') {
+        index = count - 1 - Math.floor(diffMs / 3600000);
+      } else {
+        index = count - 1 - Math.floor(diffMs / 86400000);
+      }
 
-    if (index >= 0 && index < count) {
-      if (inc.severity === 'critical') critical[index]++;
-      else if (inc.severity === 'high') high[index]++;
-      else other[index]++;
-    }
-  });
+      if (index >= 0 && index < count) {
+        if (inc.severity === 'critical') critical[index]++;
+        else if (inc.severity === 'high') high[index]++;
+        else other[index]++;
+      }
+    });
+  }
 
   return { labels, critical, high, other };
 }

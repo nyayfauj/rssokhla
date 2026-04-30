@@ -28,7 +28,7 @@ export default function AreaThreatGauges({ incidents }: Props) {
   };
 
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-5 gap-4">
+    <div className="grid grid-cols-3 sm:grid-cols-5 gap-3 sm:gap-4">
       {AREAS.map(area => {
         const level = getThreatLevel(area.id);
         const color = level > 70 ? '#ef4444' : level > 40 ? '#f59e0b' : '#10b981';

@@ -119,7 +119,7 @@ export default function CommandCenterPage() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 lg:gap-6">
           <MetricCard label="Active Threats" value={stats.critical + stats.high} subValue={`${stats.critical} critical`} color="text-red-500" icon="🚨" />
           <MetricCard label="Intelligence Nodes" value={incidents.length} subValue="Verified reports" color="text-zinc-100" icon="📡" />
-          <MetricCard label="Operatives Tracked" value={profiles.length} subValue="Karyakarta profiles" color="text-orange-500" icon="🕵️" />
+          <MetricCard label="Operatives Tracked" value={profiles.length} subValue="Field Intelligence" color="text-orange-500" icon="🕵️" />
           <MetricCard label="Operational Zones" value="12" subValue="Monitoring active" color="text-blue-500" icon="📍" />
         </div>
 
@@ -148,10 +148,10 @@ export default function CommandCenterPage() {
               </div>
             </GlassCard>
 
-            <div className="bg-gradient-to-br from-red-600 to-red-900 rounded-2xl p-6 text-white space-y-4 shadow-[0_20px_50px_-20px_rgba(220,38,38,0.5)]">
+            <div className="bg-gradient-to-br from-zinc-800 to-zinc-950 border border-red-500/10 rounded-2xl p-6 text-white space-y-4 shadow-[0_20px_50px_-20px_rgba(220,38,38,0.2)]">
               <h4 className="text-lg font-black tracking-tight uppercase italic leading-none">Submit Intelligence</h4>
-              <p className="text-[10px] font-medium opacity-80 leading-relaxed uppercase tracking-wider">Help protect Okhla. All submissions are encrypted and processed by autonomous AI.</p>
-              <Link href="/report" className="block w-full py-3 bg-black text-white text-center text-[10px] font-black uppercase tracking-[0.2em] rounded-xl hover:bg-zinc-900 transition-colors hover-scan">
+              <p className="text-[10px] font-medium opacity-70 leading-relaxed uppercase tracking-[0.15em]">Help protect the community. All submissions are encrypted and processed by autonomous systems.</p>
+              <Link href="/report" className="block w-full py-3 bg-red-600/10 border border-red-600/20 text-red-500 text-center text-[10px] font-black uppercase tracking-[0.3em] rounded-xl hover:bg-red-600/20 transition-all hover-scan active:scale-95">
                 New Report →
               </Link>
             </div>

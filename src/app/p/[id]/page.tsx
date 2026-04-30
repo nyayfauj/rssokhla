@@ -138,8 +138,8 @@ export default async function PublicIncidentPage({ params }: PageProps) {
       name: 'NyayFauj',
       url: DOMAIN,
     },
-    keywords: incident.tags.join(', '),
-    ...(incident.mediaUrls.length > 0 && { image: incident.mediaUrls[0] }),
+    keywords: (incident.tags || []).join(', '),
+    ...((incident.mediaUrls || []).length > 0 && { image: incident.mediaUrls[0] }),
   };
 
   return (
@@ -194,7 +194,7 @@ export default async function PublicIncidentPage({ params }: PageProps) {
           </div>
 
           {/* Media */}
-          {incident.mediaUrls.length > 0 && (
+          {(incident.mediaUrls || []).length > 0 && (
             <div className="mb-6">
               <h2 className="text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-3">Evidence</h2>
               <div className="grid grid-cols-2 gap-2">
@@ -208,7 +208,7 @@ export default async function PublicIncidentPage({ params }: PageProps) {
           )}
 
           {/* Tags */}
-          {incident.tags.length > 0 && (
+          {(incident.tags || []).length > 0 && (
             <div className="mb-6">
               <h2 className="text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-2">Tags</h2>
               <div className="flex flex-wrap gap-1.5">

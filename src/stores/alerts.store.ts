@@ -51,14 +51,25 @@ export const useAlertsStore = create<AlertsState>()((set, get) => ({
         COLLECTIONS.ALERTS,
         [
           Query.equal('isActive', true),
-          Query.orderDesc('severity'),
-          Query.orderDesc('timestamp'),
-          Query.limit(20),
+          Query.limit(100),
         ]
       );
 
+      // Sort in-memory to avoid missing index errors on Appwrite
+      const sorted = (response.documents as unknown as Alert[]).sort((a, b) => {
+        // Priority by severity (critical > high > medium > low)
+        const sevMap: Record<string, number> = { critical: 4, high: 3, medium: 2, low: 1 };
+        const sevA = sevMap[a.severity] || 0;
+        const sevB = sevMap[b.severity] || 0;
+        
+        if (sevA !== sevB) return sevB - sevA;
+        
+        // Then by timestamp
+        return new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime();
+      }).slice(0, 20);
+
       set({
-        activeAlerts: response.documents as unknown as Alert[],
+        activeAlerts: sorted,
         isLoading: false,
       });
     } catch (err) {

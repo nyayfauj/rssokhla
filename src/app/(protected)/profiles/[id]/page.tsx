@@ -9,7 +9,7 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { databases } from '@/lib/appwrite/client';
 import { DATABASE_ID, COLLECTIONS } from '@/lib/appwrite/collections';
-import ProfileAIAssessment from '@/components/profile/ProfileAIAssessment';
+import ProfileAssessment from '@/components/profile/ProfileAIAssessment';
 
 export default function ProfileDetailPage() {
   const params = useParams();
@@ -109,8 +109,9 @@ export default function ProfileDetailPage() {
 
         {/* Affiliations */}
         <div className="flex flex-wrap gap-1.5 mt-3">
-          {p.affiliations.map(aff => {
+          {(p.affiliations || []).map(aff => {
             const a = AFFILIATION_LABELS[aff];
+            if (!a) return null;
             return <span key={aff} className={`text-xs ${a.color} bg-zinc-800/60 px-2 py-0.5 rounded-lg`}>{a.icon} {a.label}</span>;
           })}
         </div>
@@ -118,9 +119,9 @@ export default function ProfileDetailPage() {
         {/* Quick stats */}
         <div className="grid grid-cols-4 gap-2 mt-3">
           {[
-            { v: p.sightings.length, l: 'Sightings' },
-            { v: p.linkedIncidentIds.length, l: 'Incidents' },
-            { v: p.associates.length, l: 'Associates' },
+            { v: (p.sightings || []).length, l: 'Sightings' },
+            { v: (p.linkedIncidentIds || []).length, l: 'Incidents' },
+            { v: (p.associates || []).length, l: 'Associates' },
             { v: `${p.reliabilityScore}%`, l: 'Reliability' },
           ].map(s => (
             <div key={s.l} className="text-center bg-zinc-800/30 rounded-lg py-1.5">
@@ -131,8 +132,8 @@ export default function ProfileDetailPage() {
         </div>
       </div>
 
-      {/* AI Assessment */}
-      <ProfileAIAssessment profile={p} />
+      {/* Assessment */}
+      <ProfileAssessment profile={p} />
 
       {/* Identity */}
       <Section title="Identity" icon="🪪">
@@ -154,13 +155,13 @@ export default function ProfileDetailPage() {
 
       {/* Contact */}
       <Section title="Contact" icon="📞">
-        {p.phoneNumbers.map((ph, i) => <Field key={i} label={`Phone ${i + 1}`} value={ph} />)}
-        {p.emails.map((em, i) => <Field key={i} label={`Email ${i + 1}`} value={em} />)}
-        {p.phoneNumbers.length === 0 && p.emails.length === 0 && <p className="text-xs text-zinc-600">No contact info recorded</p>}
+        {(p.phoneNumbers || []).map((ph, i) => <Field key={i} label={`Phone ${i + 1}`} value={ph} />)}
+        {(p.emails || []).map((em, i) => <Field key={i} label={`Email ${i + 1}`} value={em} />)}
+        {(!p.phoneNumbers || p.phoneNumbers.length === 0) && (!p.emails || p.emails.length === 0) && <p className="text-xs text-zinc-600">No contact info recorded</p>}
       </Section>
 
       {/* Social Media */}
-      {p.socialMedia.length > 0 && (
+      {(p.socialMedia || []).length > 0 && (
         <Section title="Social Media" icon="🌐">
           {p.socialMedia.map((sm, i) => (
             <div key={i} className="flex items-center justify-between py-1.5 border-b border-zinc-800/20 last:border-0">
@@ -175,7 +176,7 @@ export default function ProfileDetailPage() {
       )}
 
       {/* Addresses */}
-      {p.addresses.length > 0 && (
+      {(p.addresses || []).length > 0 && (
         <Section title="Addresses" icon="📍">
           {p.addresses.map((addr, i) => (
             <div key={i} className="py-2 border-b border-zinc-800/20 last:border-0">
@@ -202,12 +203,13 @@ export default function ProfileDetailPage() {
       {/* Known Activities */}
       <Section title="Known Activities" icon="📋">
         <div className="flex flex-wrap gap-1.5">
-          {p.knownActivities.map(act => {
+          {(p.knownActivities || []).map(act => {
             const a = ACTIVITY_LABELS[act];
+            if (!a) return null;
             return <span key={act} className="text-xs text-zinc-300 bg-zinc-800/50 px-2 py-1 rounded-lg">{a.icon} {a.label}</span>;
           })}
         </div>
-        {p.areasOfOperation.length > 0 && (
+        {(p.areasOfOperation || []).length > 0 && (
           <div className="mt-2.5">
             <p className="text-[10px] text-zinc-500 mb-1">Areas of Operation:</p>
             <div className="flex flex-wrap gap-1.5">
@@ -218,7 +220,7 @@ export default function ProfileDetailPage() {
       </Section>
 
       {/* Sightings */}
-      {p.sightings.length > 0 && (
+      {(p.sightings || []).length > 0 && (
         <Section title={`Sightings (${p.sightings.length})`} icon="👁️">
           {p.sightings.map((s, i) => (
             <div key={i} className="py-2 border-b border-zinc-800/20 last:border-0">
@@ -234,7 +236,7 @@ export default function ProfileDetailPage() {
       )}
 
       {/* Employment */}
-      {p.employmentHistory.length > 0 && (
+      {(p.employmentHistory || []).length > 0 && (
         <Section title="Employment" icon="💼">
           {p.employmentHistory.map((emp, i) => (
             <div key={i} className="py-1.5 border-b border-zinc-800/20 last:border-0">
@@ -250,7 +252,7 @@ export default function ProfileDetailPage() {
       )}
 
       {/* Vehicles */}
-      {p.vehicles.length > 0 && (
+      {(p.vehicles || []).length > 0 && (
         <Section title="Vehicles" icon="🚗">
           {p.vehicles.map((v, i) => (
             <div key={i} className="flex items-center justify-between py-1.5">
@@ -262,8 +264,8 @@ export default function ProfileDetailPage() {
       )}
 
       {/* Associates */}
-      {p.associates.length > 0 && (
-        <Section title={`Primary Associations (${p.associates.length})`} icon="🤝">
+      {(p.associates || []).length > 0 && (
+        <Section title={`Primary Associations (${(p.associates || []).length})`} icon="🤝">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
             {p.associates.map((assoc, i) => (
               <Link key={i} href={`/profiles/${assoc.profileId}`}
@@ -296,7 +298,7 @@ export default function ProfileDetailPage() {
             <p className="text-xs text-zinc-300 leading-relaxed">{p.internalNotes}</p>
           </div>
         )}
-        {p.sources.length > 0 && (
+        {(p.sources || []).length > 0 && (
           <div className="mt-2">
             <p className="text-[10px] text-zinc-500 mb-1">Sources:</p>
             <div className="flex flex-wrap gap-1">{p.sources.map((s, i) => <span key={i} className="text-[9px] text-zinc-500 bg-zinc-800/40 px-1.5 py-0.5 rounded">{s}</span>)}</div>
@@ -304,7 +306,7 @@ export default function ProfileDetailPage() {
         )}
         <div className="mt-2">
           <p className="text-[10px] text-zinc-500 mb-1">Tags:</p>
-          <div className="flex flex-wrap gap-1">{p.tags.map(t => <span key={t} className="text-[9px] text-red-400/70 bg-red-500/5 border border-red-500/10 px-1.5 py-0.5 rounded">#{t}</span>)}</div>
+          <div className="flex flex-wrap gap-1">{(p.tags || []).map(t => <span key={t} className="text-[9px] text-red-400/70 bg-red-500/5 border border-red-500/10 px-1.5 py-0.5 rounded">#{t}</span>)}</div>
         </div>
       </Section>
     </div>

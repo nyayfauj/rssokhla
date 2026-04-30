@@ -42,18 +42,20 @@ function buildGraph(profiles: KaryakartaProfile[]) {
   const nodeSet = new Set(profiles.map(p => p.$id));
 
   profiles.forEach(p => {
-    p.associates.forEach(assoc => {
-      if (nodeSet.has(assoc.profileId)) {
-        // Avoid duplicate edges
-        const existing = edges.find(e =>
-          (e.from === p.$id && e.to === assoc.profileId) ||
-          (e.from === assoc.profileId && e.to === p.$id)
-        );
-        if (!existing) {
-          edges.push({ from: p.$id, to: assoc.profileId, relationship: assoc.relationship });
+    if (p.associates && Array.isArray(p.associates)) {
+      p.associates.forEach(assoc => {
+        if (nodeSet.has(assoc.profileId)) {
+          // Avoid duplicate edges
+          const existing = edges.find(e =>
+            (e.from === p.$id && e.to === assoc.profileId) ||
+            (e.from === assoc.profileId && e.to === p.$id)
+          );
+          if (!existing) {
+            edges.push({ from: p.$id, to: assoc.profileId, relationship: assoc.relationship });
+          }
         }
-      }
-    });
+      });
+    }
   });
 
   return { nodes, edges };

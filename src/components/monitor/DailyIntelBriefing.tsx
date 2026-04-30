@@ -31,7 +31,7 @@ export default function DailyIntelBriefing() {
       <div className="space-y-4">
         <div className="flex items-center gap-2">
           <div className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></div>
-          <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-red-500">Autonomous Briefing</h3>
+          <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-red-500">Autonomous Intel Analysis</h3>
         </div>
 
         <div className={`space-y-2 transition-all duration-700 ${isAnalyzing ? 'blur-sm opacity-50' : 'blur-0 opacity-100'}`}>
@@ -47,7 +47,7 @@ export default function DailyIntelBriefing() {
         )}
 
         <div className="pt-2 flex items-center justify-between text-[8px] font-black uppercase tracking-widest text-zinc-600">
-          <span>Source: Gemini 1.5 Flash</span>
+          <span>Vector: NF-CORE-PRO</span>
           <span>Update: {new Date().toLocaleTimeString()}</span>
         </div>
       </div>
