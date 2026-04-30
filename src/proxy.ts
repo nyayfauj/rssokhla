@@ -51,8 +51,10 @@ export function middleware(request: NextRequest) {
   }
 
   // ─── 4. Auth check for protected routes ─────────────────
-  const sessionCookie = request.cookies.get('rssokhla-session');
-  const isAuthenticated = !!sessionCookie?.value;
+  // Appwrite cookies are named a_session_[PROJECT_ID]
+  const allCookies = request.cookies.getAll();
+  const appwriteSessionCookie = allCookies.find(c => c.name.startsWith('a_session_'));
+  const isAuthenticated = !!appwriteSessionCookie?.value;
   const isPublicRoute = PUBLIC_ROUTES.includes(pathname) || pathname.startsWith('/p/');
   const isAuthRoute = AUTH_ROUTES.includes(pathname);
 

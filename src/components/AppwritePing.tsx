@@ -5,23 +5,17 @@
 
 import { useEffect } from 'react';
 import { client, account } from '@/lib/appwrite/client';
+import { useAuthStore } from '@/stores/auth.store';
 
 export default function AppwritePing() {
+  const { initialize } = useAuthStore();
+
   useEffect(() => {
-    // account.get() is a valid way to check connectivity. 
-    // It will return 401 if not logged in, but the promise will still settle.
-    account.get()
-      .then(() => {
-        console.log('✅ [Appwrite] Session active.');
-      })
-      .catch((err: any) => {
-        if (err.code === 401) {
-          console.log('✅ [Appwrite] Backend reachable (Guest session).');
-        } else {
-          console.error('❌ [Appwrite] Connection failed:', err);
-        }
-      });
-  }, []);
+    // Initialize auth state (checks for active session)
+    initialize().then(() => {
+      console.log('✅ [Auth] Initialization complete.');
+    });
+  }, [initialize]);
 
   return null;
 }
