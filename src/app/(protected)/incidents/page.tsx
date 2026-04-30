@@ -73,7 +73,7 @@ export default function IncidentsPage() {
                   
                   <div className="pt-4 border-t border-zinc-800/40 flex items-center justify-between">
                     <span className="text-[10px] text-zinc-600 font-bold uppercase tracking-widest">
-                      {incident.type || 'General'}
+                      {incident.category || 'General'}
                     </span>
                     <Link href={`/incidents/${incident.$id}`} className="text-[10px] font-black text-red-500 uppercase tracking-widest hover:text-red-400 transition-colors">
                       Details →

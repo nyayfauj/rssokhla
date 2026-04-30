@@ -35,6 +35,10 @@ Example:
 - Don't expose database errors to clients — map to user-friendly messages
 - Agent: check existing code before creating utility functions — avoid duplicates
 
+## Project patterns
+
+- Git Commit: update — confirmed 4x
+
 ## 📚 Comprehensive Expert Skills (READ THESE)
 > **CRITICAL:** BrainSync has pre-compiled full expert rulebooks for this project. If you are working on any of the following domains, you MUST read the corresponding `SKILL.md` file BEFORE writing code to instantly learn all proper default skills:
 

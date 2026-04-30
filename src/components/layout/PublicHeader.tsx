@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import ThemeToggle from './ThemeToggle';
 
 export default function PublicHeader() {
   const pathname = usePathname();
@@ -52,6 +53,7 @@ export default function PublicHeader() {
           >
             Sign In
           </Link>
+          <ThemeToggle />
           {/* Mobile Menu Button - simple link to menu or just report for now */}
           <Link 
             href="/anonymous" 

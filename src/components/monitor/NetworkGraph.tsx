@@ -241,8 +241,17 @@ export default function NetworkGraph({ profiles }: Props) {
         );
       });
 
+      // Draw Scanning Line
+      const scanY = (frame % 200) / 200 * dimensions.h;
+      ctx.beginPath();
+      ctx.moveTo(0, scanY);
+      ctx.lineTo(dimensions.w, scanY);
+      ctx.strokeStyle = 'rgba(239, 68, 68, 0.05)';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+
       frame++;
-      if (frame < 200) animRef.current = requestAnimationFrame(draw);
+      animRef.current = requestAnimationFrame(draw);
     };
 
     draw();

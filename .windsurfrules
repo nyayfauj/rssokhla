@@ -1,5 +1,5 @@
 # rssokhla — Project Memory
-# Auto-synced | 172 observations
+# Auto-synced | 173 observations
 
 # 🏛️ CORE ARCHITECTURE
 
@@ -33,6 +33,7 @@ Example:
 
 # 📐 Conventions
 
+- Git Commit: update — confirmed 4x
 - Version your API from day 1 (/api/v1/)
 - Use consistent response format across all endpoints
 - Implement soft delete for important data — don't hard delete without confirmation
@@ -40,7 +41,6 @@ Example:
 - Make layouts responsive from the start — mobile-first approach
 - Disable submit button during form submission — prevent double-submit
 - Always add empty states ("No items yet" with call-to-action)
-- Always add error states with retry button — not just blank screen
 
 # ⚡ Available Tools (ON-DEMAND only)
 - `sys_core_02(title, content, category)` — Save a note + auto-detect conflicts

@@ -6,6 +6,8 @@ import ErrorBoundary from '@/components/ErrorBoundary';
 import ToastContainer from '@/components/ui/Toast';
 import AppwritePing from '@/components/AppwritePing';
 import PublicHeader from '@/components/layout/PublicHeader';
+import CommandPalette from '@/components/ui/CommandPalette';
+import AlertToasts from '@/components/ui/AlertToasts';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -80,14 +82,24 @@ export default function RootLayout({
         <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
         <meta name="mobile-web-app-capable" content="yes" />
       </head>
-      <body className="font-sans bg-[#0a0a0a] text-zinc-100 antialiased overscroll-none">
-        <ErrorBoundary>
-          <ServiceWorkerRegistrar />
-          <AppwritePing />
-          <ToastContainer />
-          <PublicHeader />
-          {children}
-        </ErrorBoundary>
+      <body className="font-sans bg-[#050606] text-zinc-100 antialiased overscroll-none selection:bg-red-500/30">
+        {/* Cinematic Overlays */}
+        <div className="fixed inset-0 bg-grid opacity-20 pointer-events-none z-0"></div>
+        <div className="fixed inset-0 bg-scanline opacity-5 pointer-events-none z-10 animate-scan"></div>
+        
+        <div className="relative z-20 min-h-screen flex flex-col">
+          <ErrorBoundary>
+            <ServiceWorkerRegistrar />
+            <AppwritePing />
+            <ToastContainer />
+            <CommandPalette />
+            <AlertToasts />
+            <PublicHeader />
+            <main className="flex-1">
+              {children}
+            </main>
+          </ErrorBoundary>
+        </div>
       </body>
     </html>
   );

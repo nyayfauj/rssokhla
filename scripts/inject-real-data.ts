@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Client, Databases, ID } from 'node-appwrite';
 import * as dotenv from 'dotenv';
 import { resolve } from 'path';

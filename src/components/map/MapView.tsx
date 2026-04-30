@@ -41,7 +41,7 @@ export default function MapView({ incidents }: Props) {
   const [compassActive, setCompassActive] = useState(false);
   const [userLocation, setUserLocation] = useState<[number, number] | null>(null);
   const [activeLayers, setActiveLayers] = useState<ActiveLayers>({
-    incidents: true, heatmap: false, geofences: true, labels: true,
+    incidents: true, heatmap: true, geofences: true, labels: true,
   });
 
   // ─── Initialize Map ─────────────────────────────────────
@@ -144,21 +144,21 @@ export default function MapView({ incidents }: Props) {
         id: LAYER_IDS.HEATMAP,
         type: 'heatmap',
         source: 'heatmap-data',
-        layout: { visibility: 'none' },
+        layout: { visibility: activeLayers.heatmap ? 'visible' : 'none' },
         paint: {
           'heatmap-weight': ['get', 'weight'],
           'heatmap-intensity': ['interpolate', ['linear'], ['zoom'], 11, 1, 18, 3],
-          'heatmap-radius': ['interpolate', ['linear'], ['zoom'], 11, 15, 18, 40],
+          'heatmap-radius': ['interpolate', ['linear'], ['zoom'], 11, 15, 18, 50],
           'heatmap-color': [
             'interpolate', ['linear'], ['heatmap-density'],
             0, 'rgba(0,0,0,0)',
-            0.2, 'rgba(103,0,13,0.4)',
-            0.4, 'rgba(203,24,29,0.5)',
-            0.6, 'rgba(239,69,51,0.6)',
-            0.8, 'rgba(251,106,74,0.7)',
-            1, 'rgba(252,187,161,0.9)',
+            0.1, 'rgba(0,255,255,0.2)', // Intelligence Blue/Cyan
+            0.3, 'rgba(0,0,255,0.4)',
+            0.6, 'rgba(255,255,0,0.5)', // Warning Yellow
+            0.8, 'rgba(255,0,0,0.6)',   // High Alert
+            1, 'rgba(255,0,0,0.8)',     // Critical
           ],
-          'heatmap-opacity': 0.8,
+          'heatmap-opacity': 0.6,
         },
       });
 

@@ -16,7 +16,8 @@ export default function ProfilesPage() {
 
   const filtered = profiles.filter(p => 
     p.fullName.toLowerCase().includes(search.toLowerCase()) ||
-    p.organization.toLowerCase().includes(search.toLowerCase())
+    (p.primaryArea && p.primaryArea.toLowerCase().includes(search.toLowerCase())) ||
+    (p.shakhaLocation && p.shakhaLocation.toLowerCase().includes(search.toLowerCase()))
   );
 
   return (
@@ -50,7 +51,7 @@ export default function ProfilesPage() {
             filtered.map(profile => (
               <GlassCard 
                 key={profile.$id} 
-                title={profile.organization} 
+                title={profile.shakhaLocation || profile.primaryArea} 
                 icon="🕵️"
               >
                 <div className="space-y-4 text-center py-2">

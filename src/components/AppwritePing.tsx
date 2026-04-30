@@ -4,7 +4,7 @@
 'use client';
 
 import { useEffect } from 'react';
-import { client } from '@/lib/appwrite/client';
+import { client, account } from '@/lib/appwrite/client';
 
 export default function AppwritePing() {
   useEffect(() => {

@@ -14,6 +14,9 @@ import type { KaryakartaProfile } from '@/types/karyakarta.types';
 import GlassCard from '@/components/ui/GlassCard';
 import ActivityTicker from '@/components/monitor/ActivityTicker';
 import AreaThreatGauges from '@/components/monitor/AreaThreatGauges';
+import SectorHeatTicker from '@/components/monitor/SectorHeatTicker';
+import DailyIntelBriefing from '@/components/monitor/DailyIntelBriefing';
+import ThemeToggle from '@/components/layout/ThemeToggle';
 
 // Dynamic Visuals
 const MapView = dynamic(() => import('@/components/map/MapView'), { ssr: false });
@@ -55,10 +58,12 @@ export default function CommandCenterPage() {
   return (
     <main className="min-h-screen bg-[#050606] text-zinc-100 overflow-x-hidden selection:bg-red-500/30">
       {/* 1. Global Alert Ticker */}
-      <ActivityTicker incidents={incidents} />
+      <div className="no-print">
+        <ActivityTicker incidents={incidents} />
+      </div>
 
       {/* 2. Top Navigation / Header */}
-      <nav className="sticky top-0 z-50 bg-[#050606]/80 backdrop-blur-xl border-b border-zinc-800/40">
+      <nav className="sticky top-0 z-50 bg-[#050606]/80 backdrop-blur-xl border-b border-zinc-800/40 no-print">
         <div className="container mx-auto px-4 h-14 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
@@ -81,6 +86,7 @@ export default function CommandCenterPage() {
             <div className="h-6 w-px bg-zinc-800/50 hidden sm:block mx-2" />
 
             <div className="flex items-center gap-4">
+              <ThemeToggle />
               <div className="flex flex-col items-end hidden sm:flex">
                 <span className="text-[10px] font-mono text-zinc-500 leading-none mb-1">{clock} IST</span>
                 <span className="text-[9px] text-green-500 font-bold uppercase tracking-widest flex items-center gap-1.5">
@@ -89,7 +95,7 @@ export default function CommandCenterPage() {
                 </span>
               </div>
               {!isAuthenticated ? (
-                <Link href="/login" className="px-4 py-1.5 bg-zinc-100 hover:bg-white text-[#050606] text-[10px] font-black uppercase tracking-widest rounded-lg transition-all active:scale-95 shadow-[0_0_20px_-5px_rgba(255,255,255,0.3)]">
+                <Link href="/login" className="px-4 py-1.5 bg-zinc-100 hover:bg-white text-[#050606] text-[10px] font-black uppercase tracking-widest rounded-lg transition-all active:scale-95 shadow-[0_0_20px_-5px_rgba(255,255,255,0.3)] btn-glitch">
                   Access
                 </Link>
               ) : (
@@ -102,7 +108,13 @@ export default function CommandCenterPage() {
         </div>
       </nav>
 
+      {/* 2.1 Sector Heat Ticker */}
+      <SectorHeatTicker />
+
       <div className="container mx-auto px-4 py-8 space-y-8">
+        {/* 0. Intelligence Briefing */}
+        <DailyIntelBriefing />
+
         {/* 3. Hero / Metrics Grid */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 lg:gap-6">
           <MetricCard label="Active Threats" value={stats.critical + stats.high} subValue={`${stats.critical} critical`} color="text-red-500" icon="🚨" />
@@ -139,7 +151,7 @@ export default function CommandCenterPage() {
             <div className="bg-gradient-to-br from-red-600 to-red-900 rounded-2xl p-6 text-white space-y-4 shadow-[0_20px_50px_-20px_rgba(220,38,38,0.5)]">
               <h4 className="text-lg font-black tracking-tight uppercase italic leading-none">Submit Intelligence</h4>
               <p className="text-[10px] font-medium opacity-80 leading-relaxed uppercase tracking-wider">Help protect Okhla. All submissions are encrypted and processed by autonomous AI.</p>
-              <Link href="/report" className="block w-full py-3 bg-black text-white text-center text-[10px] font-black uppercase tracking-[0.2em] rounded-xl hover:bg-zinc-900 transition-colors">
+              <Link href="/report" className="block w-full py-3 bg-black text-white text-center text-[10px] font-black uppercase tracking-[0.2em] rounded-xl hover:bg-zinc-900 transition-colors hover-scan">
                 New Report →
               </Link>
             </div>

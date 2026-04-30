@@ -9,6 +9,7 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { databases } from '@/lib/appwrite/client';
 import { DATABASE_ID, COLLECTIONS } from '@/lib/appwrite/collections';
+import ProfileAIAssessment from '@/components/profile/ProfileAIAssessment';
 
 export default function ProfileDetailPage() {
   const params = useParams();
@@ -68,11 +69,20 @@ export default function ProfileDetailPage() {
 
   return (
     <div className="max-w-2xl mx-auto px-3 sm:px-4 py-4 pb-24 space-y-3">
-      {/* Back */}
-      <button onClick={() => router.back()} className="flex items-center gap-1.5 text-sm text-zinc-500 hover:text-white transition-colors">
-        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
-        Back
-      </button>
+      {/* Navigation */}
+      <div className="flex items-center justify-between no-print">
+        <button onClick={() => router.back()} className="flex items-center gap-1.5 text-sm text-zinc-500 hover:text-white transition-colors">
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
+          Back
+        </button>
+        <button 
+          onClick={() => window.print()} 
+          className="flex items-center gap-2 px-3 py-1.5 bg-red-600/10 border border-red-600/20 rounded-lg text-[10px] font-black uppercase tracking-widest text-red-500 hover:bg-red-600/20 transition-all active:scale-95"
+        >
+          <span>📄</span>
+          Export Briefing
+        </button>
+      </div>
 
       {/* Header Card */}
       <div className={`bg-zinc-900/60 border rounded-2xl p-4 ${p.threatLevel === 'critical' ? 'border-red-800/50' : 'border-zinc-800/50'}`}>
@@ -120,6 +130,9 @@ export default function ProfileDetailPage() {
           ))}
         </div>
       </div>
+
+      {/* AI Assessment */}
+      <ProfileAIAssessment profile={p} />
 
       {/* Identity */}
       <Section title="Identity" icon="🪪">
@@ -250,17 +263,25 @@ export default function ProfileDetailPage() {
 
       {/* Associates */}
       {p.associates.length > 0 && (
-        <Section title={`Associates (${p.associates.length})`} icon="🤝">
-          {p.associates.map((assoc, i) => (
-            <Link key={i} href={`/profiles/${assoc.profileId}`}
-              className="flex items-center justify-between py-1.5 border-b border-zinc-800/20 last:border-0 hover:bg-zinc-800/20 -mx-1 px-1 rounded transition-colors">
-              <div>
-                <span className="text-xs text-zinc-300">{assoc.name}</span>
-                {assoc.notes && <span className="text-[10px] text-zinc-600 ml-2">{assoc.notes}</span>}
-              </div>
-              <span className="text-[9px] text-zinc-500 capitalize bg-zinc-800/40 px-1.5 py-0.5 rounded">{assoc.relationship}</span>
-            </Link>
-          ))}
+        <Section title={`Primary Associations (${p.associates.length})`} icon="🤝">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            {p.associates.map((assoc, i) => (
+              <Link key={i} href={`/profiles/${assoc.profileId}`}
+                className="flex items-center gap-3 p-2 rounded-xl bg-zinc-800/20 border border-zinc-800/40 hover:bg-zinc-800/40 transition-all group"
+              >
+                <div className={`w-10 h-10 rounded-lg flex items-center justify-center text-xs font-black text-white ${
+                  assoc.relationship === 'senior' ? 'bg-red-900/50 border border-red-500/30' : 'bg-zinc-800'
+                }`}>
+                  {assoc.name.charAt(0)}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-[11px] font-bold text-zinc-100 truncate">{assoc.name}</p>
+                  <p className="text-[9px] text-zinc-500 uppercase tracking-widest">{assoc.relationship}</p>
+                </div>
+                <span className="text-zinc-700 group-hover:text-zinc-400 transition-colors">→</span>
+              </Link>
+            ))}
+          </div>
         </Section>
       )}
 

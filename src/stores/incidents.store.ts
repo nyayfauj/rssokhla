@@ -2,7 +2,7 @@
 
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { databases, ID, Query } from '@/lib/appwrite/client';
+import { databases, client, ID, Query } from '@/lib/appwrite/client';
 import { DATABASE_ID, COLLECTIONS } from '@/lib/appwrite/collections';
 import type { Incident, CreateIncidentData, IncidentFilters, PendingIncident } from '@/types/incident.types';
 import { v4 as uuidv4 } from 'uuid';
@@ -27,6 +27,7 @@ interface IncidentsState {
   clearFilters: () => void;
   syncOfflineQueue: () => Promise<void>;
   clearError: () => void;
+  subscribeToIncidents: () => () => void;
 }
 
 const PAGE_SIZE = 20;
@@ -219,6 +220,29 @@ export const useIncidentsStore = create<IncidentsState>()(
       },
 
       clearError: () => set({ error: null }),
+
+      subscribeToIncidents: () => {
+        const unsubscribe = client.subscribe(
+          `databases.${DATABASE_ID}.collections.${COLLECTIONS.INCIDENTS}.documents`,
+          (response) => {
+            if (response.events.includes('databases.*.collections.*.documents.*.create')) {
+              const newIncident = response.payload as unknown as Incident;
+              set((state) => ({
+                incidents: [newIncident, ...state.incidents].slice(0, PAGE_SIZE),
+              }));
+            }
+            if (response.events.includes('databases.*.collections.*.documents.*.update')) {
+              const updatedIncident = response.payload as unknown as Incident;
+              set((state) => ({
+                incidents: state.incidents.map((i) =>
+                  i.$id === updatedIncident.$id ? updatedIncident : i
+                ),
+              }));
+            }
+          }
+        );
+        return unsubscribe;
+      },
     }),
     {
       name: 'rssokhla-incidents',
