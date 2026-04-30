@@ -38,28 +38,36 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="space-y-5 max-w-lg mx-auto">
-      <h1 className="text-xl font-bold text-white">Settings</h1>
+    <div className="space-y-6 max-w-lg mx-auto pb-24">
+      <div className="flex items-center gap-3">
+        <span className="w-8 h-8 rounded bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-500">⚙️</span>
+        <h1 className="text-2xl font-black uppercase tracking-tighter italic text-white">Node Configuration</h1>
+      </div>
 
       {/* Profile */}
-      <Card padding="md">
-        <h2 className="text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-3">Profile</h2>
-        <div className="flex items-center gap-4">
-          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-red-500 to-red-700 flex items-center justify-center text-2xl font-bold text-white">
-            {isAnonymous ? '👤' : user?.name?.charAt(0)?.toUpperCase() || '?'}
+      <Card padding="md" className="border-zinc-800/50 bg-zinc-900/20">
+        <h2 className="text-[10px] font-black text-zinc-600 uppercase tracking-[0.3em] mb-5">Operative Identity</h2>
+        <div className="flex items-center gap-5">
+          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-red-600 to-red-900 flex items-center justify-center text-3xl font-black text-white shadow-[0_0_20px_rgba(220,38,38,0.2)]">
+            {isAnonymous ? '🕶️' : user?.name?.charAt(0)?.toUpperCase() || '?'}
           </div>
           <div className="flex-1 min-w-0">
-            <p className="font-semibold text-white">{isAnonymous ? 'Anonymous Observer' : user?.name}</p>
-            <p className="text-xs text-zinc-400 truncate">{isAnonymous ? 'No email on file' : user?.email}</p>
-            <Badge variant={role === 'admin' ? 'danger' : role === 'moderator' ? 'warning' : 'default'} size="sm" className="mt-1.5">
-              {role.replace('_', ' ')}
-            </Badge>
+            <p className="font-black text-lg text-white uppercase tracking-tight">{isAnonymous ? 'Anonymous Node' : user?.name}</p>
+            <p className="text-[10px] text-zinc-600 font-bold uppercase tracking-widest truncate">{isAnonymous ? 'STEALTH MODE ACTIVE' : user?.email}</p>
+            <div className="mt-2 flex">
+              <Badge variant={role === 'admin' ? 'danger' : role === 'moderator' ? 'warning' : 'default'} size="sm" className="font-black uppercase tracking-widest text-[8px] py-0.5">
+                {role === 'guest' ? 'Anonymous Observer' : `Verified Sangathan ${role}`}
+              </Badge>
+            </div>
           </div>
         </div>
         {isAnonymous && (
-          <Button variant="outline" size="sm" className="mt-4" fullWidth onClick={() => router.push('/register')}>
-            Upgrade to Full Account
-          </Button>
+          <button 
+            onClick={() => router.push('/sangathan')}
+            className="w-full mt-6 py-4 bg-white text-black text-[10px] font-black uppercase tracking-[0.3em] rounded-xl hover:bg-red-600 hover:text-white transition-all shadow-xl active:scale-[0.98]"
+          >
+            Join the Sangathan
+          </button>
         )}
       </Card>
 

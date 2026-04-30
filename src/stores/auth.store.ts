@@ -85,6 +85,14 @@ export const useAuthStore = create<AuthState>()(
           set({ isLoading: true, error: null });
           const session = await account.createAnonymousSession();
           const user = await account.get();
+          
+          // Generate Magic Token if not exists
+          let magicToken = localStorage.getItem('nf_magic_token');
+          if (!magicToken) {
+            magicToken = btoa(`${user.$id}:${Math.random().toString(36).substring(2)}`);
+            localStorage.setItem('nf_magic_token', magicToken);
+          }
+
           set({
             user,
             session,

@@ -4,15 +4,27 @@ import type { MetadataRoute } from 'next';
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: 'NyayFauj — Okhla Monitor',
+    name: 'NyayFauj // Intelligence Hub',
     short_name: 'NyayFauj',
-    description: 'Community safety monitoring for Okhla — track, report, and verify RSS activities',
-    start_url: '/dashboard',
+    description: 'High-fidelity community intelligence & tactical monitoring for the Okhla Sector.',
+    start_url: '/',
     display: 'standalone',
-    background_color: '#0a0a0a',
+    background_color: '#050606',
     theme_color: '#dc2626',
     orientation: 'portrait',
     categories: ['security', 'news', 'social'],
+    shortcuts: [
+      {
+        name: 'Transmit Intel',
+        url: '/incidents/report',
+        icons: [{ src: '/icons/icon-192x192.png', sizes: '192x192' }],
+      },
+      {
+        name: 'Strategic Overview',
+        url: '/',
+        icons: [{ src: '/icons/icon-192x192.png', sizes: '192x192' }],
+      },
+    ],
     icons: [
       {
         src: '/icons/icon-192x192.png',

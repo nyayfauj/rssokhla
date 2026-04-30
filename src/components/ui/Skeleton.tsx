@@ -9,23 +9,28 @@ interface SkeletonProps {
 }
 
 export default function Skeleton({ className = '', variant = 'text', width, height, lines = 1 }: SkeletonProps) {
-  const baseClasses = 'animate-pulse bg-zinc-800 rounded-lg';
+  const baseClasses = 'relative overflow-hidden bg-zinc-900/80 rounded-lg';
+  const shimmerClasses = 'absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-red-600/5 to-transparent animate-[shimmer_2s_infinite]';
+
+  const Shimmer = () => (
+    <div className={shimmerClasses} />
+  );
+
+  const style = { width: width || '100%', height: height || '16px' };
 
   if (variant === 'circular') {
     return (
-      <div
-        className={`${baseClasses} rounded-full ${className}`}
-        style={{ width: width || '40px', height: height || '40px' }}
-      />
+      <div className={`${baseClasses} rounded-full ${className}`} style={{ ...style, width: width || '40px', height: height || '40px' }}>
+        <Shimmer />
+      </div>
     );
   }
 
   if (variant === 'rectangular') {
     return (
-      <div
-        className={`${baseClasses} ${className}`}
-        style={{ width: width || '100%', height: height || '120px' }}
-      />
+      <div className={`${baseClasses} ${className}`} style={{ ...style, height: height || '120px' }}>
+        <Shimmer />
+      </div>
     );
   }
 
@@ -39,7 +44,9 @@ export default function Skeleton({ className = '', variant = 'text', width, heig
             width: i === lines - 1 && lines > 1 ? '75%' : (width || '100%'),
             height: height || '16px',
           }}
-        />
+        >
+          <Shimmer />
+        </div>
       ))}
     </div>
   );

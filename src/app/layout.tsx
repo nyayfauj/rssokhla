@@ -71,6 +71,8 @@ export const viewport: Viewport = {
   colorScheme: 'dark',
 };
 
+import MobileNav from '@/components/layout/MobileNav';
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -95,9 +97,10 @@ export default function RootLayout({
             <CommandPalette />
             <AlertToasts />
             <PublicHeader />
-            <main className="flex-1">
+            <main className="flex-1 pb-20 sm:pb-0">
               {children}
             </main>
+            <MobileNav />
           </ErrorBoundary>
         </div>
       </body>

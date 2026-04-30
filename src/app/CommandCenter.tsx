@@ -1,0 +1,163 @@
+'use client';
+
+import { useState, useEffect, useMemo } from 'react';
+import dynamic from 'next/dynamic';
+import Link from 'next/link';
+import { useIncidentsStore } from '@/stores/incidents.store';
+import { useAlertsStore } from '@/stores/alerts.store';
+import { useAuthStore } from '@/stores/auth.store';
+import type { KaryakartaProfile } from '@/types/karyakarta.types';
+import type { Incident } from '@/types/incident.types';
+import type { Alert } from '@/types/alert.types';
+import GlassCard from '@/components/ui/GlassCard';
+import ActivityTicker from '@/components/monitor/ActivityTicker';
+import AreaThreatGauges from '@/components/monitor/AreaThreatGauges';
+import SectorHeatTicker from '@/components/monitor/SectorHeatTicker';
+import DailyIntelBriefing from '@/components/monitor/DailyIntelBriefing';
+import ThemeToggle from '@/components/layout/ThemeToggle';
+
+// Dynamic Visuals with Skeletons for 2G optimization
+const MapView = dynamic(() => import('@/components/map/MapView'), { 
+  ssr: false,
+  loading: () => <div className="h-full w-full bg-zinc-900/50 animate-pulse flex items-center justify-center text-[10px] uppercase tracking-widest text-zinc-600">Initializing Map Data...</div>
+});
+const NetworkGraph = dynamic(() => import('@/components/monitor/NetworkGraph'), { ssr: false });
+const SeverityDonut = dynamic(() => import('@/components/monitor/SeverityDonut'), { ssr: false });
+const ActivityTimeline = dynamic(() => import('@/components/monitor/ActivityTimeline'), { ssr: false });
+const CategoryBreakdown = dynamic(() => import('@/components/monitor/CategoryBreakdown'), { ssr: false });
+const RecentFeed = dynamic(() => import('@/components/monitor/RecentFeed'), { ssr: false });
+
+interface Props {
+  initialIncidents: Incident[];
+  initialAlerts: Alert[];
+  initialProfiles: KaryakartaProfile[];
+}
+
+export default function CommandCenter({ initialIncidents, initialAlerts, initialProfiles }: Props) {
+  const [clock, setClock] = useState('');
+  const { incidents, setIncidents } = useIncidentsStore();
+  const { alerts, setAlerts } = useAlertsStore();
+  const { user, isAuthenticated } = useAuthStore();
+  const [profiles] = useState(initialProfiles);
+
+  // Initialize store with server data
+  useEffect(() => {
+    if (initialIncidents.length > 0) setIncidents(initialIncidents);
+    if (initialAlerts.length > 0) setAlerts(initialAlerts);
+  }, [initialIncidents, initialAlerts]);
+
+  useEffect(() => {
+    const tick = () => setClock(new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false }));
+    tick();
+    const id = setInterval(tick, 1000);
+    return () => clearInterval(id);
+  }, []);
+
+  const stats = useMemo(() => {
+    const currentIncidents = incidents.length > 0 ? incidents : initialIncidents;
+    const critical = currentIncidents.filter(i => i.severity === 'critical').length;
+    const high = currentIncidents.filter(i => i.severity === 'high').length;
+    return { critical, high, total: currentIncidents.length };
+  }, [incidents, initialIncidents]);
+
+  const displayIncidents = incidents.length > 0 ? incidents : initialIncidents;
+
+  return (
+    <div className="min-h-screen bg-[#050606] text-zinc-100 overflow-x-hidden selection:bg-red-500/30">
+      <ActivityTicker incidents={displayIncidents} />
+
+      <nav className="sticky top-0 z-50 bg-[#050606]/80 backdrop-blur-xl border-b border-zinc-800/40">
+        <div className="container mx-auto px-4 h-14 flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2">
+              <span className="w-8 h-8 rounded-lg bg-gradient-to-br from-red-600 to-red-900 flex items-center justify-center font-black text-sm italic">NF</span>
+              <div className="hidden sm:block">
+                <h1 className="text-sm font-black tracking-tighter uppercase leading-none">Nyay<span className="text-red-500">Fauj</span></h1>
+                <p className="text-[8px] text-zinc-600 font-bold tracking-[0.2em] uppercase">Autonomous Intelligence</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-4">
+            <ThemeToggle />
+            <div className="flex flex-col items-end hidden sm:flex">
+              <span className="text-[10px] font-mono text-zinc-500 leading-none mb-1">{clock} IST</span>
+              <span className="text-[9px] text-green-500 font-bold uppercase tracking-widest flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
+                Live Feed
+              </span>
+            </div>
+            {!isAuthenticated ? (
+              <Link href="/login" className="px-4 py-1.5 bg-zinc-100 text-[#050606] text-[10px] font-black uppercase tracking-widest rounded-lg">
+                Access
+              </Link>
+            ) : (
+              <div className="w-8 h-8 rounded-full border border-zinc-800 bg-zinc-900 flex items-center justify-center text-[10px] font-bold">
+                {user?.name?.charAt(0) || 'O'}
+              </div>
+            )}
+          </div>
+        </div>
+      </nav>
+
+      <SectorHeatTicker />
+
+      <div className="container mx-auto px-4 py-8 space-y-8">
+        <DailyIntelBriefing />
+
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 lg:gap-6">
+          <MetricCard label="Active Threats" value={stats.critical + stats.high} subValue={`${stats.critical} critical`} color="text-red-500" icon="🚨" />
+          <MetricCard label="Intelligence Nodes" value={stats.total} subValue="Verified Intelligence" color="text-zinc-100" icon="📡" />
+          <MetricCard label="Verified Operatives" value={profiles.length} subValue="Sangathan Presence" color="text-orange-500" icon="🚩" />
+          <MetricCard label="Operational Zones" value="12" subValue="Monitoring active" color="text-blue-500" icon="📍" />
+        </div>
+
+        <div className="grid grid-cols-1 xl:grid-cols-12 gap-8">
+          <div className="xl:col-span-8 space-y-8">
+            <GlassCard title="Operational Theater Overview" icon="🗺️">
+              <div className="h-[450px] -mx-4 -mb-4">
+                <MapView incidents={displayIncidents} />
+              </div>
+            </GlassCard>
+            <GlassCard title="Zone Threat Assessment" icon="📊">
+              <AreaThreatGauges incidents={displayIncidents} />
+            </GlassCard>
+          </div>
+
+          <div className="xl:col-span-4 space-y-8">
+            <GlassCard title="Activity Timeline" icon="📈">
+              <ActivityTimeline incidents={displayIncidents} />
+            </GlassCard>
+            <div className="bg-gradient-to-br from-zinc-800 to-zinc-950 border border-red-500/10 rounded-2xl p-6 relative overflow-hidden group">
+              <div className="absolute top-0 right-0 p-2 opacity-20">
+                <span className="text-[8px] font-black uppercase tracking-widest text-red-500 border border-red-500/50 px-2 py-0.5 rounded">Data Integrity: Immutable</span>
+              </div>
+              <h4 className="text-lg font-black uppercase italic leading-none text-white">Transmit Intel</h4>
+              <p className="text-[9px] text-zinc-500 uppercase font-bold tracking-widest mt-2">Wikileaks-level source protection</p>
+              <Link href="/incidents/report" className="mt-4 block w-full py-4 bg-red-600 text-white text-center text-[10px] font-black uppercase tracking-[0.3em] rounded-xl shadow-lg shadow-red-900/20 active:scale-95 transition-all">
+                New Intelligence →
+              </Link>
+            </div>
+          </div>
+        </div>
+
+        <GlassCard title="Intelligence Stream Log" icon="🗞️">
+          <RecentFeed incidents={displayIncidents} />
+        </GlassCard>
+      </div>
+    </div>
+  );
+}
+
+function MetricCard({ label, value, subValue, color, icon }: any) {
+  return (
+    <div className="bg-zinc-900/30 border border-zinc-800/40 rounded-2xl p-5 group transition-all hover:bg-zinc-900/50">
+      <span className="text-xs text-zinc-700">{icon}</span>
+      <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest mt-4 mb-1">{label}</p>
+      <div className="flex items-baseline gap-2">
+        <h4 className={`text-3xl font-black tracking-tighter ${color}`}>{value}</h4>
+        <span className="text-[9px] text-zinc-600 font-bold uppercase">{subValue}</span>
+      </div>
+    </div>
+  );
+}

@@ -3,7 +3,7 @@
 import { NextResponse, type NextRequest } from 'next/server';
 
 // Routes that don't require authentication
-const PUBLIC_ROUTES = ['/', '/login', '/register', '/anonymous', '/p', '/incidents', '/profiles', '/about'];
+const PUBLIC_ROUTES = ['/', '/login', '/register', '/anonymous', '/p', '/incidents', '/profiles', '/about', '/incidents/report'];
 const AUTH_ROUTES = ['/login', '/register', '/anonymous'];
 
 // PWA assets that should always be accessible
@@ -90,8 +90,8 @@ export function middleware(request: NextRequest) {
         "default-src 'self'",
         "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
         "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-        "font-src 'self' https://fonts.gstatic.com",
-        "img-src 'self' data: blob: https://cloud.appwrite.io https://sgp.cloud.appwrite.io",
+        "font-src 'self' https://fonts.gstatic.com https://frontend-cdn.perplexity.ai",
+        "img-src 'self' data: blob: https://cloud.appwrite.io https://sgp.cloud.appwrite.io https://frontend-cdn.perplexity.ai",
         "connect-src 'self' https://cloud.appwrite.io wss://cloud.appwrite.io https://sgp.cloud.appwrite.io wss://sgp.cloud.appwrite.io",
         "frame-ancestors 'none'",
       ].join('; ')

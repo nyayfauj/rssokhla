@@ -1,9 +1,9 @@
 // ─── Service Worker ─────────────────────────────────────────
 // Cache strategies: cache-first for static, network-first for API
 
-const CACHE_NAME = 'rssokhla-v1';
-const STATIC_CACHE = 'rssokhla-static-v1';
-const API_CACHE = 'rssokhla-api-v1';
+const CACHE_NAME = 'rssokhla-v2';
+const STATIC_CACHE = 'rssokhla-static-v2';
+const API_CACHE = 'rssokhla-api-v2';
 
 const STATIC_ASSETS = [
   '/',
@@ -43,6 +43,9 @@ self.addEventListener('fetch', (event) => {
 
   // Skip non-GET requests
   if (request.method !== 'GET') return;
+
+  // Skip non-http(s) requests (e.g. chrome-extension, data)
+  if (!request.url.startsWith('http')) return;
 
   // API requests: network-first with cache fallback
   if (url.pathname.startsWith('/api/')) {
@@ -148,8 +151,12 @@ async function cacheFirst(request, cacheName) {
 }
 
 async function networkFirst(request, cacheName) {
+  const timeoutPromise = new Promise((_, reject) => 
+    setTimeout(() => reject(new Error('Network timeout')), 5000)
+  );
+
   try {
-    const response = await fetch(request);
+    const response = await Promise.race([fetch(request), timeoutPromise]);
     if (response.ok) {
       const cache = await caches.open(cacheName);
       cache.put(request, response.clone());
@@ -158,7 +165,7 @@ async function networkFirst(request, cacheName) {
   } catch {
     const cached = await caches.match(request);
     if (cached) return cached;
-    return new Response('Offline', { status: 503 });
+    return new Response('Network Timeout or Offline', { status: 504 });
   }
 }
 
