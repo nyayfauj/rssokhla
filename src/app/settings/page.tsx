@@ -56,7 +56,7 @@ export default function SettingsPage() {
             <p className="text-[10px] text-zinc-600 font-bold uppercase tracking-widest truncate">{isAnonymous ? 'STEALTH MODE ACTIVE' : user?.email}</p>
             <div className="mt-2 flex">
               <Badge variant={role === 'admin' ? 'danger' : role === 'moderator' ? 'warning' : 'default'} size="sm" className="font-black uppercase tracking-widest text-[8px] py-0.5">
-                {role === 'guest' ? 'Anonymous Observer' : `Verified Sangathan ${role}`}
+                {role === 'anonymous_user' ? 'Anonymous Observer' : `Verified Sangathan ${role}`}
               </Badge>
             </div>
           </div>

@@ -23,6 +23,7 @@ export interface Incident {
   title: string;
   description: string;
   locationId: string;
+  landmark?: string;
   reporterId: string;
   timestamp: string;
   category: IncidentCategory;
@@ -40,6 +41,7 @@ export interface CreateIncidentData {
   title: string;
   description: string;
   locationId?: string;
+  landmark?: string;
   category: IncidentCategory;
   severity: IncidentSeverity;
   mediaUrls?: string[];

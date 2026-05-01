@@ -1,13 +1,16 @@
-// ─── Anonymous Access Component ─────────────────────────────
-
 'use client';
-
+ 
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/stores/auth.store';
 import { useUIStore } from '@/stores/ui.store';
 import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
 
+export default function AnonymousAccess() {
+  const router = useRouter();
+  const { loginAnonymous, isLoading } = useAuthStore();
+  const addToast = useUIStore((s) => s.addToast);
   const [magicLink, setMagicLink] = useState('');
 
   const handleAnonymousAccess = async () => {

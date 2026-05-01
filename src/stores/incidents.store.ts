@@ -28,6 +28,7 @@ interface IncidentsState {
   syncOfflineQueue: () => Promise<void>;
   clearError: () => void;
   subscribeToIncidents: () => () => void;
+  setIncidents: (incidents: Incident[]) => void;
 }
 
 const PAGE_SIZE = 20;
@@ -243,6 +244,7 @@ export const useIncidentsStore = create<IncidentsState>()(
         );
         return unsubscribe;
       },
+      setIncidents: (incidents) => set({ incidents }),
     }),
     {
       name: 'rssokhla-incidents',

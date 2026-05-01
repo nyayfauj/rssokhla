@@ -16,6 +16,7 @@ interface AlertsState {
   fetchActiveAlerts: () => Promise<void>;
   dismissAlert: (id: string) => void;
   clearError: () => void;
+  setAlerts: (alerts: Alert[]) => void;
 }
 
 export const useAlertsStore = create<AlertsState>()((set, get) => ({
@@ -85,4 +86,5 @@ export const useAlertsStore = create<AlertsState>()((set, get) => ({
   },
 
   clearError: () => set({ error: null }),
+  setAlerts: (alerts: Alert[]) => set({ alerts }),
 }));

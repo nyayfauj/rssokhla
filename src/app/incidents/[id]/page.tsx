@@ -182,5 +182,3 @@ function TacticalMetric({ label, value, sub, accent = "text-white" }: { label: s
     </div>
   );
 }
-  );
-}
