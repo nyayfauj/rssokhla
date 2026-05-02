@@ -56,7 +56,7 @@ export default function ReportIncidentPage() {
   const removeMedia = (id: string) => setMedia(prev => prev.filter(m => m.id !== id));
 
   const canAdvance = () => {
-    if (step === 0) return true; // category always has default
+    if (step === 0) return true;
     if (step === 1) return !!area;
     if (step === 2) return title.trim().length >= 3;
     return true;
@@ -77,7 +77,6 @@ export default function ReportIncidentPage() {
     };
 
     if (isOffline) {
-      // Save to IndexedDB for later sync
       await savePendingReport({
         ...payload,
         offlineId: `off-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
@@ -102,28 +101,29 @@ export default function ReportIncidentPage() {
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <div>
-          <h1 className="text-xl font-black uppercase tracking-tighter italic text-red-500 flex items-center gap-2">
-            <span className="w-8 h-8 rounded bg-red-600 flex items-center justify-center text-white not-italic text-sm">INTEL</span> Transmit Intelligence
+          <h1 className="text-xl font-semibold text-white flex items-center gap-2">
+            <span className="w-8 h-8 rounded bg-red-600 flex items-center justify-center text-white text-sm">&#x1F4E2;</span>
+            Report an Incident
           </h1>
-          <p className="text-[9px] text-zinc-500 mt-1 uppercase tracking-widest font-bold">
-            Phase {step + 1} / {STEPS.length}: Protocol {STEPS[step]}
+          <p className="text-xs text-zinc-500 mt-1">
+            Step {step + 1} of {STEPS.length}: {STEPS[step]}
           </p>
         </div>
-        <button onClick={() => router.back()} className="text-[10px] font-black uppercase tracking-widest text-zinc-600 hover:text-red-500 transition-colors">Abort</button>
+        <button onClick={() => router.back()} aria-label="Cancel report" className="text-xs font-medium text-zinc-500 hover:text-zinc-300 transition-colors">Cancel</button>
       </div>
 
       {/* Progress bar */}
       <div className="h-1 bg-zinc-900 rounded-full mb-6 overflow-hidden">
-        <div className="h-full bg-red-600 transition-all duration-700 ease-out shadow-[0_0_10px_rgba(220,38,38,0.5)]" style={{ width: `${progress}%` }} />
+        <div className="h-full bg-red-600 transition-all duration-500 ease-out" style={{ width: `${progress}%` }} />
       </div>
 
       {/* Offline banner */}
       {isOffline && (
-        <div className="bg-amber-500/5 border border-amber-500/20 rounded-xl p-3 mb-6 flex items-center gap-3">
-          <span className="animate-pulse text-amber-500 text-lg">📡</span>
+        <div className="bg-amber-500/5 border border-amber-500/20 rounded-xl p-3 mb-6 flex items-center gap-3" role="status">
+          <span className="animate-pulse text-amber-500 text-lg" aria-hidden="true">&#x1F4F6;</span>
           <div>
-            <p className="text-[10px] font-black text-amber-500 uppercase tracking-widest">Offline Node Detected</p>
-            <p className="text-[9px] text-amber-500/60 uppercase">Intel will be cached locally and synced on reconnection.</p>
+            <p className="text-xs font-semibold text-amber-500">You&apos;re Offline</p>
+            <p className="text-xs text-amber-500/60">Your report will be saved locally and synced when you reconnect.</p>
           </div>
         </div>
       )}
@@ -133,15 +133,15 @@ export default function ReportIncidentPage() {
         {step === 0 && (
           <div className="space-y-6 animate-fade-in">
             <div className="bg-zinc-900/40 border border-zinc-800/50 p-4 rounded-2xl">
-              <p className="text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-4">Select Intelligence Category</p>
+              <p className="text-sm font-medium text-zinc-400 mb-4">Select Report Category</p>
               <QuickCategoryPicker selected={category} onSelect={setCategory} />
             </div>
 
-            <button type="button" onClick={() => setUrgency(!urgency)}
-              className={`w-full py-4 rounded-2xl border text-xs font-black uppercase tracking-[0.2em] transition-all active:scale-[0.98] flex items-center justify-center gap-3 ${
-                urgency ? 'border-red-600 bg-red-600/20 text-red-500 shadow-[0_0_15px_rgba(220,38,38,0.1)]' : 'border-zinc-800 bg-zinc-900/40 text-zinc-600 hover:border-zinc-700'
+            <button type="button" onClick={() => setUrgency(!urgency)} aria-pressed={urgency}
+              className={`w-full py-4 rounded-2xl border text-sm font-semibold transition-all active:scale-[0.98] flex items-center justify-center gap-3 ${
+                urgency ? 'border-red-600 bg-red-600/20 text-red-500' : 'border-zinc-800 bg-zinc-900/40 text-zinc-500 hover:border-zinc-700'
               }`}>
-              {urgency ? '🚨 MISSION CRITICAL / URGENT' : 'Mark as Urgent Intelligence'}
+              {urgency ? '🚨 High Priority' : 'Mark as Urgent'}
             </button>
           </div>
         )}
@@ -150,7 +150,7 @@ export default function ReportIncidentPage() {
         {step === 1 && (
           <div className="space-y-6 animate-fade-in">
             <div className="bg-zinc-900/40 border border-zinc-800/50 p-4 rounded-2xl">
-              <p className="text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-4">Pinpoint Operational Zone</p>
+              <p className="text-sm font-medium text-zinc-400 mb-4">Select Location</p>
               <LocationPicker area={area} onAreaChange={setArea} coordinates={coordinates} onCoordinatesChange={setCoordinates} landmark={landmark} onLandmarkChange={setLandmark} />
             </div>
           </div>
@@ -161,23 +161,23 @@ export default function ReportIncidentPage() {
           <div className="space-y-6 animate-fade-in">
             <div className="space-y-4">
               <div className="space-y-2">
-                <label className="text-[10px] font-black text-zinc-500 uppercase tracking-widest ml-1">Intelligence Title</label>
-                <input type="text" value={title} onChange={e => setTitle(e.target.value)} placeholder="E.G. SUSPECTED SURVEILLANCE NEAR HUB"
-                  className="w-full bg-zinc-900/60 border border-zinc-800 text-white placeholder-zinc-700 rounded-2xl px-5 py-4 text-xs font-bold uppercase tracking-widest focus:border-red-600 outline-none transition-all" />
+                <label htmlFor="report-title" className="text-sm font-medium text-zinc-400 ml-1">Report Title</label>
+                <input id="report-title" type="text" value={title} onChange={e => setTitle(e.target.value)} placeholder="Brief description of the incident"
+                  className="w-full bg-zinc-900/60 border border-zinc-800 text-white placeholder-zinc-600 rounded-2xl px-5 py-4 text-sm focus:border-red-600 outline-none transition-all" />
               </div>
               <div className="space-y-2">
-                <label className="text-[10px] font-black text-zinc-500 uppercase tracking-widest ml-1">Field Observations</label>
-                <textarea value={description} onChange={e => setDescription(e.target.value)} placeholder="DETAILED ACCOUNT OF THE OBSERVATION..."
-                  rows={4} className="w-full bg-zinc-900/60 border border-zinc-800 text-white placeholder-zinc-700 rounded-2xl px-5 py-4 text-xs font-bold uppercase tracking-widest focus:border-red-600 outline-none transition-all resize-none" />
+                <label htmlFor="report-desc" className="text-sm font-medium text-zinc-400 ml-1">Description</label>
+                <textarea id="report-desc" value={description} onChange={e => setDescription(e.target.value)} placeholder="Provide details about what happened..."
+                  rows={4} className="w-full bg-zinc-900/60 border border-zinc-800 text-white placeholder-zinc-600 rounded-2xl px-5 py-4 text-sm focus:border-red-600 outline-none transition-all resize-none" />
               </div>
             </div>
 
             <div className="space-y-2">
-              <label className="text-[10px] font-black text-zinc-500 uppercase tracking-widest ml-1">Threat Level Assessment</label>
-              <div className="grid grid-cols-4 gap-2">
+              <label className="text-sm font-medium text-zinc-400 ml-1">Severity Level</label>
+              <div className="grid grid-cols-4 gap-2" role="radiogroup" aria-label="Severity level">
                 {(Object.entries(SEVERITY_LEVELS) as [IncidentSeverity, typeof SEVERITY_LEVELS[IncidentSeverity]][]).map(([key, sev]) => (
-                  <button key={key} type="button" onClick={() => setSeverity(key)}
-                    className={`py-3 rounded-xl border text-[10px] font-black uppercase tracking-tighter transition-all active:scale-[0.97] ${
+                  <button key={key} type="button" onClick={() => setSeverity(key)} aria-checked={severity === key} role="radio"
+                    className={`py-3 rounded-xl border text-xs font-semibold transition-all active:scale-[0.97] ${
                       severity === key ? `border-current ${sev.text} ${sev.bg}` : 'border-zinc-800 bg-zinc-900 text-zinc-600 hover:border-zinc-700'
                     }`}>{sev.label}</button>
                 ))}
@@ -190,7 +190,7 @@ export default function ReportIncidentPage() {
         {step === 3 && (
           <div className="space-y-6 animate-fade-in">
             <div className="bg-zinc-900/40 border border-zinc-800/50 p-4 rounded-2xl">
-              <p className="text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-4">Evidence & Media Capture</p>
+              <p className="text-sm font-medium text-zinc-400 mb-4">Photos &amp; Media</p>
               <MediaCapture media={media} onAdd={addMedia} onRemove={removeMedia} voiceText={voiceText} onVoiceText={setVoiceText} />
             </div>
           </div>
@@ -199,34 +199,34 @@ export default function ReportIncidentPage() {
         {/* ─── Step 4: Review ──────────────────────── */}
         {step === 4 && (
           <div className="space-y-6 animate-fade-in">
-            <div className="bg-zinc-900/40 border border-zinc-800/50 rounded-2xl divide-y divide-zinc-800/20 overflow-hidden">
+            <div className="bg-zinc-900/40 border border-zinc-800/50 rounded-2xl divide-y divide-zinc-800/20 overflow-hidden" role="list" aria-label="Report summary">
               {[
-                { l: 'Sector', v: landmark || (area ? OKHLA_AREAS[area as OkhlaArea]?.label : 'Not set') },
-                { l: 'Category', v: category.toUpperCase() },
-                { l: 'Title', v: title.toUpperCase() },
-                { l: 'Threat', v: SEVERITY_LEVELS[severity].label.toUpperCase() },
-                { l: 'Evidence', v: media.length > 0 ? `${media.length} FILE(S)` : 'NONE' },
+                { l: 'Location', v: landmark || (area ? OKHLA_AREAS[area as OkhlaArea]?.label : 'Not set') },
+                { l: 'Category', v: category },
+                { l: 'Title', v: title },
+                { l: 'Severity', v: SEVERITY_LEVELS[severity].label },
+                { l: 'Media', v: media.length > 0 ? `${media.length} file(s)` : 'None' },
               ].map(r => (
-                <div key={r.l} className="flex items-center justify-between px-5 py-4">
-                  <span className="text-[9px] text-zinc-600 font-black uppercase tracking-widest">{r.l}</span>
-                  <span className="text-[10px] text-zinc-300 font-bold tracking-widest">{r.v}</span>
+                <div key={r.l} className="flex items-center justify-between px-5 py-4" role="listitem">
+                  <span className="text-xs text-zinc-500 font-medium">{r.l}</span>
+                  <span className="text-sm text-zinc-300">{r.v}</span>
                 </div>
               ))}
             </div>
 
-            <button type="button" onClick={() => setAnonymous(!anonymous)}
-              className={`w-full py-4 rounded-2xl border text-[10px] font-black uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-3 active:scale-[0.98] ${
-                anonymous ? 'border-purple-600/40 bg-purple-600/10 text-purple-500 shadow-[0_0_15px_rgba(147,51,234,0.05)]' : 'border-zinc-800 bg-zinc-900/40 text-zinc-600 hover:border-zinc-700'
+            <button type="button" onClick={() => setAnonymous(!anonymous)} aria-pressed={anonymous}
+              className={`w-full py-4 rounded-2xl border text-sm font-semibold transition-all flex items-center justify-center gap-3 active:scale-[0.98] ${
+                anonymous ? 'border-purple-600/40 bg-purple-600/10 text-purple-400' : 'border-zinc-800 bg-zinc-900/40 text-zinc-500 hover:border-zinc-700'
               }`}>
-              {anonymous ? '🕶️ ANONYMOUS PROTOCOL ACTIVE' : 'TRANSMIT AS VERIFIED NODE'}
+              {anonymous ? '🕶️ Submitting Anonymously' : 'Submit with My Profile'}
             </button>
 
-            <div className="bg-red-600/5 border border-red-600/20 rounded-2xl p-4 space-y-2">
-              <p className="text-[9px] text-red-500 font-black uppercase tracking-widest flex items-center gap-2">
-                ⚠️ IMMUTABILITY NOTICE
+            <div className="bg-zinc-800/50 border border-zinc-700/50 rounded-2xl p-4 space-y-2">
+              <p className="text-xs text-zinc-400 font-medium flex items-center gap-2">
+                &#x26A0;&#xFE0F; Important
               </p>
-              <p className="text-[8px] text-zinc-500 uppercase tracking-tighter leading-relaxed">
-                Intelligence transmitted to the network is permanent and uneditable. You are exercising your fundamental duty under Article 51A of the Constitution.
+              <p className="text-xs text-zinc-500 leading-relaxed">
+                Reports submitted to the platform are archived for community records. Please ensure the information you provide is accurate and submitted in good faith.
               </p>
             </div>
           </div>
@@ -236,21 +236,22 @@ export default function ReportIncidentPage() {
         <div className="flex gap-4 mt-8">
           {step > 0 && (
             <button type="button" onClick={() => setStep(step - 1)}
-              className="flex-1 py-4 bg-zinc-900 border border-zinc-800 text-zinc-500 text-[10px] font-black uppercase tracking-widest rounded-2xl hover:bg-zinc-800 hover:text-zinc-300 transition-all active:scale-[0.98]">
-              ← Back
+              aria-label="Go back to previous step"
+              className="flex-1 py-4 bg-zinc-900 border border-zinc-800 text-zinc-400 text-sm font-medium rounded-2xl hover:bg-zinc-800 hover:text-zinc-200 transition-all active:scale-[0.98]">
+              &larr; Back
             </button>
           )}
           {step < STEPS.length - 1 ? (
             <button type="button" onClick={() => setStep(step + 1)} disabled={!canAdvance()}
-              className={`flex-1 py-4 text-[10px] font-black uppercase tracking-[0.2em] rounded-2xl transition-all active:scale-[0.98] shadow-lg ${
+              className={`flex-1 py-4 text-sm font-semibold rounded-2xl transition-all active:scale-[0.98] shadow-lg ${
                 canAdvance() ? 'bg-red-600 hover:bg-red-500 text-white shadow-red-900/20' : 'bg-zinc-900 text-zinc-700 border border-zinc-800 cursor-not-allowed'
               }`}>
-              Analyze & Proceed →
+              Continue &rarr;
             </button>
           ) : (
             <button type="submit" disabled={submitting || !canAdvance()}
-              className="flex-1 py-4 bg-red-600 hover:bg-red-500 text-white text-[11px] font-black uppercase tracking-[0.3em] rounded-2xl transition-all active:scale-[0.98] flex items-center justify-center gap-3 disabled:opacity-50 shadow-xl shadow-red-900/40">
-              {submitting ? <><span className="animate-spin text-lg">⚙️</span> TRANSMITTING...</> : <>{isOffline ? '💾 CACHE INTEL' : '🚀 TRANSMIT INTELLIGENCE'}</>}
+              className="flex-1 py-4 bg-red-600 hover:bg-red-500 text-white text-sm font-semibold rounded-2xl transition-all active:scale-[0.98] flex items-center justify-center gap-3 disabled:opacity-50 shadow-xl shadow-red-900/40">
+              {submitting ? <><span className="animate-spin text-lg" aria-hidden="true">&#x2699;&#xFE0F;</span> Submitting...</> : <>{isOffline ? '💾 Save Draft' : '🚀 Submit Report'}</>}
             </button>
           )}
         </div>

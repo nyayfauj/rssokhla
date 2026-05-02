@@ -1,18 +1,22 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // ─── Image Optimization ─────────────────────────────────
+  compress: true,
+
   images: {
     remotePatterns: [
       {
         protocol: 'https',
         hostname: 'cloud.appwrite.io',
       },
+      {
+        protocol: 'https',
+        hostname: 'sgp.cloud.appwrite.io',
+      },
     ],
     formats: ['image/webp', 'image/avif'],
   },
 
-  // ─── Security Headers ──────────────────────────────────
   async headers() {
     return [
       {
@@ -35,14 +39,12 @@ const nextConfig: NextConfig = {
     ];
   },
 
-  // ─── PWA / Service Worker ──────────────────────────────
   async rewrites() {
     return [];
   },
 
-  // ─── Experimental / Performance ────────────────────────
   experimental: {
-    optimizePackageImports: ['zustand', 'appwrite'],
+    optimizePackageImports: ['zustand', 'appwrite', 'chart.js', 'date-fns'],
   },
 };
 

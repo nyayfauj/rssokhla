@@ -21,21 +21,22 @@ export default function ThemeToggle() {
       localStorage.setItem('nf-theme', 'stealth');
     } else {
       document.documentElement.classList.remove('stealth-mode');
-      localStorage.setItem('nf-theme', 'intelligence');
+      localStorage.setItem('nf-theme', 'default');
     }
   };
 
   return (
-    <button 
+    <button
       onClick={toggle}
       className="flex items-center gap-2 px-2 py-1 rounded-lg hover:bg-white/5 transition-colors group"
-      title={isStealth ? "Switch to Intelligence Mode" : "Activate Stealth Mode"}
+      aria-label={isStealth ? 'Switch to default theme' : 'Switch to stealth theme'}
+      aria-pressed={isStealth}
     >
-      <div className={`w-8 h-4 rounded-full relative transition-colors ${isStealth ? 'bg-red-900/50' : 'bg-zinc-800'}`}>
-        <div className={`absolute top-0.5 w-3 h-3 rounded-full transition-all duration-300 ${isStealth ? 'left-4.5 bg-red-500' : 'left-0.5 bg-zinc-500'} shadow-[0_0_8px_rgba(239,68,68,0.5)]`}></div>
+      <div className={`w-9 h-5 rounded-full relative transition-colors ${isStealth ? 'bg-red-900/50' : 'bg-zinc-800'}`}>
+        <div className={`absolute top-0.5 w-4 h-4 rounded-full transition-all duration-300 ${isStealth ? 'left-4 bg-red-500' : 'left-0.5 bg-zinc-500'} shadow-[0_0_8px_rgba(239,68,68,0.5)]`}></div>
       </div>
-      <span className="text-[8px] font-black uppercase tracking-widest text-zinc-600 group-hover:text-zinc-400">
-        {isStealth ? 'STEALTH' : 'INTEL'}
+      <span className="text-xs font-medium text-zinc-600 group-hover:text-zinc-400">
+        {isStealth ? 'Stealth' : 'Default'}
       </span>
     </button>
   );

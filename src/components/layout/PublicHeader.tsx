@@ -19,7 +19,7 @@ export default function PublicHeader() {
     <header className="sticky top-0 z-50 bg-[#0a0a0a]/80 backdrop-blur-xl border-b border-zinc-800/60">
       <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-2 group">
-          <span className="text-2xl transition-transform group-hover:scale-110">🛡️</span>
+          <span className="text-2xl transition-transform group-hover:scale-110" aria-hidden="true">&#x1F6E1;&#xFE0F;</span>
           <span className="font-bold text-lg tracking-tight text-white">
             Nyay<span className="text-red-500">Fauj</span>
           </span>

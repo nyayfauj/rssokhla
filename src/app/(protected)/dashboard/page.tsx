@@ -40,7 +40,7 @@ export default function DashboardPage() {
           </p>
         </div>
         <Badge variant={role === 'admin' ? 'danger' : role === 'moderator' ? 'warning' : 'default'} size="md">
-          {role.replace('_', ' ')}
+          {(role || 'user').replace(/_/g, ' ')}
         </Badge>
       </div>
 

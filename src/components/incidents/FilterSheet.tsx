@@ -26,12 +26,12 @@ export default function FilterSheet({ isOpen, onClose }: FilterSheetProps) {
     onClose();
   };
 
-  const handleReset = () => {
+  const handleReset = async () => {
     setLocalCategory(undefined);
     setLocalSeverity(undefined);
     setLocalStatus(undefined);
     clearFilters();
-    fetchIncidents();
+    await fetchIncidents();
     onClose();
   };
 
@@ -46,6 +46,7 @@ export default function FilterSheet({ isOpen, onClose }: FilterSheetProps) {
               <button
                 key={key}
                 onClick={() => setLocalCategory(localCategory === key ? undefined : key)}
+                aria-pressed={localCategory === key}
                 className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${
                   localCategory === key
                     ? 'bg-red-500/10 text-red-400 border-red-500/30'
@@ -66,6 +67,7 @@ export default function FilterSheet({ isOpen, onClose }: FilterSheetProps) {
               <button
                 key={key}
                 onClick={() => setLocalSeverity(localSeverity === key ? undefined : key)}
+                aria-pressed={localSeverity === key}
                 className={`flex-1 py-2 rounded-xl text-xs font-medium border transition-colors ${
                   localSeverity === key
                     ? `${sev.bg} ${sev.text} border-current`
@@ -86,6 +88,7 @@ export default function FilterSheet({ isOpen, onClose }: FilterSheetProps) {
               <button
                 key={key}
                 onClick={() => setLocalStatus(localStatus === key ? undefined : key)}
+                aria-pressed={localStatus === key}
                 className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${
                   localStatus === key
                     ? 'bg-zinc-800 text-white border-zinc-600'
@@ -102,7 +105,7 @@ export default function FilterSheet({ isOpen, onClose }: FilterSheetProps) {
         {/* Actions */}
         <div className="flex gap-3 pt-2">
           <Button variant="ghost" fullWidth onClick={handleReset}>Reset</Button>
-          <Button fullWidth onClick={handleApply}>Apply Filters</Button>
+          <Button fullWidth onClick={handleApply}>Apply</Button>
         </div>
       </div>
     </Modal>

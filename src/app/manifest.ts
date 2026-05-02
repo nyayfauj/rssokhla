@@ -1,26 +1,24 @@
-// ─── PWA Web App Manifest ───────────────────────────────────
-
 import type { MetadataRoute } from 'next';
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: 'NyayFauj // Intelligence Hub',
+    name: 'NyayFauj — Okhla Community Monitor',
     short_name: 'NyayFauj',
-    description: 'High-fidelity community intelligence & tactical monitoring for the Okhla Sector.',
+    description: 'Community-powered safety monitoring platform for Okhla — report, track, and verify local activities securely.',
     start_url: '/',
     display: 'standalone',
     background_color: '#050606',
     theme_color: '#dc2626',
     orientation: 'portrait',
-    categories: ['security', 'news', 'social'],
+    categories: ['safety', 'community', 'news'],
     shortcuts: [
       {
-        name: 'Transmit Intel',
+        name: 'Report Incident',
         url: '/incidents/report',
         icons: [{ src: '/icons/icon-192x192.png', sizes: '192x192' }],
       },
       {
-        name: 'Strategic Overview',
+        name: 'Community Monitor',
         url: '/',
         icons: [{ src: '/icons/icon-192x192.png', sizes: '192x192' }],
       },

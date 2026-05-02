@@ -20,44 +20,43 @@ function AccessHandler() {
       return;
     }
 
-    // Recovery logic: Restore token to localStorage and login
     try {
       localStorage.setItem('nf_magic_token', token);
       loginAnonymous().then(() => {
         setStatus('success');
-        addToast({ type: 'success', message: 'Identity Restored via Magic Link' });
+        addToast({ type: 'success', message: 'Identity restored via magic link' });
         setTimeout(() => router.push('/'), 2000);
       }).catch(() => setStatus('error'));
     } catch {
       setStatus('error');
     }
-  }, [searchParams]);
+  }, [searchParams, loginAnonymous, addToast, router]);
 
   return (
     <div className="min-h-screen bg-[#050606] flex items-center justify-center p-4">
-      <GlassCard title="Identity Recovery" icon="🛡️">
+      <GlassCard title="Identity Recovery" icon="&#x1F6E1;&#xFE0F;">
         <div className="text-center space-y-6 py-8">
           {status === 'verifying' && (
             <>
               <div className="w-12 h-12 border-2 border-red-500 border-t-transparent rounded-full animate-spin mx-auto" />
-              <p className="text-xs font-bold uppercase tracking-widest text-zinc-500">Decrypting Access Token...</p>
+              <p className="text-sm text-zinc-400">Verifying your link...</p>
             </>
           )}
 
           {status === 'success' && (
             <>
-              <div className="text-4xl">✅</div>
-              <p className="text-sm font-bold text-white uppercase tracking-widest">Access Granted</p>
-              <p className="text-[10px] text-zinc-500">Redirecting to Intelligence Dashboard...</p>
+              <div className="text-4xl" aria-hidden="true">&#x2705;</div>
+              <p className="text-sm font-semibold text-white">Access Granted</p>
+              <p className="text-xs text-zinc-500">Redirecting to dashboard...</p>
             </>
           )}
 
           {status === 'error' && (
             <>
-              <div className="text-4xl">⚠️</div>
-              <p className="text-sm font-bold text-red-500 uppercase tracking-widest">Invalid or Expired Link</p>
-              <p className="text-[10px] text-zinc-500 max-w-[200px] mx-auto">This recovery link is either broken or the session has been terminated by the secure node.</p>
-              <button onClick={() => router.push('/login')} className="text-[10px] text-zinc-400 underline uppercase tracking-widest">Return to Base</button>
+              <div className="text-4xl" aria-hidden="true">&#x26A0;&#xFE0F;</div>
+              <p className="text-sm font-semibold text-red-500">Invalid or Expired Link</p>
+              <p className="text-xs text-zinc-500 max-w-xs mx-auto">This link may have expired or is no longer valid.</p>
+              <button onClick={() => router.push('/login')} className="text-sm text-zinc-400 underline hover:text-zinc-200 transition-colors">Return to login</button>
             </>
           )}
         </div>
@@ -68,7 +67,7 @@ function AccessHandler() {
 
 export default function AccessPage() {
   return (
-    <Suspense fallback={<div>Loading Access Protocol...</div>}>
+    <Suspense fallback={<div className="min-h-screen bg-[#050606] flex items-center justify-center text-zinc-400">Loading...</div>}>
       <AccessHandler />
     </Suspense>
   );

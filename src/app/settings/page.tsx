@@ -40,23 +40,23 @@ export default function SettingsPage() {
   return (
     <div className="space-y-6 max-w-lg mx-auto pb-24">
       <div className="flex items-center gap-3">
-        <span className="w-8 h-8 rounded bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-500">⚙️</span>
-        <h1 className="text-2xl font-black uppercase tracking-tighter italic text-white">Node Configuration</h1>
+        <span className="w-8 h-8 rounded bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-500" aria-hidden="true">&#x2699;&#xFE0F;</span>
+        <h1 className="text-2xl font-semibold text-white">Settings</h1>
       </div>
 
       {/* Profile */}
       <Card padding="md" className="border-zinc-800/50 bg-zinc-900/20">
-        <h2 className="text-[10px] font-black text-zinc-600 uppercase tracking-[0.3em] mb-5">Operative Identity</h2>
+        <h2 className="text-sm font-medium text-zinc-500 mb-4">Profile</h2>
         <div className="flex items-center gap-5">
-          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-red-600 to-red-900 flex items-center justify-center text-3xl font-black text-white shadow-[0_0_20px_rgba(220,38,38,0.2)]">
-            {isAnonymous ? '🕶️' : user?.name?.charAt(0)?.toUpperCase() || '?'}
+          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-red-600 to-red-900 flex items-center justify-center text-3xl font-bold text-white shadow-[0_0_20px_rgba(220,38,38,0.2)]">
+            {isAnonymous ? <span aria-hidden="true">&#x1F576;&#xFE0F;</span> : user?.name?.charAt(0)?.toUpperCase() || '?'}
           </div>
           <div className="flex-1 min-w-0">
-            <p className="font-black text-lg text-white uppercase tracking-tight">{isAnonymous ? 'Anonymous Node' : user?.name}</p>
-            <p className="text-[10px] text-zinc-600 font-bold uppercase tracking-widest truncate">{isAnonymous ? 'STEALTH MODE ACTIVE' : user?.email}</p>
+            <p className="font-semibold text-lg text-white">{isAnonymous ? 'Anonymous User' : user?.name}</p>
+            <p className="text-xs text-zinc-500 truncate">{isAnonymous ? 'Browsing anonymously' : user?.email}</p>
             <div className="mt-2 flex">
-              <Badge variant={role === 'admin' ? 'danger' : role === 'moderator' ? 'warning' : 'default'} size="sm" className="font-black uppercase tracking-widest text-[8px] py-0.5">
-                {role === 'anonymous_user' ? 'Anonymous Observer' : `Verified Sangathan ${role}`}
+              <Badge variant={role === 'admin' ? 'danger' : role === 'moderator' ? 'warning' : 'default'} size="sm">
+                {role?.replace(/_/g, ' ') || 'user'}
               </Badge>
             </div>
           </div>
@@ -64,7 +64,8 @@ export default function SettingsPage() {
         {isAnonymous && (
           <button 
             onClick={() => router.push('/sangathan')}
-            className="w-full mt-6 py-4 bg-white text-black text-[10px] font-black uppercase tracking-[0.3em] rounded-xl hover:bg-red-600 hover:text-white transition-all shadow-xl active:scale-[0.98]"
+            aria-label="Create an account to join the community"
+            className="w-full mt-6 py-4 bg-white text-black text-sm font-semibold rounded-xl hover:bg-red-600 hover:text-white transition-all shadow-xl active:scale-[0.98]"
           >
             Join the Sangathan
           </button>
@@ -98,7 +99,7 @@ export default function SettingsPage() {
               <p className="text-sm font-medium text-white">Device Fingerprint</p>
               <p className="text-xs text-zinc-500">Browser-based identification</p>
             </div>
-            <Badge variant="info" size="sm">Tracked</Badge>
+            <Badge variant="info" size="sm">Active</Badge>
           </div>
         </div>
       </Card>
@@ -127,7 +128,10 @@ export default function SettingsPage() {
           </div>
           <button
             onClick={toggleTheme}
+            aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
             className="w-12 h-7 rounded-full bg-zinc-800 border border-zinc-700 relative transition-colors"
+            role="switch"
+            aria-checked={theme === 'dark'}
           >
             <div className={`w-5 h-5 rounded-full bg-white shadow-md absolute top-0.5 transition-transform ${theme === 'dark' ? 'translate-x-6' : 'translate-x-0.5'}`} />
           </button>
@@ -136,7 +140,7 @@ export default function SettingsPage() {
 
       {/* Data & Storage */}
       <Card padding="md">
-        <h2 className="text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-3">Data & Storage</h2>
+        <h2 className="text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-3">Data &amp; Storage</h2>
         <div className="space-y-3">
           <div className="flex items-center justify-between">
             <div>
@@ -146,6 +150,7 @@ export default function SettingsPage() {
             <Button
               variant="ghost"
               size="sm"
+              aria-label="Clear cached data"
               onClick={() => {
                 if ('caches' in window) {
                   caches.keys().then((names) => names.forEach((name) => caches.delete(name)));

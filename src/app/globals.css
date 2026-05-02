@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
-/* ─── CSS Custom Properties (Design Tokens) ──────────────── */
+/* -- CSS Custom Properties (Design Tokens) -- */
 :root {
-  --color-bg: #0a0a0a;
+  --color-bg: #050606;
   --color-surface: #171717;
   --color-surface-elevated: #1c1c1c;
   --color-border: #27272a;
@@ -12,11 +12,19 @@
   --color-info: #3b82f6;
   --color-text: #fafafa;
   --color-muted: #a1a1aa;
-  --radius-card: 1rem;
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-2xl: 1.25rem;
   --font-sans: var(--font-inter), 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --z-bottom-nav: 50;
+  --z-overlay: 40;
+  --z-modal: 50;
+  --z-toast: 60;
 }
 
-/* ─── Base Resets ────────────────────────────────────────── */
+/* -- Base Resets -- */
 * {
   -webkit-tap-highlight-color: transparent;
 }
@@ -31,7 +39,7 @@ body {
   overscroll-behavior-y: contain;
 }
 
-/* ─── Safe Area Padding (for notched devices) ────────────── */
+/* -- Safe Area Padding (for notched devices) -- */
 .safe-area-pb {
   padding-bottom: env(safe-area-inset-bottom, 0px);
 }
@@ -40,9 +48,9 @@ body {
   padding-top: env(safe-area-inset-top, 0px);
 }
 
-/* ─── Scrollbar Styling ──────────────────────────────────── */
+/* -- Scrollbar Styling -- */
 ::-webkit-scrollbar {
-  width: 4px;
+  width: 6px;
 }
 
 ::-webkit-scrollbar-track {
@@ -51,20 +59,20 @@ body {
 
 ::-webkit-scrollbar-thumb {
   background: #27272a;
-  border-radius: 4px;
+  border-radius: 6px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
   background: #3f3f46;
 }
 
-/* ─── Selection ──────────────────────────────────────────── */
+/* -- Selection -- */
 ::selection {
   background: rgba(220, 38, 38, 0.3);
   color: #fafafa;
 }
 
-/* ─── Animations ─────────────────────────────────────────── */
+/* -- Animations -- */
 @keyframes slideUp {
   from {
     opacity: 0;
@@ -104,7 +112,7 @@ body {
 
 .line-clamp-1 { overflow: hidden; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 1; }
 
-/* ─── Glassmorphism Utilities ────────────────────────────── */
+/* -- Glassmorphism Utilities -- */
 .glass {
   background: rgba(23, 23, 23, 0.6);
   backdrop-filter: blur(12px);
@@ -118,12 +126,12 @@ body {
   -webkit-backdrop-filter: blur(24px);
 }
 
-/* ─── Touch Utilities ────────────────────────────────────── */
+/* -- Touch Utilities -- */
 .touch-manipulation {
   touch-action: manipulation;
 }
 
-/* ─── Reduced Motion ─────────────────────────────────────── */
+/* -- Reduced Motion -- */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -133,12 +141,20 @@ body {
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
+  .animate-marquee,
+  .animate-scan,
+  .animate-pulse,
+  .animate-ping,
+  .animate-spin,
+  .animate-float {
+    animation: none !important;
+  }
 }
 
-/* ─── Mobile-First Responsive Padding ────────────────────── */
+/* -- Mobile-First Responsive Padding -- */
 .page-container {
   padding: 1rem;
-  padding-bottom: 5rem; /* Space for bottom nav */
+  padding-bottom: 5rem;
   max-width: 640px;
   margin: 0 auto;
 }
@@ -158,7 +174,7 @@ body {
   }
 }
 
-/* ─── Premium UI Utilities ───────────────────────────────── */
+/* -- Premium UI Utilities -- */
 .text-gradient {
   background: linear-gradient(to right, #ffffff, #a1a1aa);
   -webkit-background-clip: text;
@@ -209,16 +225,16 @@ body {
   animation: float 6s ease-in-out infinite;
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .animate-float { animation: none !important; }
+}
+
 @keyframes float {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-10px); }
 }
 
-::selection {
-  @apply bg-red-500/30 text-white;
-}
-
-/* ─── Cinematic Scanning Background ──────────────────────── */
+/* -- Cinematic Scanning Background -- */
 .bg-scanline {
   background: linear-gradient(
     to bottom,
@@ -232,7 +248,7 @@ body {
 }
 
 .bg-grid {
-  background-image: 
+  background-image:
     linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
     linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
   background-size: 40px 40px;
@@ -247,7 +263,11 @@ body {
   to { background-position: 0 100%; }
 }
 
-/* ─── Haptic Visual Effects ─────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .animate-scan { animation: none !important; }
+}
+
+/* -- Haptic Visual Effects -- */
 .btn-glitch:hover {
   text-shadow: 2px 0 #ef4444, -2px 0 #3b82f6;
   animation: glitch-anim 0.3s infinite linear alternate-reverse;
@@ -278,7 +298,7 @@ body {
   animation: h-scan 1s linear infinite;
 }
 
-/* ─── Classified Briefing Print Styles ──────────────────── */
+/* -- Classified Briefing Print Styles -- */
 @media print {
   body {
     background: white !important;
@@ -308,20 +328,9 @@ body {
   .rounded-2xl {
     border-radius: 0 !important;
   }
-  /* Classified Header */
-  body::before {
-    content: "SECRET // NYAYFAUJ INTELLIGENCE // DO NOT DISTRIBUTE";
-    display: block;
-    text-align: center;
-    font-weight: bold;
-    font-size: 10px;
-    border-bottom: 1px solid black;
-    margin-bottom: 20px;
-    padding-bottom: 5px;
-  }
 }
 
-/* ─── Stealth Mode Overrides ────────────────────────────── */
+/* -- Stealth Mode Overrides -- */
 .stealth-mode {
   --bg-color: #000000;
   --panel-bg: rgba(0, 0, 0, 0.8);
@@ -353,10 +362,11 @@ body {
 .animate-marquee {
   animation: marquee 30s linear infinite;
 }
-  @keyframes scan-y {
-    0% { transform: translateY(-100%); }
-    100% { transform: translateY(1000%); }
-  }
-  .animate-scan-y {
-    animation: scan-y 3s linear infinite;
-  }
+
+@keyframes scan-y {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(1000%); }
+}
+.animate-scan-y {
+  animation: scan-y 3s linear infinite;
+}

@@ -6,6 +6,7 @@ import { INCIDENT_CATEGORIES, SEVERITY_LEVELS, STATUS_LABELS } from '@/lib/utils
 import { OKHLA_AREAS, type OkhlaArea } from '@/types/location.types';
 import type { IncidentStatus, IncidentSeverity } from '@/types/incident.types';
 import { useIncidentsStore } from '@/stores/incidents.store';
+import { useAuthStore } from '@/stores/auth.store';
 import { databases } from '@/lib/appwrite/client';
 import { DATABASE_ID, COLLECTIONS } from '@/lib/appwrite/collections';
 
@@ -13,9 +14,11 @@ type ReviewAction = 'verify' | 'reject' | 'escalate';
 
 export default function AdminPage() {
   const { incidents, fetchIncidents, verifyIncident, isLoading } = useIncidentsStore();
+  const { user } = useAuthStore();
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [filter, setFilter] = useState<'all' | 'reported' | 'verified'>('all');
   const [note, setNote] = useState('');
+  const [actionLoading, setActionLoading] = useState(false);
 
   useEffect(() => {
     fetchIncidents();
@@ -36,11 +39,11 @@ export default function AdminPage() {
   }), [incidents]);
 
   const handleAction = async (action: ReviewAction) => {
-    if (!selectedId) return;
+    if (!selectedId || actionLoading) return;
+    setActionLoading(true);
     try {
       if (action === 'verify') {
-        // Just use a mock user ID for admin for now or fetch the current user
-        await verifyIncident(selectedId, 'admin_user');
+        await verifyIncident(selectedId, user?.$id || 'current');
       } else if (action === 'reject') {
         await databases.updateDocument(DATABASE_ID, COLLECTIONS.INCIDENTS, selectedId, {
           status: 'false_positive' as IncidentStatus
@@ -54,10 +57,11 @@ export default function AdminPage() {
       }
     } catch (e) {
       console.error('Failed to update incident:', e);
+    } finally {
+      setActionLoading(false);
+      setSelectedId(null);
+      setNote('');
     }
-    
-    setSelectedId(null);
-    setNote('');
   };
 
   return (

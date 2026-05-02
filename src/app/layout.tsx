@@ -8,6 +8,8 @@ import AppwritePing from '@/components/AppwritePing';
 import PublicHeader from '@/components/layout/PublicHeader';
 import CommandPalette from '@/components/ui/CommandPalette';
 import AlertToasts from '@/components/ui/AlertToasts';
+import Footer from '@/components/layout/Footer';
+import CookieConsent from '@/components/layout/CookieConsent';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -21,27 +23,13 @@ export const metadata: Metadata = {
     default: 'NyayFauj — Okhla Community Monitor',
     template: '%s | NyayFauj',
   },
-  description: 'Community-driven safety monitoring platform for Okhla — track, report, and verify activities in your neighborhood securely.',
-  keywords: ['okhla', 'safety', 'monitor', 'community', 'reporting', 'nyayfauj', 'jamia nagar', 'shaheen bagh'],
+  description: 'Community-driven safety monitoring platform for Okhla, New Delhi — report, track, and verify local activities securely.',
+  keywords: ['okhla', 'community safety', 'incident reporting', 'okhla news', 'jamia nagar', 'shaheen bagh', 'new delhi'],
   authors: [{ name: 'NyayFauj Community' }],
   applicationName: 'NyayFauj',
-  alternates: {
-    canonical: '/',
-  },
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: {
-      index: true,
-      follow: true,
-      'max-video-preview': -1,
-      'max-image-preview': 'large',
-      'max-snippet': -1,
-    },
-  },
   openGraph: {
     title: 'NyayFauj — Okhla Community Monitor',
-    description: 'Autonomous community-driven safety monitoring platform for Okhla.',
+    description: 'Community-powered safety monitoring for Okhla, New Delhi.',
     url: '/',
     siteName: 'NyayFauj',
     locale: 'en_IN',
@@ -50,7 +38,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'NyayFauj — Okhla Community Monitor',
-    description: 'Autonomous community-driven safety monitoring platform for Okhla.',
+    description: 'Community-powered safety monitoring for Okhla, New Delhi.',
   },
   appleWebApp: {
     capable: true,
@@ -65,13 +53,12 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
-  maximumScale: 1,
-  userScalable: false,
+  maximumScale: 5,
   themeColor: '#0a0a0a',
   colorScheme: 'dark',
 };
 
-import MobileNav from '@/components/layout/MobileNav';
+import BottomNav from '@/components/layout/BottomNav';
 
 export default function RootLayout({
   children,
@@ -86,8 +73,8 @@ export default function RootLayout({
       </head>
       <body className="font-sans bg-[#050606] text-zinc-100 antialiased overscroll-none selection:bg-red-500/30">
         {/* Cinematic Overlays */}
-        <div className="fixed inset-0 bg-grid opacity-20 pointer-events-none z-0"></div>
-        <div className="fixed inset-0 bg-scanline opacity-5 pointer-events-none z-10 animate-scan"></div>
+        <div className="fixed inset-0 bg-grid opacity-20 pointer-events-none z-0" aria-hidden="true"></div>
+        <div className="fixed inset-0 bg-scanline opacity-5 pointer-events-none z-10 animate-scan" aria-hidden="true"></div>
         
         <div className="relative z-20 min-h-screen flex flex-col">
           <ErrorBoundary>
@@ -97,10 +84,12 @@ export default function RootLayout({
             <CommandPalette />
             <AlertToasts />
             <PublicHeader />
-            <main className="flex-1 pb-20 sm:pb-0">
+            <main className="flex-1 pb-20 sm:pb-0" role="main">
               {children}
             </main>
-            <MobileNav />
+            <Footer />
+            <CookieConsent />
+            <BottomNav />
           </ErrorBoundary>
         </div>
       </body>

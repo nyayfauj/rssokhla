@@ -83,12 +83,12 @@ export default function LocationSearch({ onSelect }: Props) {
     onSelect(r.lng, r.lat);
   };
 
-  const typeIcon = (type: string) => type === 'area' ? '📍' : type === 'zone' ? '⭕' : '🏛️';
+  const typeIcon = (type: string) => type === 'area' ? '&#x1F4CD;' : type === 'zone' ? '&#x2B55;' : '&#x1F3DB;&#xFE0F;';
 
   return (
     <div className="relative">
       <div className="relative">
-        <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs text-zinc-500">🔍</span>
+        <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-sm text-zinc-500" aria-hidden="true">&#x1F50D;</span>
         <input
           ref={inputRef}
           type="text"
@@ -97,23 +97,24 @@ export default function LocationSearch({ onSelect }: Props) {
           onChange={e => setQuery(e.target.value)}
           onFocus={() => setFocused(true)}
           onBlur={() => setTimeout(() => setFocused(false), 200)}
-          className="w-full bg-zinc-900/90 backdrop-blur-xl border border-zinc-800/60 text-white placeholder-zinc-600 rounded-xl pl-8 pr-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-red-500/30 shadow-lg"
+          aria-label="Search for locations in Okhla"
+          className="w-full bg-zinc-900/90 backdrop-blur-xl border border-zinc-800/60 text-white placeholder-zinc-600 rounded-xl pl-8 pr-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-500/30 shadow-lg"
         />
         {query && (
-          <button onClick={() => { setQuery(''); setResults([]); }} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-zinc-600 hover:text-white text-xs">✕</button>
+          <button onClick={() => { setQuery(''); setResults([]); }} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-zinc-600 hover:text-white text-sm" aria-label="Clear search">&#x2715;</button>
         )}
       </div>
 
       {/* Results dropdown */}
       {focused && results.length > 0 && (
-        <div className="absolute top-full left-0 right-0 mt-1 bg-zinc-900/95 backdrop-blur-xl border border-zinc-800/60 rounded-xl overflow-hidden shadow-2xl z-20">
+        <div className="absolute top-full left-0 right-0 mt-1 bg-zinc-900/95 backdrop-blur-xl border border-zinc-800/60 rounded-xl overflow-hidden shadow-2xl z-20" role="listbox">
           {results.map(r => (
-            <button key={r.id} onClick={() => handleSelect(r)}
-              className="flex items-center gap-2 w-full px-3 py-2 text-left hover:bg-zinc-800/50 transition-colors border-b border-zinc-800/20 last:border-0">
-              <span className="text-sm">{typeIcon(r.type)}</span>
+            <button key={r.id} onClick={() => handleSelect(r)} role="option"
+              className="flex items-center gap-2 w-full px-3 py-2.5 text-left hover:bg-zinc-800/50 transition-colors border-b border-zinc-800/20 last:border-0">
+              <span className="text-sm" aria-hidden="true" dangerouslySetInnerHTML={{ __html: typeIcon(r.type) }} />
               <div className="min-w-0">
-                <p className="text-xs text-white truncate">{r.label}</p>
-                <p className="text-[10px] text-zinc-500 truncate">{r.sub}</p>
+                <p className="text-sm text-white truncate">{r.label}</p>
+                <p className="text-xs text-zinc-500 truncate">{r.sub}</p>
               </div>
             </button>
           ))}

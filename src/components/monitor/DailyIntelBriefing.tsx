@@ -1,54 +1,46 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useMemo } from 'react';
 import { useIncidentsStore } from '@/stores/incidents.store';
 
 export default function DailyIntelBriefing() {
   const { incidents } = useIncidentsStore();
-  const [summary, setSummary] = useState<string>('Analyzing latest intelligence nodes...');
-  const [isAnalyzing, setIsAnalyzing] = useState(true);
 
-  useEffect(() => {
-    // Simulate AI analysis delay
-    const timer = setTimeout(() => {
-      if (incidents.length > 0) {
-        setSummary(`Critical vigilance required. ${incidents.length} incidents logged in the last period. Focus remains on the Okhla-Shaheen Bagh corridor. Intelligence suggests stable but persistent monitoring levels.`);
-      } else {
-        setSummary("System optimal. No critical anomalies detected in the current surveillance cycle. Continue standard monitoring protocols.");
-      }
-      setIsAnalyzing(false);
-    }, 2000);
+  const summary = useMemo(() => {
+    if (incidents.length === 0) {
+      return 'No reports have been submitted yet. Be the first to report activity in your area.';
+    }
 
-    return () => clearTimeout(timer);
+    const critical = incidents.filter(i => i.severity === 'critical').length;
+    const verified = incidents.filter(i => i.status === 'verified').length;
+    const recent = incidents.filter(i => {
+      const diff = Date.now() - new Date(i.timestamp).getTime();
+      return diff < 24 * 60 * 60 * 1000;
+    }).length;
+
+    const parts: string[] = [];
+    if (critical > 0) parts.push(`${critical} critical report${critical > 1 ? 's' : ''} require attention`);
+    parts.push(`${verified} of ${incidents.length} reports verified by the community`);
+    if (recent > 0) parts.push(`${recent} new report${recent > 1 ? 's' : ''} in the last 24 hours`);
+
+    return parts.join('. ') + '.';
   }, [incidents]);
 
   return (
-    <div className="bg-red-500/5 border border-red-500/10 rounded-2xl p-6 relative overflow-hidden group">
-      <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-        <span className="text-4xl">🤖</span>
-      </div>
-      
-      <div className="space-y-4">
+    <div className="bg-zinc-900/30 border border-zinc-800/40 rounded-2xl p-5 relative overflow-hidden">
+      <div className="space-y-3">
         <div className="flex items-center gap-2">
-          <div className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></div>
-          <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-red-500">Autonomous Intel Analysis</h3>
+          <div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" aria-hidden="true"></div>
+          <h3 className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">Activity Summary</h3>
         </div>
 
-        <div className={`space-y-2 transition-all duration-700 ${isAnalyzing ? 'blur-sm opacity-50' : 'blur-0 opacity-100'}`}>
-          <p className="text-sm font-bold text-zinc-100 leading-relaxed italic">
-            "{summary}"
-          </p>
-        </div>
+        <p className="text-sm text-zinc-300 leading-relaxed">
+          {summary}
+        </p>
 
-        {isAnalyzing && (
-          <div className="absolute inset-0 flex items-center justify-center bg-black/20">
-            <div className="w-4 h-4 border-2 border-red-500 border-t-transparent rounded-full animate-spin"></div>
-          </div>
-        )}
-
-        <div className="pt-2 flex items-center justify-between text-[8px] font-black uppercase tracking-widest text-zinc-600">
-          <span>Vector: NF-CORE-PRO</span>
-          <span>Update: {new Date().toLocaleTimeString()}</span>
+        <div className="pt-2 flex items-center justify-between text-xs text-zinc-600">
+          <span>Community-generated</span>
+          <span>Updated: {new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}</span>
         </div>
       </div>
     </div>

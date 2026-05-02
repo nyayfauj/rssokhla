@@ -5,10 +5,10 @@
 import { useUIStore, type Toast as ToastType } from '@/stores/ui.store';
 
 const ICON_MAP = {
-  success: '✓',
-  error: '✕',
-  warning: '⚠',
-  info: 'ℹ',
+  success: '&#x2713;',
+  error: '&#x2715;',
+  warning: '&#x26A0;',
+  info: '&#x2139;',
 };
 
 const COLOR_MAP = {

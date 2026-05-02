@@ -58,13 +58,14 @@ export default function LocationPicker({ area, onAreaChange, coordinates, onCoor
   return (
     <div className="space-y-3">
       {/* Mode tabs */}
-      <div className="flex gap-1 bg-zinc-900/60 rounded-xl p-1">
-        {([['gps', '📍', 'GPS'], ['area', '🗺️', 'Area'], ['landmark', '🏛️', 'Landmark']] as [Mode, string, string][]).map(([m, icon, label]) => (
-          <button key={m} type="button" onClick={() => setMode(m)}
-            className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-medium transition-colors ${
+      <div className="flex gap-1 bg-zinc-900/60 rounded-xl p-1" role="tablist" aria-label="Location input method">
+        {([['gps', '&#x1F4CD;', 'GPS'], ['area', '&#x1F5FA;&#xFE0F;', 'Area'], ['landmark', '&#x1F3DB;&#xFE0F;', 'Landmark']] as [Mode, string, string][]).map(([m, icon, label]) => (
+          <button key={m} type="button" onClick={() => setMode(m)} role="tab" aria-selected={mode === m}
+            className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-sm font-medium transition-colors ${
               mode === m ? 'bg-zinc-800 text-white' : 'text-zinc-500 hover:text-zinc-300'
-            }`}>
-            <span>{icon}</span>{label}
+            }`}
+            aria-label={`Use ${label} to select location`}>
+            <span aria-hidden="true" dangerouslySetInnerHTML={{ __html: icon }} />{label}
           </button>
         ))}
       </div>

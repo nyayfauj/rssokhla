@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useMemo } from 'react';
 import type { Incident } from '@/types/incident.types';
 import { formatDistanceToNow } from 'date-fns';
 
@@ -9,26 +9,40 @@ interface Props {
 }
 
 export default function ActivityTicker({ incidents }: Props) {
-  if (!incidents || incidents.length === 0) return null;
+  const tickerItems = useMemo(() => {
+    if (!incidents || incidents.length === 0) return [];
+    const base = incidents.slice(0, 15).map(incident => ({
+      severity: incident.severity?.toUpperCase() || 'LOW',
+      title: incident.title || 'Untitled',
+      location: incident.locationId?.replace(/_/g, ' ').toUpperCase() || 'Unknown',
+      time: formatDistanceToNow(new Date(incident.timestamp)),
+    }));
+    return [...base, ...base];
+  }, [incidents]);
+
+  if (tickerItems.length === 0) return null;
 
   return (
-    <div className="bg-red-600 border-y border-red-500 py-2 overflow-hidden flex items-center h-10">
+    <div
+      className="bg-red-600 border-y border-red-500 py-2 overflow-hidden flex items-center h-10"
+      role="marquee"
+      aria-label="Live activity feed"
+    >
       <div className="flex items-center gap-3 px-6 h-full bg-red-600 relative z-10 shadow-[15px_0_20px_rgba(220,38,38,1)]">
-        <span className="text-[11px] font-black text-white uppercase tracking-[0.3em] whitespace-nowrap flex items-center gap-2.5">
+        <span className="text-xs font-bold text-white uppercase tracking-widest whitespace-nowrap flex items-center gap-2.5">
           <span className="w-2 h-2 bg-white rounded-full animate-pulse shadow-[0_0_10px_#fff]"></span>
-          Intelligence Wire
+          Live Updates
         </span>
       </div>
       
       <div className="flex-1 relative flex items-center overflow-hidden">
         <div className="flex items-center gap-16 whitespace-nowrap animate-marquee">
-          {/* Repeat items twice for infinite scroll */}
-          {[...incidents, ...incidents, ...incidents].map((incident, idx) => (
-            <div key={`${incident.$id}-${idx}`} className="flex items-center gap-6">
-              <span className="text-[10px] font-black text-white/60">[{incident.severity.toUpperCase()}]</span>
-              <span className="text-[11px] font-bold text-white uppercase tracking-[0.1em]">{incident.title}</span>
-              <span className="text-[10px] text-white/50 italic">— {incident.locationId.replace('_', ' ').toUpperCase()}</span>
-              <span className="text-[10px] text-white/70 font-mono">({formatDistanceToNow(new Date(incident.timestamp))} ago)</span>
+          {tickerItems.map((item, idx) => (
+            <div key={idx} className="flex items-center gap-6">
+              <span className="text-xs font-bold text-white/60">[{item.severity}]</span>
+              <span className="text-xs font-medium text-white uppercase tracking-wide">{item.title}</span>
+              <span className="text-xs text-white/50 italic">&#x2014; {item.location}</span>
+              <span className="text-xs text-white/70 font-mono">({item.time} ago)</span>
               <span className="text-white/30 px-3">///</span>
             </div>
           ))}
@@ -43,8 +57,10 @@ export default function ActivityTicker({ incidents }: Props) {
         .animate-marquee {
           animation: marquee 60s linear infinite;
         }
-        .animate-marquee:hover {
-          animation-play-state: paused;
+        @media (prefers-reduced-motion: reduce) {
+          .animate-marquee {
+            animation: none;
+          }
         }
       `}</style>
     </div>

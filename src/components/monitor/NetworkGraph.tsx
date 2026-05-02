@@ -1,5 +1,3 @@
-// ─── Karyakarta Network Visualization ───────────────────────
-
 'use client';
 
 import { useRef, useEffect, useState, useCallback } from 'react';
@@ -23,7 +21,6 @@ interface NetworkEdge {
 }
 
 function buildGraph(profiles: KaryakartaProfile[]) {
-  // Deterministic jitter
   const jitter = (i: number, offset: number) => (((i * 2654435761 + offset * 1597334677) >>> 0) % 80 - 40);
   const nodes: NetworkNode[] = profiles.map((p, i) => {
     const angle = (i / profiles.length) * Math.PI * 2;
@@ -45,7 +42,6 @@ function buildGraph(profiles: KaryakartaProfile[]) {
     if (p.associates && Array.isArray(p.associates)) {
       p.associates.forEach(assoc => {
         if (nodeSet.has(assoc.profileId)) {
-          // Avoid duplicate edges
           const existing = edges.find(e =>
             (e.from === p.$id && e.to === assoc.profileId) ||
             (e.from === assoc.profileId && e.to === p.$id)
@@ -73,12 +69,10 @@ export default function NetworkGraph({ profiles }: Props) {
   const graphRef = useRef(buildGraph(profiles));
   const animRef = useRef<number>(0);
 
-  // Update graph if profiles change
   useEffect(() => {
     graphRef.current = buildGraph(profiles);
   }, [profiles]);
 
-  // Resize observer
   useEffect(() => {
     const el = containerRef.current;
     if (!el) return;
@@ -90,20 +84,17 @@ export default function NetworkGraph({ profiles }: Props) {
     return () => obs.disconnect();
   }, []);
 
-  // Simple force simulation
   const simulate = useCallback(() => {
     const { nodes, edges } = graphRef.current;
     const cx = dimensions.w / 2;
     const cy = dimensions.h / 2;
     const damping = 0.85;
 
-    // Center gravity
     nodes.forEach(n => {
       n.vx += (cx - n.x) * 0.002;
       n.vy += (cy - n.y) * 0.002;
     });
 
-    // Node repulsion
     for (let i = 0; i < nodes.length; i++) {
       for (let j = i + 1; j < nodes.length; j++) {
         const dx = nodes[j].x - nodes[i].x;
@@ -117,7 +108,6 @@ export default function NetworkGraph({ profiles }: Props) {
       }
     }
 
-    // Edge attraction
     edges.forEach(e => {
       const a = nodes.find(n => n.id === e.from);
       const b = nodes.find(n => n.id === e.to);
@@ -132,19 +122,16 @@ export default function NetworkGraph({ profiles }: Props) {
       b.vy -= (dy / d) * force;
     });
 
-    // Update positions
     nodes.forEach(n => {
       n.vx *= damping;
       n.vy *= damping;
       n.x += n.vx;
       n.y += n.vy;
-      // Bounds
       n.x = Math.max(n.radius, Math.min(dimensions.w - n.radius, n.x));
       n.y = Math.max(n.radius, Math.min(dimensions.h - n.radius, n.y));
     });
   }, [dimensions]);
 
-  // Render loop
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -162,7 +149,6 @@ export default function NetworkGraph({ profiles }: Props) {
 
       const { nodes, edges } = graphRef.current;
 
-      // Draw edges
       edges.forEach(e => {
         const a = nodes.find(n => n.id === e.from);
         const b = nodes.find(n => n.id === e.to);
@@ -177,7 +163,6 @@ export default function NetworkGraph({ profiles }: Props) {
         ctx.stroke();
         ctx.setLineDash([]);
 
-        // Direction arrow for senior relationships
         if (e.relationship === 'senior') {
           const mx = (a.x + b.x) / 2;
           const my = (a.y + b.y) / 2;
@@ -188,13 +173,11 @@ export default function NetworkGraph({ profiles }: Props) {
         }
       });
 
-      // Draw nodes
       nodes.forEach(n => {
         const threat = THREAT_COLORS[n.profile.threatLevel];
         const isSelected = selected?.$id === n.id;
         const r = n.radius;
 
-        // Outer glow
         if (n.profile.threatLevel === 'critical') {
           const glow = ctx.createRadialGradient(n.x, n.y, r, n.x, n.y, r + 8);
           glow.addColorStop(0, 'rgba(220,38,38,0.15)');
@@ -205,7 +188,6 @@ export default function NetworkGraph({ profiles }: Props) {
           ctx.fill();
         }
 
-        // Circle
         ctx.beginPath();
         ctx.arc(n.x, n.y, r, 0, Math.PI * 2);
         const grad = ctx.createRadialGradient(n.x - r * 0.3, n.y - r * 0.3, 0, n.x, n.y, r);
@@ -222,28 +204,26 @@ export default function NetworkGraph({ profiles }: Props) {
         ctx.fillStyle = grad;
         ctx.fill();
 
-        // Border
         ctx.strokeStyle = isSelected ? '#ffffff' : 'rgba(255,255,255,0.15)';
         ctx.lineWidth = isSelected ? 2 : 0.8;
         ctx.stroke();
 
-        // Initial letter
         ctx.fillStyle = '#ffffff';
         ctx.font = `bold ${r * 0.6}px Inter, sans-serif`;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        ctx.fillText(n.profile.fullName.charAt(0), n.x, n.y);
+        const initial = n.profile.fullName?.charAt(0) || '?';
+        ctx.fillText(initial, n.x, n.y);
 
-        // Name below
         ctx.fillStyle = isSelected ? '#d4d4d8' : '#71717a';
         ctx.font = `${Math.max(8, r * 0.35)}px Inter, sans-serif`;
+        const name = n.profile.fullName || 'Unknown';
         ctx.fillText(
-          n.profile.fullName.length > 12 ? n.profile.fullName.substring(0, 11) + '…' : n.profile.fullName,
+          name.length > 12 ? name.substring(0, 11) + '\u2026' : name,
           n.x, n.y + r + 10
         );
       });
 
-      // Draw Scanning Line
       const scanY = (frame % 200) / 200 * dimensions.h;
       ctx.beginPath();
       ctx.moveTo(0, scanY);
@@ -260,12 +240,14 @@ export default function NetworkGraph({ profiles }: Props) {
     return () => cancelAnimationFrame(animRef.current);
   }, [dimensions, selected, simulate]);
 
-  // Click handler
-  const handleClick = (e: React.MouseEvent<HTMLCanvasElement>) => {
-    const rect = canvasRef.current?.getBoundingClientRect();
-    if (!rect) return;
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+  const handleClick = useCallback((e: React.MouseEvent<HTMLCanvasElement>) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    const x = (e.clientX - rect.left) * scaleX / 2;
+    const y = (e.clientY - rect.top) * scaleY / 2;
     const { nodes } = graphRef.current;
     const clicked = nodes.find(n => {
       const dx = n.x - x;
@@ -273,16 +255,29 @@ export default function NetworkGraph({ profiles }: Props) {
       return Math.sqrt(dx * dx + dy * dy) < n.radius;
     });
     setSelected(clicked ? clicked.profile : null);
-  };
+  }, []);
+
+  const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLCanvasElement>) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      const { nodes } = graphRef.current;
+      if (nodes.length > 0) setSelected(prev => prev ? null : nodes[0].profile);
+    }
+  }, []);
+
+  const associatesCount = selected?.associates?.length ?? 0;
+  const sightingsCount = selected?.sightings?.length ?? 0;
+  const rankLabel = selected?.rank ? RANK_LABELS[selected.rank]?.label || selected.rank : '';
+  const affiliationLabels = selected?.affiliations?.map(a => AFFILIATION_LABELS[a]?.label || a).join(', ') || '';
 
   return (
     <div className="bg-zinc-900/30 border border-zinc-800/40 rounded-2xl overflow-hidden">
-      <div className="flex items-center justify-between px-3 sm:px-4 py-2.5 border-b border-zinc-800/40 bg-zinc-900/60">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-zinc-800/40 bg-zinc-900/60">
         <div className="flex items-center gap-2">
-          <span className="text-xs">🕸️</span>
-          <span className="text-[10px] sm:text-xs font-semibold text-zinc-400 uppercase tracking-widest">Network Map</span>
+          <span className="text-sm" aria-hidden="true">&#x1F578;&#xFE0F;</span>
+          <span className="text-xs font-semibold text-zinc-400 uppercase tracking-widest">Network Map</span>
         </div>
-        <span className="text-[10px] text-zinc-600">{profiles.length} operatives</span>
+        <span className="text-xs text-zinc-600">{profiles.length} profiles</span>
       </div>
 
       <div ref={containerRef} className="relative">
@@ -291,29 +286,32 @@ export default function NetworkGraph({ profiles }: Props) {
           className="w-full cursor-pointer"
           style={{ height: dimensions.h }}
           onClick={handleClick}
+          onKeyDown={handleKeyDown}
+          tabIndex={0}
+          role="img"
+          aria-label="Interactive network visualization of community profiles. Click or tap a node to view details."
         />
 
-        {/* Selected profile detail */}
         {selected && (
-          <div className="absolute bottom-2 left-2 right-2 bg-zinc-900/95 backdrop-blur-xl border border-zinc-800/50 rounded-xl p-2.5 animate-fade-in">
+          <div className="absolute bottom-2 left-2 right-2 bg-zinc-900/95 backdrop-blur-xl border border-zinc-800/50 rounded-xl p-3 animate-fade-in">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold text-white ${
                   selected.threatLevel === 'critical' ? 'bg-red-700' : selected.threatLevel === 'high' ? 'bg-amber-700' : 'bg-zinc-700'
-                }`}>{selected.fullName.charAt(0)}</div>
+                }`}>{selected.fullName?.charAt(0) || '?'}</div>
                 <div>
-                  <p className="text-xs font-semibold text-white">{selected.fullName}</p>
-                  <p className="text-[10px] text-zinc-500">{RANK_LABELS[selected.rank].label} · {selected.affiliations.map(a => AFFILIATION_LABELS[a].label).join(', ')}</p>
+                  <p className="text-xs font-semibold text-white">{selected.fullName || 'Unknown'}</p>
+                  <p className="text-xs text-zinc-500">{rankLabel}{rankLabel && affiliationLabels ? ' \u00B7 ' : ''}{affiliationLabels}</p>
                 </div>
               </div>
-              <button onClick={() => setSelected(null)} className="text-zinc-600 text-xs">✕</button>
+              <button onClick={() => setSelected(null)} className="text-zinc-600 hover:text-white text-sm p-1" aria-label="Close profile details">&#x2715;</button>
             </div>
-            <div className="flex gap-2 mt-1.5">
-              <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full ${THREAT_COLORS[selected.threatLevel].bg} ${THREAT_COLORS[selected.threatLevel].text}`}>
-                {THREAT_COLORS[selected.threatLevel].label.toUpperCase()}
+            <div className="flex gap-3 mt-2">
+              <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${THREAT_COLORS[selected.threatLevel]?.bg || ''} ${THREAT_COLORS[selected.threatLevel]?.text || ''}`}>
+                {THREAT_COLORS[selected.threatLevel]?.label?.toUpperCase() || 'Unknown'}
               </span>
-              <span className="text-[10px] text-zinc-500">{selected.associates.length} associates</span>
-              <span className="text-[10px] text-zinc-500">{selected.sightings.length} sightings</span>
+              <span className="text-xs text-zinc-500">{associatesCount} associates</span>
+              <span className="text-xs text-zinc-500">{sightingsCount} sightings</span>
             </div>
           </div>
         )}
@@ -321,6 +319,3 @@ export default function NetworkGraph({ profiles }: Props) {
     </div>
   );
 }
-
-
-

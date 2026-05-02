@@ -106,10 +106,10 @@ export default function CommandCenter({ initialIncidents, initialAlerts, initial
         <DailyIntelBriefing />
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 lg:gap-6">
-          <MetricCard label="Active Threats" value={stats.critical + stats.high} subValue={`${stats.critical} critical`} color="text-red-500" icon="🚨" />
-          <MetricCard label="Intelligence Nodes" value={stats.total} subValue="Verified Intelligence" color="text-zinc-100" icon="📡" />
-          <MetricCard label="Verified Operatives" value={profiles.length} subValue="Sangathan Presence" color="text-orange-500" icon="🚩" />
-          <MetricCard label="Operational Zones" value="12" subValue="Monitoring active" color="text-blue-500" icon="📍" />
+          <MetricCard label="Active Reports" value={stats.critical + stats.high} subValue={`${stats.critical} critical`} color="text-red-500" icon="&#x1F6A8;" />
+          <MetricCard label="Total Reports" value={stats.total} subValue="Community reports" color="text-zinc-100" icon="&#x1F4E1;" />
+          <MetricCard label="Community Members" value={profiles.length} subValue="Active participants" color="text-orange-500" icon="&#x1F465;" />
+          <MetricCard label="Areas Covered" value="12" subValue="Monitoring active" color="text-blue-500" icon="&#x1F4CD;" />
         </div>
 
         <div className="grid grid-cols-1 xl:grid-cols-12 gap-8">
@@ -130,12 +130,12 @@ export default function CommandCenter({ initialIncidents, initialAlerts, initial
             </GlassCard>
             <div className="bg-gradient-to-br from-zinc-800 to-zinc-950 border border-red-500/10 rounded-2xl p-6 relative overflow-hidden group">
               <div className="absolute top-0 right-0 p-2 opacity-20">
-                <span className="text-[8px] font-black uppercase tracking-widest text-red-500 border border-red-500/50 px-2 py-0.5 rounded">Data Integrity: Immutable</span>
+                <span className="text-xs font-semibold uppercase tracking-wider text-red-500 border border-red-500/50 px-2 py-0.5 rounded">Community Verified</span>
               </div>
-              <h4 className="text-lg font-black uppercase italic leading-none text-white">Transmit Intel</h4>
-              <p className="text-[9px] text-zinc-500 uppercase font-bold tracking-widest mt-2">Wikileaks-level source protection</p>
-              <Link href="/incidents/report" className="mt-4 block w-full py-4 bg-red-600 text-white text-center text-[10px] font-black uppercase tracking-[0.3em] rounded-xl shadow-lg shadow-red-900/20 active:scale-95 transition-all">
-                New Intelligence →
+              <h4 className="text-lg font-bold italic leading-none text-white">Submit a Report</h4>
+              <p className="text-xs text-zinc-500 font-medium tracking-wide mt-2">Help keep the community informed</p>
+              <Link href="/incidents/report" className="mt-4 block w-full py-4 bg-red-600 text-white text-center text-xs font-bold uppercase tracking-wider rounded-xl shadow-lg shadow-red-900/20 active:scale-95 transition-all">
+                New Report &rarr;
               </Link>
             </div>
           </div>

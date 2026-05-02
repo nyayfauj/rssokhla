@@ -260,8 +260,15 @@ export default function MapView({ incidents }: Props) {
     map.on('mouseleave', LAYER_IDS.INCIDENT_CLUSTERS, () => { map.getCanvas().style.cursor = ''; });
 
     mapRef.current = map;
+    let isDestroyed = false;
 
-    return () => { map.remove(); mapRef.current = null; };
+    return () => {
+      isDestroyed = true;
+      if (mapRef.current) {
+        mapRef.current.remove();
+        mapRef.current = null;
+      }
+    };
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ─── Update Data Sources on Incidents Change ────────────
@@ -325,18 +332,25 @@ export default function MapView({ incidents }: Props) {
       try { await navigator.share({ title: title || 'Location', text, url }); } catch { /* cancelled */ }
     } else {
       await navigator.clipboard.writeText(text);
-      alert('Location link copied to clipboard');
+      const mapContainer = containerRef.current;
+      if (mapContainer) {
+        const toast = document.createElement('div');
+        toast.className = 'absolute top-16 left-1/2 -translate-x-1/2 bg-zinc-900/95 backdrop-blur border border-zinc-700 text-white text-xs px-4 py-2 rounded-xl z-30 animate-fade-in';
+        toast.textContent = 'Location link copied to clipboard';
+        mapContainer.appendChild(toast);
+        setTimeout(() => toast.remove(), 3000);
+      }
     }
-  }, []);
+  }, [containerRef]);
 
   // ─── No Token Fallback ─────────────────────────────────
   if (!MAPBOX_TOKEN) {
     return (
       <div className="h-full flex items-center justify-center bg-zinc-900 rounded-2xl p-6 text-center">
         <div>
-          <span className="text-5xl">🗺️</span>
-          <h3 className="text-lg font-bold text-white mt-3">Map Token Required</h3>
-          <p className="text-xs text-zinc-400 mt-1 max-w-xs">
+          <span className="text-5xl" aria-hidden="true">&#x1F5FA;&#xFE0F;</span>
+          <h3 className="text-lg font-bold text-white mt-3">Map Unavailable</h3>
+          <p className="text-sm text-zinc-400 mt-1 max-w-xs">
             Add <code className="text-red-400">NEXT_PUBLIC_MAPBOX_TOKEN</code> to your <code className="text-zinc-300">.env.local</code> file to enable the interactive map.
           </p>
           <a href="https://mapbox.com" target="_blank" rel="noopener" className="inline-block mt-3 text-xs text-red-400 hover:text-red-300 underline">
