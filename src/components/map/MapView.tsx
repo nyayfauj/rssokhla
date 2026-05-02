@@ -10,6 +10,13 @@ import { OKHLA_CENTER, OKHLA_ZOOM } from '@/lib/map/config';
 import { OKHLA_WARDS } from '@/lib/utils/wards';
 import type { Incident } from '@/types/incident.types';
 
+export interface ActiveLayers {
+  incidents: boolean;
+  heatmap: boolean;
+  geofences: boolean;
+  labels: boolean;
+}
+
 // Standard Leaflet Icon fix for Next.js
 const fixLeafletIcons = () => {
   // @ts-ignore

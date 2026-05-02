@@ -1,18 +1,18 @@
 {
   "project": {
     "enabled": true,
-    "lastGenerated": "2026-05-02T08:20:59.120Z",
-    "observationCount": 147,
+    "lastGenerated": "2026-05-02T08:30:59.107Z",
+    "observationCount": 149,
     "skillCount": 0,
     "domain": "project",
     "triggerGlobs": [
       "**/*"
     ],
-    "description": "Project for rssokhla. 19 gotchas, 100 conventions."
+    "description": "Project for rssokhla. 19 gotchas, 101 conventions."
   },
   "typescript": {
     "enabled": true,
-    "lastGenerated": "2026-05-02T08:20:59.120Z",
+    "lastGenerated": "2026-05-02T08:30:59.108Z",
     "observationCount": 7,
     "skillCount": 0,
     "domain": "typescript",
@@ -24,7 +24,7 @@
   },
   "typescript-react": {
     "enabled": true,
-    "lastGenerated": "2026-05-02T08:20:59.121Z",
+    "lastGenerated": "2026-05-02T08:30:59.109Z",
     "observationCount": 25,
     "skillCount": 0,
     "domain": "typescript-react",
@@ -35,7 +35,7 @@
   },
   "config": {
     "enabled": true,
-    "lastGenerated": "2026-05-02T08:20:59.121Z",
+    "lastGenerated": "2026-05-02T08:30:59.109Z",
     "observationCount": 7,
     "skillCount": 0,
     "domain": "config",
@@ -49,9 +49,9 @@
   },
   "convention": {
     "enabled": true,
-    "lastGenerated": "2026-05-02T08:20:59.122Z",
+    "lastGenerated": "2026-05-02T08:30:59.110Z",
     "observationCount": 0,
-    "skillCount": 1,
+    "skillCount": 2,
     "domain": "convention",
     "triggerGlobs": [
       "**/*"

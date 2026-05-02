@@ -15,11 +15,15 @@ const AREA_POS: Record<OkhlaArea, { x: number; y: number }> = {
   jamia_nagar:        { x: 50, y: 22 },
   zakir_nagar:        { x: 55, y: 15 },
   abul_fazal_enclave: { x: 62, y: 45 },
+  abul_fazal:         { x: 60, y: 40 },
   johri_farm:         { x: 68, y: 30 },
   okhla_phase_1:      { x: 30, y: 72 },
   okhla_phase_2:      { x: 38, y: 82 },
   okhla_vihar:        { x: 52, y: 68 },
   jasola:             { x: 18, y: 55 },
+  sarita_vihar:       { x: 12, y: 65 },
+  madanpur_khadar_west: { x: 25, y: 90 },
+  madanpur_khadar_east: { x: 45, y: 95 },
 };
 
 function getAreaThreat(area: OkhlaArea, incidents: Incident[]): { level: string; count: number; color: string } {

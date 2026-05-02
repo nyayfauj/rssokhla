@@ -7,7 +7,7 @@ import { useUIStore } from '@/stores/ui.store';
 import Badge from '@/components/ui/Badge';
 
 export default function Header() {
-  const { isAuthenticated, isAnonymous, user } = useAuthStore();
+  const { isAuthenticated, isAnonymous, user, role } = useAuthStore();
   const { isOnline } = useUIStore();
 
   return (
@@ -40,7 +40,7 @@ export default function Header() {
                 <div className="flex items-center gap-3">
                   <div className="flex flex-col items-end">
                     <span className="text-[9px] font-black text-red-500 uppercase tracking-[0.2em] leading-none mb-0.5">
-                      {(user?.prefs?.role || 'operative').toUpperCase()}
+                      {role.toUpperCase()}
                     </span>
                     <span className="text-[8px] font-mono text-zinc-600 leading-none">
                       NODE: {user?.$id.slice(-6).toUpperCase()}

@@ -36,7 +36,7 @@ export default function MapControls({ activeLayers, onToggleLayer, compassActive
         <div className="bg-zinc-900/95 backdrop-blur-xl border border-zinc-800/60 rounded-2xl p-2.5 shadow-2xl min-w-[140px] animate-fade-in">
           <p className="text-[9px] text-zinc-500 uppercase tracking-widest font-semibold px-1 mb-1.5">Layers</p>
           {LAYER_OPTIONS.map(opt => (
-            <button key={opt.key} onClick={() => onToggleLayer(opt.key)}
+            <button key={opt.key as string} onClick={() => onToggleLayer(opt.key)}
               className={`flex items-center gap-2 w-full px-2 py-1.5 rounded-lg text-left text-xs transition-colors ${
                 activeLayers[opt.key] ? 'bg-red-500/10 text-red-400' : 'text-zinc-500 hover:bg-zinc-800/50'
               }`}>
