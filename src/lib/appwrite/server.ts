@@ -42,19 +42,21 @@ async function appwriteFetch(collectionId: string) {
 
 export async function getServerSideData() {
   try {
-    const [incidents, alerts, profiles] = await Promise.all([
+    const [incidents, alerts, profiles, operatives] = await Promise.all([
       appwriteFetch(COLLECTIONS.INCIDENTS),
       appwriteFetch(COLLECTIONS.ALERTS),
       appwriteFetch(COLLECTIONS.PROFILES),
+      appwriteFetch(COLLECTIONS.OPERATIVES),
     ]);
 
     return {
       incidents: incidents.documents || [],
       alerts: alerts.documents || [],
       profiles: profiles.documents || [],
+      operatives: operatives.documents || [],
     };
   } catch (error) {
     console.error('Failed to fetch server-side data:', error);
-    return { incidents: [], alerts: [], profiles: [] };
+    return { incidents: [], alerts: [], profiles: [], operatives: [] };
   }
 }

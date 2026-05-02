@@ -14,6 +14,7 @@ export default async function Page() {
       initialIncidents={data.incidents as unknown as Incident[]} 
       initialAlerts={data.alerts as unknown as Alert[]}
       initialProfiles={data.profiles as unknown as KaryakartaProfile[]}
+      initialOperatives={data.operatives as any[]}
     />
   );
 }

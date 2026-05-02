@@ -19,7 +19,7 @@ export async function createUserProfile(
 
   const doc = await databases.createDocument(
     DATABASE_ID,
-    COLLECTIONS.USERS,
+    COLLECTIONS.OPERATIVES,
     userId,
     {
       username,
@@ -50,7 +50,7 @@ export async function createAnonymousProfile(
 
   const doc = await databases.createDocument(
     DATABASE_ID,
-    COLLECTIONS.USERS,
+    COLLECTIONS.OPERATIVES,
     userId,
     {
       username: `anon_${userId.slice(-6)}`,
@@ -77,7 +77,7 @@ export async function updateLastActive(userId: string): Promise<void> {
   try {
     await databases.updateDocument(
       DATABASE_ID,
-      COLLECTIONS.USERS,
+      COLLECTIONS.OPERATIVES,
       userId,
       { lastActive: new Date().toISOString() }
     );
@@ -93,7 +93,7 @@ export async function getUserProfile(userId: string): Promise<AppUser | null> {
   try {
     const doc = await databases.getDocument(
       DATABASE_ID,
-      COLLECTIONS.USERS,
+      COLLECTIONS.OPERATIVES,
       userId
     );
     return doc as unknown as AppUser;
@@ -142,7 +142,7 @@ export async function convertAnonymousToRegistered(
   // Update the database profile
   await databases.updateDocument(
     DATABASE_ID,
-    COLLECTIONS.USERS,
+    COLLECTIONS.OPERATIVES,
     user.$id,
     {
       email,

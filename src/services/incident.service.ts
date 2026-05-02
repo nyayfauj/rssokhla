@@ -38,8 +38,8 @@ export async function createIncident(
 
   // Increment reporter's submission count
   try {
-    const userDoc = await databases.getDocument(DATABASE_ID, COLLECTIONS.USERS, userId);
-    await databases.updateDocument(DATABASE_ID, COLLECTIONS.USERS, userId, {
+    const userDoc = await databases.getDocument(DATABASE_ID, COLLECTIONS.OPERATIVES, userId);
+    await databases.updateDocument(DATABASE_ID, COLLECTIONS.OPERATIVES, userId, {
       reportsSubmitted: ((userDoc as Record<string, unknown>).reportsSubmitted as number || 0) + 1,
     });
   } catch {

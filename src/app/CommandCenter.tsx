@@ -31,14 +31,16 @@ interface Props {
   initialIncidents: Incident[];
   initialAlerts: Alert[];
   initialProfiles: KaryakartaProfile[];
+  initialOperatives: any[];
 }
 
-export default function CommandCenter({ initialIncidents, initialAlerts, initialProfiles }: Props) {
+export default function CommandCenter({ initialIncidents, initialAlerts, initialProfiles, initialOperatives }: Props) {
   const [clock, setClock] = useState('');
   const { incidents, setIncidents } = useIncidentsStore();
   const { alerts, setAlerts } = useAlertsStore();
   const { user, isAuthenticated } = useAuthStore();
   const [profiles] = useState(initialProfiles);
+  const [operatives] = useState(initialOperatives);
 
   // Initialize store with server data
   useEffect(() => {
@@ -108,7 +110,7 @@ export default function CommandCenter({ initialIncidents, initialAlerts, initial
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
           <MetricCard label="Active Reports" value={stats.critical + stats.high} subValue={`${stats.critical} critical`} color="text-red-500" icon="🚨" />
           <MetricCard label="Total Reports" value={stats.total} subValue="Community reports" color="text-zinc-100" icon="📡" />
-          <MetricCard label="Community" value="5" subValue="Members & verifiers" color="text-blue-500" icon="👤" />
+          <MetricCard label="Operatives" value={operatives.length} subValue="Field agents" color="text-blue-500" icon="👤" />
           <MetricCard label="Adversaries" value={profiles.length} subValue="Monitored targets" color="text-orange-500" icon="🕵️" />
         </div>
 
