@@ -57,7 +57,7 @@ export default function Sidebar() {
         })}
 
         {/* Admin link — only for moderators/admins */}
-        {(role === 'admin' || role === 'moderator') && (
+        {(role === 'commander' || role === 'verifier') && (
           <>
             <div className="h-px bg-zinc-800/50 my-2" />
             <Link

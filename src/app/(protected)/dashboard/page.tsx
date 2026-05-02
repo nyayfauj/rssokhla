@@ -47,7 +47,7 @@ export default function DashboardPage() {
             </p>
           </div>
         </div>
-        <Badge variant={role === 'admin' ? 'danger' : role === 'moderator' ? 'warning' : 'default'} size="md">
+        <Badge variant={role === 'commander' ? 'danger' : role === 'verifier' ? 'warning' : 'default'} size="md">
           {isAnonymous ? 'STEALTH PROTOCOL' : (role || 'user').replace(/_/g, ' ').toUpperCase()}
         </Badge>
       </div>
