@@ -68,12 +68,12 @@ export default function CommandCenter({ initialIncidents, initialAlerts, initial
 
       <nav className="sticky top-0 z-50 bg-[#050606]/80 backdrop-blur-xl border-b border-zinc-800/40">
         <div className="container mx-auto px-4 h-14 flex items-center justify-between">
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2.5 sm:gap-4">
             <div className="flex items-center gap-2">
-              <span className="w-8 h-8 rounded-lg bg-gradient-to-br from-red-600 to-red-900 flex items-center justify-center font-black text-sm italic">NF</span>
-              <div className="hidden sm:block">
-                <h1 className="text-sm font-black tracking-tighter uppercase leading-none">Nyay<span className="text-red-500">Fauj</span></h1>
-                <p className="text-[8px] text-zinc-600 font-bold tracking-[0.2em] uppercase">Autonomous Intelligence</p>
+              <span className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-gradient-to-br from-red-600 to-red-900 flex items-center justify-center font-black text-xs sm:text-sm italic">NF</span>
+              <div>
+                <h1 className="text-[11px] sm:text-sm font-black tracking-tighter uppercase leading-none">Nyay<span className="text-red-500">Fauj</span></h1>
+                <p className="text-[7px] sm:text-[8px] text-zinc-600 font-bold tracking-[0.2em] uppercase">Intelligence</p>
               </div>
             </div>
           </div>
@@ -100,22 +100,22 @@ export default function CommandCenter({ initialIncidents, initialAlerts, initial
         </div>
       </nav>
 
-      <SectorHeatTicker />
+      <SectorHeatTicker incidents={displayIncidents} />
 
-      <div className="container mx-auto px-4 py-8 space-y-8">
+      <div className="container mx-auto px-4 py-6 sm:py-8 space-y-6 sm:space-y-8">
         <DailyIntelBriefing />
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 lg:gap-6">
-          <MetricCard label="Active Reports" value={stats.critical + stats.high} subValue={`${stats.critical} critical`} color="text-red-500" icon="&#x1F6A8;" />
-          <MetricCard label="Total Reports" value={stats.total} subValue="Community reports" color="text-zinc-100" icon="&#x1F4E1;" />
-          <MetricCard label="Community Members" value={profiles.length} subValue="Active participants" color="text-orange-500" icon="&#x1F465;" />
-          <MetricCard label="Areas Covered" value="12" subValue="Monitoring active" color="text-blue-500" icon="&#x1F4CD;" />
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
+          <MetricCard label="Active Reports" value={stats.critical + stats.high} subValue={`${stats.critical} critical`} color="text-red-500" icon="🚨" />
+          <MetricCard label="Total Reports" value={stats.total} subValue="Community reports" color="text-zinc-100" icon="📡" />
+          <MetricCard label="Community Members" value={profiles.length} subValue="Active participants" color="text-orange-500" icon="👥" />
+          <MetricCard label="Areas Covered" value={new Set(displayIncidents.map(i => i.locationId)).size || 5} subValue="Monitoring active" color="text-blue-500" icon="📍" />
         </div>
 
-        <div className="grid grid-cols-1 xl:grid-cols-12 gap-8">
-          <div className="xl:col-span-8 space-y-8">
+        <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 sm:gap-8">
+          <div className="xl:col-span-8 space-y-6 sm:space-y-8">
             <GlassCard title="Operational Theater Overview" icon="🗺️">
-              <div className="h-[450px] -mx-4 -mb-4">
+              <div className="h-[350px] sm:h-[450px] -mx-4 -mb-4">
                 <MapView incidents={displayIncidents} />
               </div>
             </GlassCard>
@@ -124,18 +124,18 @@ export default function CommandCenter({ initialIncidents, initialAlerts, initial
             </GlassCard>
           </div>
 
-          <div className="xl:col-span-4 space-y-8">
+          <div className="xl:col-span-4 space-y-6 sm:space-y-8">
             <GlassCard title="Activity Timeline" icon="📈">
               <ActivityTimeline incidents={displayIncidents} />
             </GlassCard>
             <div className="bg-gradient-to-br from-zinc-800 to-zinc-950 border border-red-500/10 rounded-2xl p-6 relative overflow-hidden group">
               <div className="absolute top-0 right-0 p-2 opacity-20">
-                <span className="text-xs font-semibold uppercase tracking-wider text-red-500 border border-red-500/50 px-2 py-0.5 rounded">Community Verified</span>
+                <span className="text-[8px] font-black uppercase tracking-wider text-red-500 border border-red-500/50 px-2 py-0.5 rounded">Community Verified</span>
               </div>
-              <h4 className="text-lg font-bold italic leading-none text-white">Submit a Report</h4>
-              <p className="text-xs text-zinc-500 font-medium tracking-wide mt-2">Help keep the community informed</p>
-              <Link href="/incidents/report" className="mt-4 block w-full py-4 bg-red-600 text-white text-center text-xs font-bold uppercase tracking-wider rounded-xl shadow-lg shadow-red-900/20 active:scale-95 transition-all">
-                New Report &rarr;
+              <h4 className="text-lg font-black italic leading-none text-white uppercase tracking-tighter">Submit Intel</h4>
+              <p className="text-[10px] text-zinc-500 font-bold tracking-widest uppercase mt-2">Strengthen the network</p>
+              <Link href="/incidents/report" className="mt-6 block w-full py-4 bg-red-600 text-white text-center text-[10px] font-black uppercase tracking-[0.2em] rounded-xl shadow-lg shadow-red-900/20 active:scale-95 transition-all">
+                New Report →
               </Link>
             </div>
           </div>

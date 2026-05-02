@@ -6,6 +6,7 @@ export type IncidentCategory =
   | 'meeting'
   | 'surveillance'
   | 'harassment'
+  | 'adversary_profile'
   | 'other';
 
 export type IncidentSeverity = 'low' | 'medium' | 'high' | 'critical';
@@ -33,6 +34,7 @@ export interface Incident {
   isAnonymous: boolean;
   verifiedBy: string[];
   verificationCount: number;
+  trustPoints: number;
   coordinates: number[];
   tags: string[];
 }

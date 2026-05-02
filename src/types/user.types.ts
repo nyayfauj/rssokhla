@@ -1,13 +1,12 @@
-// ─── User Types ─────────────────────────────────────────────
+// ─── Tactical User Types ─────────────────────────────────────
 
-export type TrustLevel = 'new' | 'established' | 'trusted';
+export type TrustLevel = 'unverified' | 'operative' | 'verifier' | 'elite';
 
 export type UserRole =
-  | 'anonymous_user'
-  | 'registered_user'
-  | 'verified_reporter'
-  | 'moderator'
-  | 'admin';
+  | 'observer'      // Anonymous / Unregistered
+  | 'operative'     // Standard registered reporter
+  | 'verifier'      // Trusted agent who can verify reports
+  | 'commander';    // Highly trusted decentralized admin
 
 export interface AppUser {
   $id: string;
@@ -16,7 +15,7 @@ export interface AppUser {
   username: string;
   email: string;
   isAnonymous: boolean;
-  reputation: number;
+  reputation: number;        // Primary trust score
   reportsSubmitted: number;
   verificationsProvided: number;
   joinDate: string;
@@ -24,17 +23,14 @@ export interface AppUser {
   deviceId: string;
   trustLevel: TrustLevel;
   areasMonitored: string[];
+  inviteCode?: string;       // Used for initial role assignment
 }
 
 export interface RegisterData {
   username: string;
   email: string;
   password: string;
-}
-
-export interface LoginData {
-  email: string;
-  password: string;
+  inviteCode?: string;      // Optional tactical code
 }
 
 export interface UserSession {
@@ -45,71 +41,48 @@ export interface UserSession {
   expiresAt: string;
 }
 
-/** Permission matrix for role-based access control */
+/** Permission matrix for tactical decentralized monitoring */
 export const ROLE_PERMISSIONS: Record<UserRole, string[]> = {
-  anonymous_user: [
+  observer: [
     'incidents:read',
-    'incidents:create',
     'alerts:read',
   ],
-  registered_user: [
+  operative: [
     'incidents:read',
     'incidents:create',
     'incidents:update_own',
-    'reports:create',
     'alerts:read',
     'profile:read',
-    'profile:update',
   ],
-  verified_reporter: [
+  verifier: [
     'incidents:read',
     'incidents:create',
-    'incidents:update_own',
-    'incidents:verify',
+    'incidents:verify',      // Can add trust points to reports
     'reports:read',
-    'reports:create',
     'alerts:read',
     'profile:read',
-    'profile:update',
   ],
-  moderator: [
+  commander: [
     'incidents:read',
     'incidents:create',
     'incidents:update',
     'incidents:delete',
     'incidents:verify',
-    'reports:read',
-    'reports:create',
-    'reports:verify',
     'alerts:read',
     'alerts:create',
     'alerts:update',
     'locations:create',
-    'locations:update',
-    'profile:read',
-    'profile:update',
-  ],
-  admin: [
-    'incidents:read',
-    'incidents:create',
-    'incidents:update',
-    'incidents:delete',
-    'incidents:verify',
-    'reports:read',
-    'reports:create',
-    'reports:verify',
-    'alerts:read',
-    'alerts:create',
-    'alerts:update',
-    'alerts:delete',
-    'locations:create',
-    'locations:update',
-    'locations:delete',
     'users:read',
-    'users:update',
-    'users:delete',
-    'security:read',
-    'profile:read',
-    'profile:update',
   ],
 };
+
+/** Trust weighting for decentralized verification */
+export const TRUST_WEIGHTS: Record<UserRole, number> = {
+  observer: 0,
+  operative: 1,
+  verifier: 5,
+  commander: 10,
+};
+
+/** Verification threshold: A report needs 10 trust points to be 'Community Verified' */
+export const VERIFICATION_THRESHOLD = 10;

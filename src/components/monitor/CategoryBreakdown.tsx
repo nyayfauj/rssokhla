@@ -6,12 +6,12 @@ import type { Incident } from '@/types/incident.types';
 interface Props { incidents: Incident[]; }
 
 const CAT_META: Record<string, { icon: string; label: string; color: string }> = {
-  recruitment: { icon: '&#x1F3AF;', label: 'Recruitment', color: 'bg-red-500' },
-  propaganda: { icon: '&#x1F4E2;', label: 'Propaganda', color: 'bg-orange-500' },
-  meeting: { icon: '&#x1F91D;', label: 'Meetings', color: 'bg-yellow-500' },
-  surveillance: { icon: '&#x1F441;&#xFE0F;', label: 'Surveillance', color: 'bg-purple-500' },
-  harassment: { icon: '&#x26A0;&#xFE0F;', label: 'Harassment', color: 'bg-pink-500' },
-  other: { icon: '&#x1F4CB;', label: 'Other', color: 'bg-zinc-500' },
+  recruitment: { icon: '🎯', label: 'Recruitment', color: 'bg-red-500' },
+  propaganda: { icon: '📢', label: 'Propaganda', color: 'bg-orange-500' },
+  meeting: { icon: '🤝', label: 'Meetings', color: 'bg-yellow-500' },
+  surveillance: { icon: '👁️', label: 'Surveillance', color: 'bg-purple-500' },
+  harassment: { icon: '⚠️', label: 'Harassment', color: 'bg-pink-500' },
+  other: { icon: '📋', label: 'Other', color: 'bg-zinc-500' },
 };
 
 export default function CategoryBreakdown({ incidents }: Props) {

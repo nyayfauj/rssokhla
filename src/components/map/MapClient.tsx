@@ -9,7 +9,7 @@ const MapView = dynamic(() => import('@/components/map/MapView'), {
   loading: () => (
     <div className="h-full flex items-center justify-center bg-zinc-900 rounded-2xl">
       <div className="text-center animate-pulse">
-        <span className="text-5xl" aria-hidden="true">&#x1F5FA;&#xFE0F;</span>
+        <span className="text-5xl" aria-hidden="true">🗺️</span>
         <p className="text-sm text-zinc-400 mt-3">Loading map...</p>
       </div>
     </div>
@@ -39,7 +39,7 @@ export default function MapClient() {
       <div className="flex items-center justify-between px-1 py-2 flex-shrink-0">
         <div>
           <h1 className="text-xl font-semibold text-white flex items-center gap-2">
-            <span className="text-red-500" aria-hidden="true">&#x1F5FA;&#xFE0F;</span> Community Safety Map
+            <span className="text-red-500" aria-hidden="true">🗺️</span> Community Safety Map
           </h1>
           <p className="text-xs text-zinc-500">Reported incidents and safety alerts</p>
         </div>

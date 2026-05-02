@@ -1,24 +1,50 @@
 'use client';
 
-const SECTORS = [
-  { name: 'SHAHEEN BAGH', heat: 'HIGH', trend: 'UP' },
-  { name: 'JAMIA NAGAR', heat: 'STABLE', trend: 'NEUTRAL' },
-  { name: 'OKHLA PH III', heat: 'LOW', trend: 'DOWN' },
-  { name: 'BATLA HOUSE', heat: 'MODERATE', trend: 'UP' },
-  { name: 'ABUL FAZAL', heat: 'STABLE', trend: 'NEUTRAL' },
-  { name: 'ZAKIR NAGAR', heat: 'LOW', trend: 'DOWN' },
-];
+import { useMemo } from 'react';
+import type { Incident } from '@/types/incident.types';
+import { OKHLA_WARDS } from '@/lib/utils/wards';
 
-export default function SectorHeatTicker() {
+interface Props {
+  incidents: Incident[];
+}
+
+export default function SectorHeatTicker({ incidents }: Props) {
+  const sectors = useMemo(() => {
+    return OKHLA_WARDS.map(ward => {
+      const wardIncidents = incidents.filter(i => i.locationId === ward.id);
+      const criticalCount = wardIncidents.filter(i => i.severity === 'critical').length;
+      const highCount = wardIncidents.filter(i => i.severity === 'high').length;
+      
+      let heat = 'STABLE';
+      let trend = 'NEUTRAL';
+
+      if (criticalCount > 0) {
+        heat = 'CRITICAL';
+        trend = 'UP';
+      } else if (highCount > 1) {
+        heat = 'HIGH';
+        trend = 'UP';
+      } else if (wardIncidents.length > 2) {
+        heat = 'MODERATE';
+        trend = 'NEUTRAL';
+      } else if (wardIncidents.length === 0) {
+        heat = 'QUIET';
+        trend = 'STABLE';
+      }
+
+      return { name: ward.name.toUpperCase(), heat, trend };
+    });
+  }, [incidents]);
+
   return (
     <div className="bg-zinc-950 border-y border-zinc-800/40 py-1.5 overflow-hidden flex whitespace-nowrap no-print">
       <div className="flex animate-marquee items-center">
-        {[...SECTORS, ...SECTORS].map((s, i) => (
+        {[...sectors, ...sectors].map((s, i) => (
           <div key={i} className="flex items-center gap-4 mx-8 group cursor-default">
             <span className="text-[9px] font-black text-zinc-500 tracking-widest">{s.name}</span>
             <div className="flex items-center gap-1.5">
               <span className={`text-[9px] font-black ${
-                s.heat === 'HIGH' ? 'text-red-500' : s.heat === 'MODERATE' ? 'text-orange-500' : 'text-green-500'
+                s.heat === 'CRITICAL' || s.heat === 'HIGH' ? 'text-red-500' : s.heat === 'MODERATE' ? 'text-orange-500' : 'text-green-500'
               }`}>
                 {s.heat}
               </span>

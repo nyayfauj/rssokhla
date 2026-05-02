@@ -25,7 +25,7 @@ function AccessHandler() {
       loginAnonymous().then(() => {
         setStatus('success');
         addToast({ type: 'success', message: 'Identity restored via magic link' });
-        setTimeout(() => router.push('/'), 2000);
+        setTimeout(() => router.push('/dashboard'), 2000);
       }).catch(() => setStatus('error'));
     } catch {
       setStatus('error');
@@ -34,7 +34,7 @@ function AccessHandler() {
 
   return (
     <div className="min-h-screen bg-[#050606] flex items-center justify-center p-4">
-      <GlassCard title="Identity Recovery" icon="&#x1F6E1;&#xFE0F;">
+      <GlassCard title="Identity Recovery" icon="🛡️">
         <div className="text-center space-y-6 py-8">
           {status === 'verifying' && (
             <>
@@ -45,7 +45,7 @@ function AccessHandler() {
 
           {status === 'success' && (
             <>
-              <div className="text-4xl" aria-hidden="true">&#x2705;</div>
+              <div className="text-4xl" aria-hidden="true">✅</div>
               <p className="text-sm font-semibold text-white">Access Granted</p>
               <p className="text-xs text-zinc-500">Redirecting to dashboard...</p>
             </>
@@ -53,7 +53,7 @@ function AccessHandler() {
 
           {status === 'error' && (
             <>
-              <div className="text-4xl" aria-hidden="true">&#x26A0;&#xFE0F;</div>
+              <div className="text-4xl" aria-hidden="true">⚠️</div>
               <p className="text-sm font-semibold text-red-500">Invalid or Expired Link</p>
               <p className="text-xs text-zinc-500 max-w-xs mx-auto">This link may have expired or is no longer valid.</p>
               <button onClick={() => router.push('/login')} className="text-sm text-zinc-400 underline hover:text-zinc-200 transition-colors">Return to login</button>

@@ -148,7 +148,7 @@ export default function ActivityTimeline({ incidents }: Props) {
       <div className="bg-zinc-900/30 border border-zinc-800/40 rounded-2xl overflow-hidden" style={{ height: 250 }}>
         <div className="flex items-center justify-between px-4 py-3 border-b border-zinc-800/40 bg-zinc-900/60">
           <div className="flex items-center gap-2">
-            <span className="text-sm" aria-hidden="true">&#x1F4C8;</span>
+            <span className="text-sm" aria-hidden="true">📈</span>
             <span className="text-xs font-semibold text-zinc-400 uppercase tracking-widest">Activity Timeline</span>
           </div>
         </div>
@@ -163,7 +163,7 @@ export default function ActivityTimeline({ incidents }: Props) {
     <div className="bg-zinc-900/30 border border-zinc-800/40 rounded-2xl overflow-hidden" role="img" aria-label="Activity timeline chart">
       <div className="flex items-center justify-between px-4 py-3 border-b border-zinc-800/40 bg-zinc-900/60">
         <div className="flex items-center gap-2">
-          <span className="text-sm" aria-hidden="true">&#x1F4C8;</span>
+          <span className="text-sm" aria-hidden="true">📈</span>
           <span className="text-xs font-semibold text-zinc-400 uppercase tracking-widest">Activity Timeline</span>
         </div>
         <div className="flex gap-1" role="group" aria-label="Time range selector">

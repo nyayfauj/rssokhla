@@ -114,21 +114,21 @@ export default function MediaCapture({ media, onAdd, onRemove, voiceText, onVoic
         <button type="button" onClick={() => fileRef.current?.click()}
           className="py-3 bg-zinc-900 border border-zinc-700 rounded-xl text-sm text-zinc-300 hover:bg-zinc-800 transition-colors active:scale-[0.97] flex flex-col items-center gap-1"
           aria-label="Upload photo or video">
-          <span className="text-lg" aria-hidden="true">&#x1F4F7;</span>Photo/Video
+          <span className="text-lg" aria-hidden="true">📷</span>Photo/Video
         </button>
         <button type="button" onClick={recording ? stopAudioRecording : startAudioRecording}
           className={`py-3 border rounded-xl text-sm transition-colors active:scale-[0.97] flex flex-col items-center gap-1 ${
             recording ? 'bg-red-500/15 border-red-500/40 text-red-400' : 'bg-zinc-900 border-zinc-700 text-zinc-300 hover:bg-zinc-800'
           }`}
           aria-label={recording ? 'Stop audio recording' : 'Start audio recording'}>
-          <span className="text-lg" aria-hidden="true">{recording ? '&#x23F9;' : '&#x1F399;'}</span>{recording ? 'Stop' : 'Record'}
+          <span className="text-lg" aria-hidden="true">{recording ? '⏹️' : '🎙️'}</span>{recording ? 'Stop' : 'Record'}
         </button>
         <button type="button" onClick={startVoiceToText} disabled={listening}
           className={`py-3 border rounded-xl text-sm transition-colors active:scale-[0.97] flex flex-col items-center gap-1 ${
             listening ? 'bg-blue-500/15 border-blue-500/40 text-blue-400 animate-pulse' : 'bg-zinc-900 border-zinc-700 text-zinc-300 hover:bg-zinc-800'
           }`}
           aria-label={listening ? 'Listening to voice input' : 'Start voice to text'}>
-          <span className="text-lg" aria-hidden="true">{listening ? '&#x1F534;' : '&#x1F5E3;'}</span>{listening ? 'Listening...' : 'Voice'}
+          <span className="text-lg" aria-hidden="true">{listening ? '🔴' : '🗣️'}</span>{listening ? 'Listening...' : 'Voice'}
         </button>
       </div>
       <input ref={fileRef} type="file" accept="image/*,video/*" multiple capture="environment" className="hidden" onChange={handleFileSelect} />
@@ -137,7 +137,7 @@ export default function MediaCapture({ media, onAdd, onRemove, voiceText, onVoic
         <div className="bg-blue-500/5 border border-blue-500/20 rounded-xl p-3">
           <div className="flex items-center justify-between mb-1">
             <span className="text-xs text-blue-400 font-semibold uppercase tracking-wider">Voice Transcript</span>
-            <button type="button" onClick={() => onVoiceText('')} className="text-zinc-600 hover:text-zinc-400 text-sm" aria-label="Clear voice transcript">&#x2715;</button>
+            <button type="button" onClick={() => onVoiceText('')} className="text-zinc-600 hover:text-zinc-400 text-sm" aria-label="Clear voice transcript">✕</button>
           </div>
           <p className="text-sm text-zinc-300 leading-relaxed">{voiceText}</p>
         </div>
@@ -151,13 +151,13 @@ export default function MediaCapture({ media, onAdd, onRemove, voiceText, onVoic
                 <img src={m.preview} alt={`Uploaded ${m.name}`} className="w-full h-full object-cover" />
               ) : (
                 <div className="w-full h-full flex flex-col items-center justify-center gap-0.5">
-                  <span className="text-lg" aria-hidden="true">{m.type === 'audio' ? '&#x1F3B5;' : '&#x1F3AC;'}</span>
+                  <span className="text-lg" aria-hidden="true">{m.type === 'audio' ? '🎵' : '🎬'}</span>
                   <span className="text-xs text-zinc-500">{formatSize(m.size)}</span>
                 </div>
               )}
               <button type="button" onClick={() => handleRemove(m.id)}
                 className="absolute top-1 right-1 w-5 h-5 bg-red-600 rounded-full text-white text-xs flex items-center justify-center hover:bg-red-500 transition-colors"
-                aria-label={`Remove ${m.name}`}>&#x2715;</button>
+                aria-label={`Remove ${m.name}`}>✕</button>
             </div>
           ))}
         </div>

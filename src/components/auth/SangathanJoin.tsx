@@ -3,19 +3,32 @@
 import { useState } from 'react';
 import GlassCard from '@/components/ui/GlassCard';
 import Button from '@/components/ui/Button';
+import { useAuthStore } from '@/stores/auth.store';
 
 export default function SangathanJoin() {
   const [step, setStep] = useState(1);
-  const [formData, setFormData] = useState({ name: '', purpose: '', commitment: false });
+  const [formData, setFormData] = useState({ name: '', email: '', password: '', inviteCode: '', purpose: '', commitment: false });
   const [isProcessing, setIsProcessing] = useState(false);
+  const { register } = useAuthStore();
 
-  const handleJoin = () => {
+  const handleJoin = async () => {
     setIsProcessing(true);
-    // Simulate AI KYC
-    setTimeout(() => {
-      setIsProcessing(false);
+    try {
+      // Real registration with tactical role assignment
+      await register(formData.email, formData.password, formData.name, formData.inviteCode);
+      
+      // Honeypot check: If they used a known 'infiltrator' code or pattern
+      if (formData.inviteCode?.includes('RSS') || formData.inviteCode?.includes('BHAKT')) {
+        console.warn('[Tactical] Infiltrator pattern detected. Flagging node.');
+      }
+
       setStep(3);
-    }, 3000);
+    } catch (err) {
+      console.error('[Sangathan] Join failed:', err);
+      alert('Verification Failed: Connection to Tactical Network lost.');
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   return (
@@ -34,9 +47,29 @@ export default function SangathanJoin() {
                 className="w-full bg-black/50 border border-zinc-800 rounded-xl px-4 py-3 text-xs uppercase tracking-widest focus:border-red-500 outline-none transition-all"
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               />
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <input 
+                  type="email" 
+                  placeholder="EMAIL ADDRESS" 
+                  className="w-full bg-black/50 border border-zinc-800 rounded-xl px-4 py-3 text-xs uppercase tracking-widest focus:border-red-500 outline-none transition-all"
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                />
+                <input 
+                  type="password" 
+                  placeholder="CREATE PASSWORD" 
+                  className="w-full bg-black/50 border border-zinc-800 rounded-xl px-4 py-3 text-xs uppercase tracking-widest focus:border-red-500 outline-none transition-all"
+                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                />
+              </div>
+              <input 
+                type="text" 
+                placeholder="TACTICAL ACCESS CODE (OPTIONAL)" 
+                className="w-full bg-black/50 border border-red-900/30 rounded-xl px-4 py-3 text-xs uppercase tracking-widest focus:border-red-500 outline-none transition-all"
+                onChange={(e) => setFormData({ ...formData, inviteCode: e.target.value })}
+              />
               <textarea 
                 placeholder="YOUR PURPOSE FOR THE COMMUNITY" 
-                className="w-full bg-black/50 border border-zinc-800 rounded-xl px-4 py-3 text-xs uppercase tracking-widest focus:border-red-500 outline-none transition-all h-32"
+                className="w-full bg-black/50 border border-zinc-800 rounded-xl px-4 py-3 text-xs uppercase tracking-widest focus:border-red-500 outline-none transition-all h-24"
                 onChange={(e) => setFormData({ ...formData, purpose: e.target.value })}
               />
             </div>

@@ -8,18 +8,18 @@ interface Props {
 }
 
 const AREAS = [
-  { id: 'shaheen_bagh', name: 'Shaheen Bagh' },
-  { id: 'jamia_nagar', name: 'Jamia Nagar' },
-  { id: 'jasola', name: 'Jasola' },
-  { id: 'batla_house', name: 'Batla House' },
-  { id: 'abf_enclave', name: 'Abul Fazal' },
+  { id: 'sarita_vihar', name: 'Sarita Vihar' },
+  { id: 'zakir_nagar', name: 'Zakir Nagar' },
+  { id: 'abul_fazal', name: 'Abul Fazal' },
+  { id: 'madanpur_khadar_west', name: 'Khadar West' },
+  { id: 'madanpur_khadar_east', name: 'Khadar East' },
 ];
 
 export default function AreaThreatGauges({ incidents }: Props) {
   const areaData = useMemo(() => {
     return AREAS.map(area => {
       const areaIncidents = incidents.filter(i => i.locationId === area.id);
-      if (areaIncidents.length === 0) return { ...area, level: 10, count: 0 };
+      if (areaIncidents.length === 0) return { ...area, level: 0, count: 0 };
       
       const score = areaIncidents.reduce((acc, i) => {
         const weight = i.severity === 'critical' ? 45 : i.severity === 'high' ? 30 : i.severity === 'medium' ? 15 : 5;

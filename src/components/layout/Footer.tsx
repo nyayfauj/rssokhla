@@ -21,13 +21,15 @@ export default function Footer() {
               <Link href="/" className="block text-sm text-zinc-500 hover:text-white transition-colors">Live Monitor</Link>
               <Link href="/incidents" className="block text-sm text-zinc-500 hover:text-white transition-colors">All Reports</Link>
               <Link href="/map" className="block text-sm text-zinc-500 hover:text-white transition-colors">Map View</Link>
-              <Link href="/about" className="block text-sm text-zinc-500 hover:text-white transition-colors">About Us</Link>
+              <Link href="/docs" className="block text-sm text-zinc-500 hover:text-white transition-colors">User Documentation</Link>
+              <Link href="/whitepaper" className="block text-sm text-zinc-500 hover:text-white transition-colors">Protocol Whitepaper</Link>
             </nav>
           </div>
 
           <div>
             <h3 className="text-xs font-semibold text-zinc-400 uppercase tracking-wider mb-3">Legal</h3>
             <nav className="space-y-2" aria-label="Legal links">
+              <Link href="/whitepaper" className="block text-sm text-zinc-500 hover:text-white transition-colors">Constitutional Basis</Link>
               <Link href="/privacy" className="block text-sm text-zinc-500 hover:text-white transition-colors">Privacy Policy</Link>
               <Link href="/terms" className="block text-sm text-zinc-500 hover:text-white transition-colors">Terms of Service</Link>
               <Link href="/incidents/report" className="block text-sm text-zinc-500 hover:text-white transition-colors">Report Incident</Link>

@@ -274,7 +274,7 @@ export default function NetworkGraph({ profiles }: Props) {
     <div className="bg-zinc-900/30 border border-zinc-800/40 rounded-2xl overflow-hidden">
       <div className="flex items-center justify-between px-4 py-3 border-b border-zinc-800/40 bg-zinc-900/60">
         <div className="flex items-center gap-2">
-          <span className="text-sm" aria-hidden="true">&#x1F578;&#xFE0F;</span>
+          <span className="text-sm" aria-hidden="true">🕸️</span>
           <span className="text-xs font-semibold text-zinc-400 uppercase tracking-widest">Network Map</span>
         </div>
         <span className="text-xs text-zinc-600">{profiles.length} profiles</span>

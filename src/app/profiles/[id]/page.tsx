@@ -309,6 +309,25 @@ export default function ProfileDetailPage() {
           <div className="flex flex-wrap gap-1">{(p.tags || []).map(t => <span key={t} className="text-[9px] text-red-400/70 bg-red-500/5 border border-red-500/10 px-1.5 py-0.5 rounded">#{t}</span>)}</div>
         </div>
       </Section>
+
+      {/* Contribute Section */}
+      <div className="bg-gradient-to-br from-zinc-900 to-black border border-zinc-800 p-6 rounded-2xl space-y-4">
+        <div className="space-y-1">
+          <h3 className="text-sm font-black text-white uppercase tracking-widest">Contribute Intel</h3>
+          <p className="text-[10px] text-zinc-500 uppercase tracking-tight leading-relaxed">
+            Help the community identify this subject. 3+ verified proofs trigger a deep internet scan by NyayFauj AI to unmask further public data.
+          </p>
+        </div>
+        
+        <div className="grid grid-cols-2 gap-3">
+          <Link href={`/incidents/report?category=adversary_profile&subject=${p.fullName}`} className="flex items-center justify-center gap-2 py-3 bg-red-600 hover:bg-red-500 rounded-xl text-[10px] font-black uppercase tracking-widest text-white transition-all active:scale-95 shadow-lg shadow-red-900/20">
+            <span>➕</span> Add Evidence
+          </Link>
+          <button className="flex items-center justify-center gap-2 py-3 bg-zinc-800 hover:bg-zinc-700 rounded-xl text-[10px] font-black uppercase tracking-widest text-zinc-300 transition-all active:scale-95 border border-zinc-700">
+            <span>✓</span> Verify Subject
+          </button>
+        </div>
+      </div>
     </div>
   );
 }

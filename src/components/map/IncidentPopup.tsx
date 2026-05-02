@@ -42,7 +42,7 @@ export default function IncidentPopup({ incident, position, onClose, onShare, on
             <p className="text-xs font-semibold text-white truncate">{(incident.title as string) || 'Untitled'}</p>
             <p className="text-xs text-zinc-500 truncate mt-0.5">{((incident.area as string) || '').replace(/_/g, ' ')}</p>
           </div>
-          <button onClick={onClose} className="text-zinc-600 hover:text-white text-sm leading-none p-1" aria-label="Close popup">&#x2715;</button>
+          <button onClick={onClose} className="text-zinc-600 hover:text-white text-sm leading-none p-1" aria-label="Close popup">✕</button>
         </div>
 
         <div className="flex items-center gap-2 mt-2">
@@ -51,7 +51,7 @@ export default function IncidentPopup({ incident, position, onClose, onShare, on
           </span>
           <span className="text-xs text-zinc-500 capitalize">{((incident.status as string) || '').replace(/_/g, ' ')}</span>
           {(incident.verificationCount as number) > 0 && (
-            <span className="text-xs text-green-400">&#x2713;{incident.verificationCount as number}</span>
+            <span className="text-xs text-green-400">✓{incident.verificationCount as number}</span>
           )}
         </div>
 

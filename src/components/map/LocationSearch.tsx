@@ -83,12 +83,12 @@ export default function LocationSearch({ onSelect }: Props) {
     onSelect(r.lng, r.lat);
   };
 
-  const typeIcon = (type: string) => type === 'area' ? '&#x1F4CD;' : type === 'zone' ? '&#x2B55;' : '&#x1F3DB;&#xFE0F;';
+  const typeIcon = (type: string) => type === 'area' ? '📍' : type === 'zone' ? '⭕' : '🏛️';
 
   return (
     <div className="relative">
       <div className="relative">
-        <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-sm text-zinc-500" aria-hidden="true">&#x1F50D;</span>
+        <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-sm text-zinc-500" aria-hidden="true">🔍</span>
         <input
           ref={inputRef}
           type="text"

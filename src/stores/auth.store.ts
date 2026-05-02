@@ -41,11 +41,15 @@ export const useAuthStore = create<AuthState>()(
           set({ isLoading: true, error: null });
           const user = await account.get();
           const isAnon = !user.email;
+          
+          // Role mapping from Appwrite prefs or defaults
+          const role = (user.prefs?.role as UserRole) || (isAnon ? 'observer' : 'operative');
+
           set({
             user,
             isAuthenticated: true,
             isAnonymous: isAnon,
-            role: isAnon ? 'anonymous_user' : 'registered_user',
+            role,
             isLoading: false,
           });
         } catch {
@@ -54,7 +58,7 @@ export const useAuthStore = create<AuthState>()(
             session: null,
             isAuthenticated: false,
             isAnonymous: false,
-            role: 'anonymous_user',
+            role: 'observer',
             isLoading: false,
           });
         }
@@ -119,10 +123,24 @@ export const useAuthStore = create<AuthState>()(
         }
       },
 
-      register: async (email: string, password: string, name: string) => {
+      register: async (email: string, password: string, name: string, inviteCode?: string) => {
         try {
           set({ isLoading: true, error: null });
-          await account.create(ID.unique(), email, password, name);
+          const user = await account.create(ID.unique(), email, password, name);
+          
+          // Determine role based on invite code
+          let role: UserRole = 'operative';
+          if (inviteCode === 'VERIFY-INTEL-99') role = 'verifier';
+          if (inviteCode === 'COMMAND-OKHLA-1') role = 'commander';
+
+          // Update user preferences with role and trust data
+          await account.updatePrefs({
+            role,
+            trustScore: role === 'verifier' ? 50 : role === 'commander' ? 100 : 10,
+            reputation: 0,
+            joinedWithCode: !!inviteCode
+          });
+
           // Auto-login after registration
           await get().login(email, password);
         } catch (err) {

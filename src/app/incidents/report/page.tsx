@@ -105,7 +105,7 @@ export default function ReportIncidentPage() {
       <div className="flex items-center justify-between mb-4">
         <div>
           <h1 className="text-xl font-semibold text-white flex items-center gap-2">
-            <span className="w-8 h-8 rounded bg-red-600 flex items-center justify-center text-white text-sm">&#x1F4E2;</span>
+            <span className="w-8 h-8 rounded bg-red-600 flex items-center justify-center text-white text-sm">📢</span>
             Report an Incident
           </h1>
           <p className="text-xs text-zinc-500 mt-1">
@@ -123,7 +123,7 @@ export default function ReportIncidentPage() {
       {/* Offline banner */}
       {isOffline && (
         <div className="bg-amber-500/5 border border-amber-500/20 rounded-xl p-3 mb-6 flex items-center gap-3" role="status">
-          <span className="animate-pulse text-amber-500 text-lg" aria-hidden="true">&#x1F4F6;</span>
+          <span className="animate-pulse text-amber-500 text-lg" aria-hidden="true">📶</span>
           <div>
             <p className="text-xs font-semibold text-amber-500">You&apos;re Offline</p>
             <p className="text-xs text-amber-500/60">Your report will be saved locally and synced when you reconnect.</p>
@@ -226,7 +226,7 @@ export default function ReportIncidentPage() {
 
             <div className="bg-zinc-800/50 border border-zinc-700/50 rounded-2xl p-4 space-y-2">
               <p className="text-xs text-zinc-400 font-medium flex items-center gap-2">
-                &#x26A0;&#xFE0F; Important
+                ⚠️ Important
               </p>
               <p className="text-xs text-zinc-500 leading-relaxed">
                 Reports submitted to the platform are archived for community records. Please ensure the information you provide is accurate and submitted in good faith.
@@ -254,7 +254,7 @@ export default function ReportIncidentPage() {
           ) : (
             <button type="submit" disabled={submitting || !canAdvance()}
               className="flex-1 py-4 bg-red-600 hover:bg-red-500 text-white text-sm font-semibold rounded-2xl transition-all active:scale-[0.98] flex items-center justify-center gap-3 disabled:opacity-50 shadow-xl shadow-red-900/40">
-              {submitting ? <><span className="animate-spin text-lg" aria-hidden="true">&#x2699;&#xFE0F;</span> Submitting...</> : <>{isOffline ? '💾 Save Draft' : '🚀 Submit Report'}</>}
+              {submitting ? <><span className="animate-spin text-lg" aria-hidden="true">⚙️</span> Submitting...</> : <>{isOffline ? '💾 Save Draft' : '🚀 Submit Report'}</>}
             </button>
           )}
         </div>

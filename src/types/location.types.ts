@@ -2,17 +2,13 @@
 
 export type LocationType = 'area' | 'landmark' | 'building' | 'street';
 
+/** Canonical Wards of Okhla as per MC Delhi */
 export type OkhlaArea =
-  | 'okhla_phase_1'
-  | 'okhla_phase_2'
-  | 'jamia_nagar'
+  | 'sarita_vihar'
   | 'zakir_nagar'
-  | 'abul_fazal_enclave'
-  | 'shaheen_bagh'
-  | 'johri_farm'
-  | 'okhla_vihar'
-  | 'jasola'
-  | 'batla_house';
+  | 'abul_fazal'
+  | 'madanpur_khadar_west'
+  | 'madanpur_khadar_east';
 
 export type RiskLevel = 'low' | 'medium' | 'high';
 
@@ -40,14 +36,9 @@ export interface CreateLocationData {
 
 /** Predefined Okhla area metadata with display names and center coordinates */
 export const OKHLA_AREAS: Record<OkhlaArea, { label: string; center: [number, number] }> = {
-  okhla_phase_1:      { label: 'Okhla Phase 1',       center: [28.5310, 77.2710] },
-  okhla_phase_2:      { label: 'Okhla Phase 2',       center: [28.5270, 77.2750] },
-  jamia_nagar:         { label: 'Jamia Nagar',          center: [28.5620, 77.2800] },
-  zakir_nagar:         { label: 'Zakir Nagar',          center: [28.5650, 77.2830] },
-  abul_fazal_enclave:  { label: 'Abul Fazal Enclave',   center: [28.5530, 77.2850] },
-  shaheen_bagh:        { label: 'Shaheen Bagh',         center: [28.5440, 77.2940] },
-  johri_farm:          { label: 'Johri Farm',           center: [28.5560, 77.2900] },
-  okhla_vihar:         { label: 'Okhla Vihar',          center: [28.5340, 77.2820] },
-  jasola:              { label: 'Jasola',               center: [28.5400, 77.2600] },
-  batla_house:         { label: 'Batla House',          center: [28.5590, 77.2790] },
+  sarita_vihar:          { label: 'Sarita Vihar',          center: [28.5292, 77.2874] },
+  zakir_nagar:           { label: 'Zakir Nagar',           center: [28.5633, 77.2828] },
+  abul_fazal:            { label: 'Abul Fazal Enclave',    center: [28.5516, 77.2917] },
+  madanpur_khadar_west:  { label: 'Madanpur Khadar West',  center: [28.5255, 77.3012] },
+  madanpur_khadar_east:  { label: 'Madanpur Khadar East',  center: [28.5122, 77.3155] },
 };

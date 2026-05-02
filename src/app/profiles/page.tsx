@@ -27,16 +27,16 @@ export default function ProfilesPage() {
           <div className="space-y-4">
             <div className="flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-red-600 shadow-[0_0_8px_rgba(220,38,38,0.5)]" />
-              <h1 className="text-3xl font-black tracking-tighter uppercase italic text-white">Intelligence Node Database</h1>
+              <h1 className="text-3xl font-black tracking-tighter uppercase italic text-white">Adversary Database</h1>
             </div>
-            <p className="text-zinc-500 text-xs font-bold uppercase tracking-widest">Targeted Adversaries & verified Sangathan nodes</p>
+            <p className="text-zinc-500 text-[10px] font-black uppercase tracking-[0.2em]">Live tracking of verified RSS operatives & monitored targets</p>
           </div>
 
           <div className="w-full md:w-64 relative group">
             <div className="absolute inset-0 bg-red-600/5 blur-xl group-hover:bg-red-600/10 transition-all" />
             <input 
               type="text" 
-              placeholder="SURVEILLANCE SCAN..."
+              placeholder="TARGET SCAN..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="relative w-full bg-zinc-900/80 border border-zinc-800/50 rounded-2xl px-5 py-3 text-[10px] font-black tracking-[0.2em] uppercase text-zinc-100 placeholder-zinc-700 focus:border-red-600 outline-none transition-all shadow-xl"

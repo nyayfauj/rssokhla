@@ -59,7 +59,7 @@ export default function LocationPicker({
         });
 
         setSelectedWardId(nearestWard.id);
-        onAreaChange(nearestWard.name);
+        onAreaChange(nearestWard.id);
 
         // 2. Since we don't have per-colony coords, we just stay at ward level 
         // or the user can refine. 
@@ -75,7 +75,7 @@ export default function LocationPicker({
 
   const handleWardSelect = (ward: Ward) => {
     setSelectedWardId(ward.id);
-    onAreaChange(ward.name);
+    onAreaChange(ward.id);
     onCoordinatesChange(ward.center);
     onLandmarkChange(''); // Reset colony/address when ward changes
   };

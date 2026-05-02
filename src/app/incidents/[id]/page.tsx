@@ -14,6 +14,7 @@ import Skeleton from '@/components/ui/Skeleton';
 import SeverityBadge from '@/components/incidents/SeverityBadge';
 import { INCIDENT_CATEGORIES, STATUS_LABELS } from '@/lib/utils/constants';
 import { formatDate, formatCoordinates } from '@/lib/utils/formatters';
+import { OKHLA_AREAS, type OkhlaArea } from '@/types/location.types';
 
 export default function IncidentDetailPage() {
   const params = useParams();
@@ -34,10 +35,16 @@ export default function IncidentDetailPage() {
       return;
     }
     setVerifying(true);
-    await verifyIncident(id, user.$id);
-    await getIncident(id);
-    setVerifying(false);
-    addToast({ type: 'success', message: 'Incident verified' });
+    try {
+      const role = user.prefs?.role || 'operative';
+      await verifyIncident(id, user.$id, role);
+      await getIncident(id);
+      addToast({ type: 'success', message: 'Intel corroborated by your node.' });
+    } catch (err) {
+      addToast({ type: 'error', message: 'Verification failed' });
+    } finally {
+      setVerifying(false);
+    }
   };
 
   const incident = selectedIncident;
@@ -118,12 +125,12 @@ export default function IncidentDetailPage() {
 
         {/* Telemetry Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <TacticalMetric label="Operational Zone" value={incident.landmark || "UNSPECIFIED"} sub={incident.coordinates.length === 2 ? formatCoordinates(incident.coordinates) : "NO COORDINATES"} />
+          <TacticalMetric label="Operational Zone" value={incident.landmark || "UNSPECIFIED"} sub={incident.locationId ? OKHLA_AREAS[incident.locationId as OkhlaArea]?.label : "UNKNOWN SECTOR"} />
           <TacticalMetric 
             label="Network Corroboration" 
-            value={`${incident.verificationCount} NODES`} 
-            sub={incident.verificationCount >= 3 ? "STABLE VERIFICATION ✓" : `${3 - incident.verificationCount} MORE REQUIRED`} 
-            accent={incident.verificationCount >= 3 ? "text-green-500" : "text-amber-500"}
+            value={`${Math.min(Math.round(((incident.trustPoints || 0) / 10) * 100), 100)}% CONFIDENCE`} 
+            sub={`${incident.trustPoints || 0} TRUST POINTS // ${incident.verificationCount} NODES`} 
+            accent={(incident.trustPoints || 0) >= 10 ? "text-green-500" : "text-amber-500"}
           />
           <TacticalMetric label="Intel Category" value={category.label.toUpperCase()} sub={`THREAT PROTOCOL: ${incident.severity.toUpperCase()}`} />
           <TacticalMetric label="Source Identity" value={incident.isAnonymous ? "STEALTH PROTOCOL" : "SANGATHAN OPERATIVE"} sub={incident.isAnonymous ? "ANONYMOUS TRANSMISSION" : `OPERATIVE ID: ${incident.reporterId.slice(-8).toUpperCase()}`} />

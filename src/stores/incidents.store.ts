@@ -5,6 +5,7 @@ import { persist } from 'zustand/middleware';
 import { databases, client, ID, Query, storage } from '@/lib/appwrite/client';
 import { DATABASE_ID, COLLECTIONS, STORAGE_BUCKET_ID } from '@/lib/appwrite/collections';
 import type { Incident, CreateIncidentData, IncidentFilters, PendingIncident } from '@/types/incident.types';
+import { TRUST_WEIGHTS, VERIFICATION_THRESHOLD, type UserRole } from '@/types/user.types';
 import { v4 as uuidv4 } from 'uuid';
 
 interface IncidentsState {
@@ -14,15 +15,17 @@ interface IncidentsState {
   isLoading: boolean;
   error: string | null;
   offlineQueue: PendingIncident[];
+  userIncidents: Incident[];
   hasMore: boolean;
   page: number;
 
   // Actions
   fetchIncidents: (filters?: IncidentFilters) => Promise<void>;
+  fetchUserIncidents: (userId: string) => Promise<void>;
   fetchMore: () => Promise<void>;
   getIncident: (id: string) => Promise<void>;
   createIncident: (data: CreateIncidentData, userId: string, isAnonymous: boolean) => Promise<void>;
-  verifyIncident: (id: string, userId: string) => Promise<void>;
+  verifyIncident: (incidentId: string, userId: string, role: UserRole) => Promise<void>;
   setFilters: (filters: Partial<IncidentFilters>) => void;
   clearFilters: () => void;
   syncOfflineQueue: () => Promise<void>;
@@ -42,6 +45,7 @@ export const useIncidentsStore = create<IncidentsState>()(
       isLoading: false,
       error: null,
       offlineQueue: [],
+      userIncidents: [],
       hasMore: true,
       page: 0,
 
@@ -65,6 +69,25 @@ export const useIncidentsStore = create<IncidentsState>()(
         } catch (err) {
           const message = err instanceof Error ? err.message : 'Failed to load incidents';
           set({ error: message, isLoading: false });
+        }
+      },
+
+      fetchUserIncidents: async (userId: string) => {
+        try {
+          set({ isLoading: true, error: null });
+          const response = await databases.listDocuments(
+            DATABASE_ID,
+            COLLECTIONS.INCIDENTS,
+            [
+              Query.equal('reporterId', userId),
+              Query.orderDesc('timestamp'),
+              Query.limit(10)
+            ]
+          );
+          set({ userIncidents: response.documents as unknown as Incident[], isLoading: false });
+        } catch (err) {
+          console.error('[IncidentsStore] Error fetching user incidents:', err);
+          set({ isLoading: false });
         }
       },
 
@@ -138,6 +161,7 @@ export const useIncidentsStore = create<IncidentsState>()(
             isAnonymous,
             verifiedBy: [],
             verificationCount: 0,
+            trustPoints: 0,
             mediaUrls: uploadedMediaUrls,
             coordinates: data.coordinates || [],
             tags: data.tags || [],
@@ -175,21 +199,41 @@ export const useIncidentsStore = create<IncidentsState>()(
         }
       },
 
-      verifyIncident: async (id: string, userId: string) => {
+      verifyIncident: async (incidentId: string, userId: string, role: UserRole) => {
         try {
-          const incident = get().incidents.find((i) => i.$id === id);
-          if (!incident) return;
+          // Get current incident state
+          const incident = await databases.getDocument(
+            DATABASE_ID,
+            COLLECTIONS.INCIDENTS,
+            incidentId
+          ) as unknown as Incident;
 
-          if (incident.verifiedBy.includes(userId)) return;
+          // Prevent double verification
+          if (incident.verifiedBy.includes(userId)) {
+            console.warn('[IncidentsStore] User already verified this incident');
+            return;
+          }
+
+          // Calculate trust weight
+          const weight = TRUST_WEIGHTS[role] || 0;
+          const newTrustPoints = (incident.trustPoints || 0) + weight;
+          const newVerifiedBy = [...incident.verifiedBy, userId];
+          
+          // Determine if status should upgrade
+          let newStatus = incident.status;
+          if (newTrustPoints >= VERIFICATION_THRESHOLD && incident.status === 'reported') {
+            newStatus = 'verified';
+          }
 
           await databases.updateDocument(
             DATABASE_ID,
             COLLECTIONS.INCIDENTS,
-            id,
+            incidentId,
             {
-              verifiedBy: [...incident.verifiedBy, userId],
-              verificationCount: incident.verificationCount + 1,
-              status: incident.verificationCount + 1 >= 3 ? 'verified' : incident.status,
+              verifiedBy: newVerifiedBy,
+              verificationCount: newVerifiedBy.length,
+              trustPoints: newTrustPoints,
+              status: newStatus,
             }
           );
 

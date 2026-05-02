@@ -18,29 +18,37 @@ import { OKHLA_AREAS } from '@/types/location.types';
 
 export default function DashboardPage() {
   const { user, isAnonymous, role } = useAuthStore();
-  const { incidents, isLoading, error, fetchIncidents, offlineQueue } = useIncidentsStore();
+  const { incidents, userIncidents, isLoading, error, fetchIncidents, fetchUserIncidents, offlineQueue } = useIncidentsStore();
   const { activeAlerts, fetchActiveAlerts } = useAlertsStore();
   const { offlineCount } = useOfflineSync();
 
   useEffect(() => {
     fetchIncidents();
     fetchActiveAlerts();
-  }, [fetchIncidents, fetchActiveAlerts]);
+    if (user?.$id) {
+      fetchUserIncidents(user.$id);
+    }
+  }, [fetchIncidents, fetchActiveAlerts, fetchUserIncidents, user?.$id]);
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6 pb-20">
       {/* Welcome banner */}
       <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-xl font-bold text-white">
-            {isAnonymous ? 'Observer Mode' : `Welcome, ${user?.name || 'Monitor'}`}
-          </h1>
-          <p className="text-xs text-zinc-500 mt-0.5">
-            Okhla Community Monitor · {new Date().toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'short' })}
-          </p>
+        <div className="flex items-center gap-4">
+          <div className={`w-12 h-12 rounded-2xl flex items-center justify-center border ${isAnonymous ? 'bg-zinc-900 border-zinc-800 text-zinc-500' : 'bg-red-600/10 border-red-600/20 text-red-500'}`}>
+            <span className="text-xl">{isAnonymous ? '🕶️' : '👤'}</span>
+          </div>
+          <div>
+            <h1 className="text-xl font-black text-white uppercase tracking-tighter italic">
+              {isAnonymous ? 'Observer // Active' : `Operative // ${user?.name || 'Monitor'}`}
+            </h1>
+            <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-[0.2em] mt-0.5">
+              Sector: Okhla · {new Date().toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short' }).toUpperCase()}
+            </p>
+          </div>
         </div>
         <Badge variant={role === 'admin' ? 'danger' : role === 'moderator' ? 'warning' : 'default'} size="md">
-          {(role || 'user').replace(/_/g, ' ')}
+          {isAnonymous ? 'STEALTH PROTOCOL' : (role || 'user').replace(/_/g, ' ').toUpperCase()}
         </Badge>
       </div>
 
@@ -49,18 +57,20 @@ export default function DashboardPage() {
 
       {/* Offline queue indicator */}
       {offlineCount > 0 && (
-        <Card variant="danger" padding="sm">
-          <div className="flex items-center gap-2 text-sm">
+        <Card variant="danger" padding="sm" className="animate-pulse">
+          <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest">
             <span>📤</span>
-            <span className="text-red-300">{offlineCount} report{offlineCount !== 1 ? 's' : ''} waiting to sync</span>
+            <span className="text-red-400">{offlineCount} Data Packets Waiting to Sync</span>
           </div>
         </Card>
       )}
 
       {/* Active alerts */}
       {activeAlerts.length > 0 && (
-        <div className="space-y-2">
-          <h2 className="text-xs font-semibold text-zinc-500 uppercase tracking-wider">Active Alerts</h2>
+        <div className="space-y-3">
+          <h2 className="text-[10px] font-black text-red-500 uppercase tracking-[0.4em] flex items-center gap-2">
+            <span className="w-1 h-4 bg-red-600 rounded-full" /> Priority Alerts
+          </h2>
           {activeAlerts.slice(0, 3).map((alert) => (
             <AlertBanner key={alert.$id} alert={alert} />
           ))}
@@ -68,74 +78,69 @@ export default function DashboardPage() {
       )}
 
       {/* Quick stats */}
-      <div className="grid grid-cols-3 gap-2">
+      <div className="grid grid-cols-3 gap-3">
         {[
           { label: 'Active', value: incidents.filter(i => i.status === 'reported').length, icon: '📡' },
           { label: 'Verified', value: incidents.filter(i => i.status === 'verified').length, icon: '✓' },
           { label: 'Critical', value: incidents.filter(i => i.severity === 'critical').length, icon: '🚨' },
         ].map((stat) => (
-          <Card key={stat.label} padding="sm">
-            <div className="text-center">
-              <div className="text-lg">{stat.icon}</div>
-              <div className="text-xl font-bold text-white mt-1">{stat.value}</div>
-              <div className="text-[10px] text-zinc-500">{stat.label}</div>
-            </div>
-          </Card>
+          <div key={stat.label} className="bg-zinc-900/40 border border-zinc-800/60 p-4 rounded-2xl text-center space-y-1">
+            <div className="text-lg">{stat.icon}</div>
+            <div className="text-xl font-black text-white">{stat.value}</div>
+            <div className="text-[8px] font-black text-zinc-600 uppercase tracking-widest">{stat.label}</div>
+          </div>
         ))}
       </div>
 
-      {/* Area quick links */}
-      <div>
-        <h2 className="text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-2">Monitored Areas</h2>
-        <div className="flex gap-2 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide">
-          {Object.entries(OKHLA_AREAS).slice(0, 6).map(([key, area]) => (
-            <button
-              key={key}
-              className="flex-shrink-0 px-3 py-1.5 bg-zinc-900 border border-zinc-800 rounded-full text-xs text-zinc-400 hover:text-white hover:border-zinc-600 transition-colors whitespace-nowrap"
-            >
-              {area.label}
-            </button>
-          ))}
+      {/* My Transmissions (Personalized) */}
+      {userIncidents.length > 0 && (
+        <div className="space-y-4">
+          <h2 className="text-[10px] font-black text-blue-500 uppercase tracking-[0.4em] flex items-center gap-2">
+            <span className="w-1 h-4 bg-blue-600 rounded-full" /> My Transmissions
+          </h2>
+          <div className="space-y-3">
+            {userIncidents.map((incident) => (
+              <IncidentCard key={incident.$id} incident={incident} />
+            ))}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Incident feed */}
       <div>
-        <div className="flex items-center justify-between mb-3">
-          <h2 className="text-xs font-semibold text-zinc-500 uppercase tracking-wider">Recent Incidents</h2>
-          <Button variant="ghost" size="sm">
-            Filter
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-[10px] font-black text-zinc-600 uppercase tracking-[0.4em] flex items-center gap-2">
+            <span className="w-1 h-4 bg-zinc-700 rounded-full" /> Global Intel Feed
+          </h2>
+          <Button variant="ghost" size="sm" className="text-[9px] font-black uppercase tracking-widest">
+            Filter Results
           </Button>
         </div>
 
         {isLoading && incidents.length === 0 ? (
           <div className="space-y-3">
             {[1, 2, 3].map((i) => (
-              <Card key={i} padding="md">
-                <Skeleton lines={3} />
-              </Card>
+              <Skeleton key={i} variant="rectangular" height="120px" className="rounded-2xl" />
             ))}
           </div>
         ) : error ? (
           <Card variant="danger" padding="md">
             <div className="text-center py-4">
-              <p className="text-sm text-red-400 mb-3">{error}</p>
+              <p className="text-xs text-red-400 mb-3 uppercase font-bold">{error}</p>
               <Button variant="danger" size="sm" onClick={() => fetchIncidents()}>
-                Retry
+                Retry Connection
               </Button>
             </div>
           </Card>
         ) : incidents.length === 0 ? (
-          <Card padding="lg">
-            <div className="text-center py-6">
-              <span className="text-4xl">📡</span>
-              <h3 className="text-sm font-semibold text-white mt-3">No incidents yet</h3>
-              <p className="text-xs text-zinc-500 mt-1">Be the first to report activity in your area</p>
-            </div>
-          </Card>
+          <div className="bg-zinc-900/20 border border-zinc-800/50 rounded-3xl p-10 text-center space-y-4">
+            <span className="text-5xl opacity-20">📡</span>
+            <h3 className="text-sm font-black text-zinc-500 uppercase tracking-widest">No Active Incidents</h3>
+            <p className="text-[10px] text-zinc-600 font-bold uppercase tracking-widest">Okhla sector is currently quiet.</p>
+          </div>
         ) : (
           <div className="space-y-3">
-            {incidents.map((incident) => (
+            {incidents.filter(i => !userIncidents.find(ui => ui.$id === i.$id)).map((incident) => (
               <IncidentCard key={incident.$id} incident={incident} />
             ))}
           </div>

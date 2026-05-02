@@ -30,14 +30,23 @@ export default function Header() {
           )}
 
           {isAuthenticated && (
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-3">
               {isAnonymous ? (
-                <Badge variant="default" size="sm">
-                  👤 Anonymous
-                </Badge>
+                <div className="flex items-center gap-2 px-3 py-1 bg-zinc-900 border border-zinc-800 rounded-lg">
+                   <span className="text-[10px] font-black text-zinc-500 uppercase tracking-widest">OBSERVER</span>
+                   <div className="w-1.5 h-1.5 rounded-full bg-zinc-700" />
+                </div>
               ) : (
-                <div className="flex items-center gap-2">
-                  <div className="w-7 h-7 rounded-full bg-gradient-to-br from-red-500 to-red-700 flex items-center justify-center text-xs font-bold text-white">
+                <div className="flex items-center gap-3">
+                  <div className="flex flex-col items-end">
+                    <span className="text-[9px] font-black text-red-500 uppercase tracking-[0.2em] leading-none mb-0.5">
+                      {(user?.prefs?.role || 'operative').toUpperCase()}
+                    </span>
+                    <span className="text-[8px] font-mono text-zinc-600 leading-none">
+                      NODE: {user?.$id.slice(-6).toUpperCase()}
+                    </span>
+                  </div>
+                  <div className="w-8 h-8 rounded-xl bg-zinc-900 border border-zinc-800 flex items-center justify-center text-xs font-bold text-white shadow-lg shadow-black">
                     {user?.name?.charAt(0)?.toUpperCase() || '?'}
                   </div>
                 </div>

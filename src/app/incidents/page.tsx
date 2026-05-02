@@ -5,6 +5,7 @@ import { useIncidentsStore } from '@/stores/incidents.store';
 import GlassCard from '@/components/ui/GlassCard';
 import { formatDistanceToNow } from 'date-fns';
 import Link from 'next/link';
+import { OKHLA_AREAS, type OkhlaArea } from '@/types/location.types';
 
 export default function IncidentsPage() {
   const { incidents, fetchIncidents, isLoading } = useIncidentsStore();
@@ -70,7 +71,7 @@ export default function IncidentsPage() {
               <div key={incident.$id} className="group relative">
                 <div className="absolute -inset-0.5 bg-gradient-to-br from-red-600/10 to-transparent blur opacity-0 group-hover:opacity-100 transition-all duration-500 rounded-[2rem]" />
                 <GlassCard 
-                  title={incident.locationId || 'UNSPECIFIED'} 
+                  title={incident.locationId ? OKHLA_AREAS[incident.locationId as OkhlaArea]?.label : 'UNSPECIFIED SECTOR'} 
                   subtitle={incident.timestamp ? formatDistanceToNow(new Date(incident.timestamp)) + ' ago' : ''}
                   icon="📡"
                 >
@@ -102,14 +103,17 @@ export default function IncidentsPage() {
                     </p>
                     
                     <div className="pt-5 border-t border-zinc-800/40 flex items-center justify-between">
-                      <div className="flex -space-x-2">
-                         {[1,2,3].map(v => (
-                           <div key={v} className="w-5 h-5 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center text-[8px] text-zinc-600">
-                             👤
-                           </div>
-                         ))}
-                         <span className="ml-4 text-[8px] font-black text-zinc-600 uppercase tracking-widest flex items-center">
-                            +{incident.verificationCount || 0} Verifications
+                      <div className="flex items-center gap-3">
+                         <div className="flex items-center gap-1.5">
+                            <span className="text-[14px]">🛡️</span>
+                            <span className={`text-[10px] font-black uppercase tracking-widest ${
+                              (incident.trustPoints || 0) >= 10 ? 'text-green-500' : 'text-amber-500'
+                            }`}>
+                              {Math.min(Math.round(((incident.trustPoints || 0) / 10) * 100), 100)}% Trust
+                            </span>
+                         </div>
+                         <span className="text-[9px] font-black text-zinc-700 uppercase tracking-widest">
+                            {incident.verificationCount || 0} Nodes
                          </span>
                       </div>
                       <Link href={`/incidents/${incident.$id}`} className="text-[10px] font-black text-red-600 hover:text-red-400 uppercase tracking-widest transition-colors flex items-center gap-1">

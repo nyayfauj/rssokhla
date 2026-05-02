@@ -15,6 +15,7 @@ const QUICK_CATEGORIES: { key: IncidentCategory; emoji: string; label: string; d
   { key: 'surveillance', emoji: '👁️', label: 'Surveillance', desc: 'Photography, stalking, drones' },
   { key: 'meeting', emoji: '🤝', label: 'Meeting', desc: 'Shakha, gatherings, rallies' },
   { key: 'harassment', emoji: '⚠️', label: 'Harassment', desc: 'Threats, intimidation' },
+  { key: 'adversary_profile', emoji: '👤', label: 'Operative Profile', desc: 'Report RSS operative details' },
   { key: 'other', emoji: '📋', label: 'Other', desc: 'Any other activity' },
 ];
 
