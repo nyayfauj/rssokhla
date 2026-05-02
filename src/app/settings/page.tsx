@@ -55,7 +55,7 @@ export default function SettingsPage() {
             <p className="font-semibold text-lg text-white">{isAnonymous ? 'Anonymous User' : user?.name}</p>
             <p className="text-xs text-zinc-500 truncate">{isAnonymous ? 'Browsing anonymously' : user?.email}</p>
             <div className="mt-2 flex">
-              <Badge variant={role === 'admin' ? 'danger' : role === 'moderator' ? 'warning' : 'default'} size="sm">
+              <Badge variant={role === 'commander' ? 'danger' : role === 'verifier' ? 'warning' : 'default'} size="sm">
                 {role?.replace(/_/g, ' ') || 'user'}
               </Badge>
             </div>

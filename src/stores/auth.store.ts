@@ -33,7 +33,7 @@ export const useAuthStore = create<AuthState>()(
       isAuthenticated: false,
       isAnonymous: false,
       isLoading: true,
-      role: 'anonymous_user' as UserRole,
+      role: 'observer' as UserRole,
       error: null,
 
       initialize: async () => {
@@ -74,7 +74,7 @@ export const useAuthStore = create<AuthState>()(
             session,
             isAuthenticated: true,
             isAnonymous: false,
-            role: 'registered_user',
+            role: 'operative',
             isLoading: false,
           });
         } catch (err) {
@@ -113,7 +113,7 @@ export const useAuthStore = create<AuthState>()(
             session,
             isAuthenticated: true,
             isAnonymous: !user.email,
-            role: !user.email ? 'anonymous_user' : 'registered_user',
+            role: !user.email ? 'observer' : 'operative',
             isLoading: false,
           });
         } catch (err) {
@@ -162,7 +162,7 @@ export const useAuthStore = create<AuthState>()(
             session: null,
             isAuthenticated: false,
             isAnonymous: false,
-            role: 'anonymous_user',
+            role: 'observer',
             isLoading: false,
             error: null,
           });
@@ -177,7 +177,7 @@ export const useAuthStore = create<AuthState>()(
             user,
             isAuthenticated: true,
             isAnonymous: isAnon,
-            role: isAnon ? 'anonymous_user' : get().role,
+            role: isAnon ? 'observer' : get().role,
           });
         } catch {
           await get().logout();
