@@ -31,7 +31,7 @@ export default function ReportIncidentPage() {
   // Form state
   const [category, setCategory] = useState<IncidentCategory>('other');
   const [severity, setSeverity] = useState<IncidentSeverity>('medium');
-  const [area, setArea] = useState<OkhlaArea | ''>('');
+  const [area, setArea] = useState<string>('');
   const [coordinates, setCoordinates] = useState<[number, number] | null>(null);
   const [landmark, setLandmark] = useState('');
   const [title, setTitle] = useState('');
@@ -57,7 +57,7 @@ export default function ReportIncidentPage() {
 
   const canAdvance = () => {
     if (step === 0) return true;
-    if (step === 1) return !!area;
+    if (step === 1) return !!area || !!landmark;
     if (step === 2) return title.trim().length >= 3;
     return true;
   };
@@ -72,7 +72,9 @@ export default function ReportIncidentPage() {
       category,
       severity,
       isAnonymous: anonymous,
-      coordinates: coordinates ? [...coordinates] : area ? [...OKHLA_AREAS[area as OkhlaArea].center] : [],
+      coordinates: coordinates ? [...coordinates] : [],
+      locationId: area,
+      landmark: landmark,
       tags: tags.split(',').map(t => t.trim()).filter(Boolean),
     };
 

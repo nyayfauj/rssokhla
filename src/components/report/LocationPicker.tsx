@@ -1,124 +1,255 @@
-// ─── Location Picker (GPS + Manual + Landmark) ─────────────
+// ─── Location Picker (Ward + Colony + GPS + Manual) ──────────
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
+import { OKHLA_WARDS, type Ward, type Colony } from '@/lib/utils/wards';
 import { OKHLA_AREAS, type OkhlaArea } from '@/types/location.types';
 
 interface Props {
-  area: OkhlaArea | '';
-  onAreaChange: (area: OkhlaArea) => void;
+  area: string;
+  onAreaChange: (area: string) => void;
   coordinates: [number, number] | null;
   onCoordinatesChange: (coords: [number, number]) => void;
   landmark: string;
   onLandmarkChange: (lm: string) => void;
 }
 
-type Mode = 'gps' | 'area' | 'landmark';
+type Mode = 'gps' | 'wards' | 'address';
 
-const LANDMARKS = [
-  { label: 'Jamia Millia Islamia Gate', area: 'jamia_nagar' as OkhlaArea, coords: [28.5620, 77.2800] as [number, number] },
-  { label: 'Shaheen Bagh Market', area: 'shaheen_bagh' as OkhlaArea, coords: [28.5440, 77.2940] as [number, number] },
-  { label: 'Batla House Junction', area: 'batla_house' as OkhlaArea, coords: [28.5590, 77.2790] as [number, number] },
-  { label: 'Zakir Nagar Market', area: 'zakir_nagar' as OkhlaArea, coords: [28.5650, 77.2830] as [number, number] },
-  { label: 'Abul Fazal Main Gate', area: 'abul_fazal_enclave' as OkhlaArea, coords: [28.5530, 77.2850] as [number, number] },
-  { label: 'Okhla Metro Station', area: 'okhla_phase_1' as OkhlaArea, coords: [28.5310, 77.2710] as [number, number] },
-  { label: 'Jogabai Extension', area: 'johri_farm' as OkhlaArea, coords: [28.5560, 77.2900] as [number, number] },
-  { label: 'Jasola Apollo Metro', area: 'jasola' as OkhlaArea, coords: [28.5400, 77.2600] as [number, number] },
-  { label: 'Kalindi Kunj', area: 'shaheen_bagh' as OkhlaArea, coords: [28.5470, 77.3000] as [number, number] },
-  { label: 'Thokar No. 8', area: 'batla_house' as OkhlaArea, coords: [28.5580, 77.2830] as [number, number] },
-  { label: 'Noor Nagar Chowk', area: 'jamia_nagar' as OkhlaArea, coords: [28.5615, 77.2810] as [number, number] },
-];
-
-export default function LocationPicker({ area, onAreaChange, coordinates, onCoordinatesChange, landmark, onLandmarkChange }: Props) {
-  const [mode, setMode] = useState<Mode>('area');
+export default function LocationPicker({ 
+  area, 
+  onAreaChange, 
+  coordinates, 
+  onCoordinatesChange, 
+  landmark, 
+  onLandmarkChange 
+}: Props) {
+  const [mode, setMode] = useState<Mode>('wards');
+  const [selectedWardId, setSelectedWardId] = useState<string | null>(null);
   const [gpsStatus, setGpsStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [gpsError, setGpsError] = useState('');
 
+  // Find selected ward and colony for UI states
+  const selectedWard = useMemo(() => 
+    OKHLA_WARDS.find(w => w.id === selectedWardId), 
+  [selectedWardId]);
+
+  // GPS Logic
   const captureGPS = useCallback(() => {
-    if (!navigator.geolocation) { setGpsError('GPS not available'); setGpsStatus('error'); return; }
+    if (!navigator.geolocation) { 
+      setGpsError('GPS not available'); 
+      setGpsStatus('error'); 
+      return; 
+    }
+    
     setGpsStatus('loading');
     navigator.geolocation.getCurrentPosition(
       (pos) => {
-        onCoordinatesChange([pos.coords.latitude, pos.coords.longitude]);
+        const lat = pos.coords.latitude;
+        const lng = pos.coords.longitude;
+        onCoordinatesChange([lat, lng]);
         setGpsStatus('success');
-        // Auto-detect nearest area
-        let nearest: OkhlaArea = 'batla_house';
-        let minDist = Infinity;
-        (Object.entries(OKHLA_AREAS) as [OkhlaArea, { center: [number, number] }][]).forEach(([key, a]) => {
-          const d = Math.hypot(a.center[0] - pos.coords.latitude, a.center[1] - pos.coords.longitude);
-          if (d < minDist) { minDist = d; nearest = key; }
+
+        // 1. Find nearest Ward
+        let nearestWard = OKHLA_WARDS[0];
+        let minWardDist = Infinity;
+        OKHLA_WARDS.forEach(w => {
+          const d = Math.hypot(w.center[0] - lat, w.center[1] - lng);
+          if (d < minWardDist) { minWardDist = d; nearestWard = w; }
         });
-        onAreaChange(nearest);
+
+        setSelectedWardId(nearestWard.id);
+        onAreaChange(nearestWard.name);
+
+        // 2. Since we don't have per-colony coords, we just stay at ward level 
+        // or the user can refine. 
+        setMode('wards');
       },
-      (err) => { setGpsError(err.message); setGpsStatus('error'); },
+      (err) => { 
+        setGpsError(err.message); 
+        setGpsStatus('error'); 
+      },
       { enableHighAccuracy: true, timeout: 10000 }
     );
   }, [onAreaChange, onCoordinatesChange]);
 
+  const handleWardSelect = (ward: Ward) => {
+    setSelectedWardId(ward.id);
+    onAreaChange(ward.name);
+    onCoordinatesChange(ward.center);
+    onLandmarkChange(''); // Reset colony/address when ward changes
+  };
+
+  const handleColonySelect = (colony: Colony) => {
+    onLandmarkChange(colony.name);
+  };
+
   return (
-    <div className="space-y-3">
-      {/* Mode tabs */}
-      <div className="flex gap-1 bg-zinc-900/60 rounded-xl p-1" role="tablist" aria-label="Location input method">
-        {([['gps', '&#x1F4CD;', 'GPS'], ['area', '&#x1F5FA;&#xFE0F;', 'Area'], ['landmark', '&#x1F3DB;&#xFE0F;', 'Landmark']] as [Mode, string, string][]).map(([m, icon, label]) => (
-          <button key={m} type="button" onClick={() => setMode(m)} role="tab" aria-selected={mode === m}
-            className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-sm font-medium transition-colors ${
-              mode === m ? 'bg-zinc-800 text-white' : 'text-zinc-500 hover:text-zinc-300'
+    <div className="space-y-6">
+      {/* Mode Navigation */}
+      <div className="flex gap-2 p-1.5 bg-black/40 border border-zinc-800/50 rounded-2xl">
+        {(['gps', 'wards', 'address'] as Mode[]).map((m) => (
+          <button
+            key={m}
+            type="button"
+            onClick={() => setMode(m)}
+            className={`flex-1 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${
+              mode === m 
+                ? 'bg-red-600 text-white shadow-lg shadow-red-900/20' 
+                : 'text-zinc-500 hover:text-zinc-300'
             }`}
-            aria-label={`Use ${label} to select location`}>
-            <span aria-hidden="true" dangerouslySetInnerHTML={{ __html: icon }} />{label}
+          >
+            {m === 'gps' && '📍 GPS'}
+            {m === 'wards' && '🗺️ Areas'}
+            {m === 'address' && '🏠 Address'}
           </button>
         ))}
       </div>
 
-      {/* GPS Mode */}
-      {mode === 'gps' && (
-        <div className="space-y-2">
-          <button type="button" onClick={captureGPS} disabled={gpsStatus === 'loading'}
-            className="w-full py-3.5 bg-zinc-900 border border-zinc-700 rounded-xl text-sm font-medium text-white hover:bg-zinc-800 transition-colors active:scale-[0.98] flex items-center justify-center gap-2">
-            {gpsStatus === 'loading' ? (
-              <><span className="animate-spin">⏳</span> Detecting location...</>
-            ) : gpsStatus === 'success' ? (
-              <><span className="text-green-400">✓</span> Location captured</>
-            ) : (
-              <><span>📍</span> Capture Current Location</>
-            )}
-          </button>
-          {gpsStatus === 'success' && coordinates && (
-            <p className="text-[10px] text-green-400 text-center font-mono">{coordinates[0].toFixed(4)}°N, {coordinates[1].toFixed(4)}°E · {area ? OKHLA_AREAS[area as OkhlaArea]?.label : ''}</p>
-          )}
-          {gpsStatus === 'error' && <p className="text-[10px] text-red-400 text-center">{gpsError}</p>}
-        </div>
-      )}
+      <div className="min-h-[280px] animate-in fade-in slide-in-from-bottom-2 duration-500">
+        {/* GPS Mode */}
+        {mode === 'gps' && (
+          <div className="flex flex-col items-center justify-center h-full space-y-6 py-8">
+            <div className={`w-20 h-20 rounded-full flex items-center justify-center transition-all ${
+              gpsStatus === 'loading' ? 'bg-red-600/10 animate-pulse' : 'bg-zinc-900 border border-zinc-800'
+            }`}>
+              <span className="text-3xl">{gpsStatus === 'success' ? '✅' : '📡'}</span>
+            </div>
+            
+            <div className="text-center space-y-2">
+              <h3 className="text-sm font-black text-white uppercase tracking-tighter">Precision Geolocation</h3>
+              <p className="text-[10px] text-zinc-500 uppercase font-bold tracking-widest leading-relaxed">
+                Automatically detect your current ward and <br/> sector for rapid response.
+              </p>
+            </div>
 
-      {/* Area Mode */}
-      {mode === 'area' && (
-        <div className="grid grid-cols-2 gap-1.5">
-          {(Object.entries(OKHLA_AREAS) as [OkhlaArea, { label: string; center: [number, number] }][]).map(([key, a]) => (
-            <button key={key} type="button" onClick={() => { onAreaChange(key); onCoordinatesChange(a.center); }}
-              className={`py-2.5 px-3 rounded-xl border text-xs font-medium transition-all text-left active:scale-[0.97] ${
-                area === key ? 'border-red-500 bg-red-500/10 text-white' : 'border-zinc-800 bg-zinc-900/40 text-zinc-400 hover:border-zinc-600'
-              }`}>
-              {a.label}
+            <button
+              type="button"
+              onClick={captureGPS}
+              disabled={gpsStatus === 'loading'}
+              className="px-8 py-3 bg-red-600 text-white text-[10px] font-black uppercase tracking-[0.2em] rounded-xl shadow-xl shadow-red-900/20 hover:bg-red-500 transition-all active:scale-95 disabled:opacity-50"
+            >
+              {gpsStatus === 'loading' ? 'Locating Node...' : 'Acquire GPS Signal'}
             </button>
-          ))}
-        </div>
-      )}
 
-      {/* Landmark Mode */}
-      {mode === 'landmark' && (
-        <div className="space-y-1.5 max-h-52 overflow-y-auto scrollbar-hide">
-          {LANDMARKS.map(lm => (
-            <button key={lm.label} type="button" onClick={() => { onLandmarkChange(lm.label); onAreaChange(lm.area); onCoordinatesChange(lm.coords); }}
-              className={`flex items-center gap-2.5 w-full px-3 py-2.5 rounded-xl border text-left transition-all text-xs active:scale-[0.98] ${
-                landmark === lm.label ? 'border-red-500 bg-red-500/10 text-white' : 'border-zinc-800/40 bg-zinc-900/30 text-zinc-400 hover:border-zinc-600'
-              }`}>
-              <span className="text-sm">🏛️</span>
-              <div>
-                <p className="font-medium">{lm.label}</p>
-                <p className="text-[10px] text-zinc-600">{OKHLA_AREAS[lm.area]?.label}</p>
+            {gpsError && <p className="text-[10px] text-red-500 font-bold uppercase tracking-widest">{gpsError}</p>}
+          </div>
+        )}
+
+        {/* Ward/Colony Mode */}
+        {mode === 'wards' && (
+          <div className="space-y-6">
+            {!selectedWardId ? (
+              <div className="space-y-4">
+                <div className="flex items-center gap-3 px-1">
+                  <span className="w-1 h-4 bg-red-600 rounded-full" />
+                  <h3 className="text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em]">Select Municipal Ward</h3>
+                </div>
+                <div className="grid grid-cols-1 gap-2.5">
+                  {OKHLA_WARDS.map(ward => (
+                    <button
+                      key={ward.id}
+                      type="button"
+                      onClick={() => handleWardSelect(ward)}
+                      className="group flex items-center justify-between p-4 bg-zinc-900/40 border border-zinc-800/60 rounded-2xl hover:border-red-600/50 hover:bg-zinc-900/60 transition-all text-left"
+                    >
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-2">
+                          <span className="text-[8px] font-black bg-zinc-800 text-zinc-400 px-1.5 py-0.5 rounded uppercase">Ward {ward.number}</span>
+                          <h4 className="text-xs font-black text-white uppercase tracking-tight">{ward.name}</h4>
+                        </div>
+                        <p className="text-[9px] text-zinc-600 font-medium">{ward.description}</p>
+                      </div>
+                      <span className="text-zinc-700 group-hover:text-red-500 group-hover:translate-x-1 transition-all">→</span>
+                    </button>
+                  ))}
+                </div>
               </div>
-            </button>
-          ))}
+            ) : (
+              <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
+                <div className="flex items-center justify-between px-1">
+                  <button 
+                    onClick={() => setSelectedWardId(null)}
+                    className="text-[9px] font-black text-red-500 uppercase tracking-widest hover:text-red-400 transition-colors"
+                  >
+                    ← Back to Wards
+                  </button>
+                  <span className="text-[10px] font-black text-white uppercase italic">{selectedWard?.name}</span>
+                </div>
+
+                <div className="space-y-4">
+                  <div className="flex items-center gap-3 px-1">
+                    <span className="w-1 h-4 bg-red-600 rounded-full" />
+                    <h3 className="text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em]">Select Specific Colony/Area</h3>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    {selectedWard?.colonies.map(colony => (
+                      <button
+                        key={colony.id}
+                        type="button"
+                        onClick={() => handleColonySelect(colony)}
+                        className={`p-3.5 rounded-xl border text-[10px] font-black uppercase tracking-tight text-left transition-all active:scale-[0.97] ${
+                          landmark === colony.name 
+                            ? 'bg-red-600 border-red-500 text-white shadow-lg shadow-red-900/20' 
+                            : 'bg-zinc-900/40 border-zinc-800 text-zinc-500 hover:border-zinc-700 hover:text-zinc-300'
+                        }`}
+                      >
+                        {colony.name}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Address Mode */}
+        {mode === 'address' && (
+          <div className="space-y-6 py-2">
+             <div className="flex items-center gap-3 px-1">
+                <span className="w-1 h-4 bg-red-600 rounded-full" />
+                <h3 className="text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em]">Manual Address Override</h3>
+              </div>
+              
+              <div className="relative group">
+                <div className="absolute -inset-0.5 bg-gradient-to-r from-red-600/20 to-transparent blur opacity-20 group-hover:opacity-40 transition-all" />
+                <textarea
+                  value={landmark}
+                  onChange={(e) => onLandmarkChange(e.target.value)}
+                  placeholder="Enter house number, street name, block, or specific landmark details here..."
+                  className="relative w-full h-40 bg-[#050606] border border-zinc-800 rounded-2xl p-5 text-sm text-zinc-200 placeholder:text-zinc-700 outline-none focus:border-red-600/50 transition-all resize-none"
+                />
+              </div>
+
+              <div className="bg-zinc-900/40 border border-zinc-800/60 p-4 rounded-xl space-y-2">
+                <div className="flex items-center gap-2">
+                  <span className="text-amber-500 text-xs">⚠️</span>
+                  <span className="text-[9px] font-black text-zinc-500 uppercase tracking-widest">Protocol Note</span>
+                </div>
+                <p className="text-[9px] text-zinc-600 leading-relaxed uppercase">
+                  Manual addresses help field operatives locate incidents faster in areas with weak GPS signals or complex alleyways.
+                </p>
+              </div>
+          </div>
+        )}
+      </div>
+
+      {/* Selected Location HUD */}
+      {(area || landmark) && (
+        <div className="pt-4 border-t border-zinc-800/40 flex items-center justify-between px-1">
+          <div className="space-y-1">
+            <p className="text-[8px] font-black text-zinc-700 uppercase tracking-[0.3em]">Current Target Zone</p>
+            <p className="text-[10px] font-black text-white uppercase truncate max-w-[200px]">
+              {area || 'UNSPECIFIED'} {landmark && `// ${landmark}`}
+            </p>
+          </div>
+          {coordinates && (
+            <div className="text-right">
+              <p className="text-[8px] font-black text-zinc-700 uppercase tracking-[0.3em]">Coordinates</p>
+              <p className="text-[9px] font-mono text-red-500/80">{coordinates[0].toFixed(4)}N, {coordinates[1].toFixed(4)}E</p>
+            </div>
+          )}
         </div>
       )}
     </div>
