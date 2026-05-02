@@ -14,7 +14,7 @@ type ReviewAction = 'verify' | 'reject' | 'escalate';
 
 export default function AdminPage() {
   const { incidents, fetchIncidents, verifyIncident, isLoading } = useIncidentsStore();
-  const { user } = useAuthStore();
+  const { user, role } = useAuthStore();
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [filter, setFilter] = useState<'all' | 'reported' | 'verified'>('all');
   const [note, setNote] = useState('');
@@ -43,7 +43,7 @@ export default function AdminPage() {
     setActionLoading(true);
     try {
       if (action === 'verify') {
-        await verifyIncident(selectedId, user?.$id || 'current');
+        await verifyIncident(selectedId, user?.$id || 'current', role || 'user');
       } else if (action === 'reject') {
         await databases.updateDocument(DATABASE_ID, COLLECTIONS.INCIDENTS, selectedId, {
           status: 'false_positive' as IncidentStatus

@@ -21,7 +21,7 @@ export default function IncidentDetailPage() {
   const router = useRouter();
   const id = params.id as string;
   const { selectedIncident, isLoading, error, getIncident, verifyIncident } = useIncidentsStore();
-  const { user, isAnonymous } = useAuthStore();
+  const { user, isAnonymous, role } = useAuthStore();
   const addToast = useUIStore((s) => s.addToast);
   const [verifying, setVerifying] = useState(false);
 
@@ -36,7 +36,6 @@ export default function IncidentDetailPage() {
     }
     setVerifying(true);
     try {
-      const role = user.prefs?.role || 'operative';
       await verifyIncident(id, user.$id, role);
       await getIncident(id);
       addToast({ type: 'success', message: 'Intel corroborated by your node.' });
