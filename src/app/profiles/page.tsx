@@ -24,13 +24,13 @@ export default function ProfilesPage() {
     <main className="min-h-screen bg-[#050606] text-zinc-100">
       <div className="container mx-auto px-4 py-12 space-y-8">
         <header className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-          <div className="space-y-4">
-            <div className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-red-600 shadow-[0_0_8px_rgba(220,38,38,0.5)]" />
-              <h1 className="text-3xl font-black tracking-tighter uppercase italic text-white">Adversary Database</h1>
+            <div className="space-y-4">
+              <div className="flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-red-600 shadow-[0_0_8px_rgba(220,38,38,0.5)]" />
+                <h1 className="text-3xl font-black tracking-tighter uppercase italic text-white">Adversary Monitor</h1>
+              </div>
+              <p className="text-zinc-500 text-[10px] font-black uppercase tracking-[0.2em]">Tracking RSS operatives & monitored threats in Okhla</p>
             </div>
-            <p className="text-zinc-500 text-[10px] font-black uppercase tracking-[0.2em]">Live tracking of verified RSS operatives & monitored targets</p>
-          </div>
 
           <div className="w-full md:w-64 relative group">
             <div className="absolute inset-0 bg-red-600/5 blur-xl group-hover:bg-red-600/10 transition-all" />

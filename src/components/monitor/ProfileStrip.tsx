@@ -17,13 +17,13 @@ export default function ProfileStrip({ profiles }: Props) {
 
   return (
     <div className="bg-zinc-900/30 border border-zinc-800/40 rounded-2xl overflow-hidden">
-      <div className="flex items-center justify-between px-3 sm:px-4 py-2.5 border-b border-zinc-800/40 bg-zinc-900/60">
-        <div className="flex items-center gap-2">
-          <span className="text-xs">🕵️</span>
-          <span className="text-[10px] sm:text-xs font-semibold text-zinc-400 uppercase tracking-widest">Known Operatives</span>
+        <div className="flex items-center justify-between px-3 sm:px-4 py-2.5 border-b border-zinc-800/40 bg-zinc-900/60">
+          <div className="flex items-center gap-2">
+            <span className="text-xs">🕵️</span>
+            <span className="text-[10px] sm:text-xs font-semibold text-zinc-400 uppercase tracking-widest">Adversary Monitor</span>
+          </div>
+          <span className="text-[10px] text-zinc-600">{highlighted.length} high-threat</span>
         </div>
-        <span className="text-[10px] text-zinc-600">{highlighted.length} high-threat</span>
-      </div>
 
       <div className="overflow-x-auto scrollbar-hide">
         <div className="flex gap-2.5 p-3 min-w-max">

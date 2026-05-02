@@ -108,8 +108,8 @@ export default function CommandCenter({ initialIncidents, initialAlerts, initial
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
           <MetricCard label="Active Reports" value={stats.critical + stats.high} subValue={`${stats.critical} critical`} color="text-red-500" icon="🚨" />
           <MetricCard label="Total Reports" value={stats.total} subValue="Community reports" color="text-zinc-100" icon="📡" />
-          <MetricCard label="Community Members" value={profiles.length} subValue="Active participants" color="text-orange-500" icon="👥" />
-          <MetricCard label="Areas Covered" value={new Set(displayIncidents.map(i => i.locationId)).size || 5} subValue="Monitoring active" color="text-blue-500" icon="📍" />
+          <MetricCard label="Community" value="5" subValue="Members & verifiers" color="text-blue-500" icon="👤" />
+          <MetricCard label="Adversaries" value={profiles.length} subValue="Monitored targets" color="text-orange-500" icon="🕵️" />
         </div>
 
         <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 sm:gap-8">

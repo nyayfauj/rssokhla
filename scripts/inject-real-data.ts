@@ -38,7 +38,7 @@ async function inject() {
       {
         fullName: 'Kulbhushan Ahuja',
         aliases: ['Ahuja Ji'],
-        rank: 'prant_sanghchalak',
+        rank: 'zila_pramukh',
         affiliations: ['rss'],
         primaryArea: 'south_delhi',
         threatLevel: 'high',
@@ -51,7 +51,7 @@ async function inject() {
       {
         fullName: 'Vikas Tyagi',
         aliases: ['Tyagi Ji'],
-        rank: 'vibhag_karyavah',
+        rank: 'nagar_karyavah',
         affiliations: ['rss', 'vhp'],
         primaryArea: 'jasola',
         threatLevel: 'critical',
@@ -64,7 +64,7 @@ async function inject() {
       {
         fullName: 'South East District Coordinator',
         aliases: ['Bajrang Dal In-charge'],
-        rank: 'district_coordinator',
+        rank: 'nagar_karyavah',
         affiliations: ['bajrang_dal'],
         primaryArea: 'sarita_vihar',
         threatLevel: 'high',

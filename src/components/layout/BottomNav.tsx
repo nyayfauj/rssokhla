@@ -10,7 +10,7 @@ const NAV_ITEMS = [
   { label: 'Monitor', icon: '📡', href: '/', activePath: '/' },
   { label: 'Map', icon: '🗺️', href: '/map', activePath: '/map' },
   { label: 'Report', icon: '➕', href: '/incidents/report', activePath: '/incidents/report', primary: true },
-  { label: 'Operatives', icon: '👤', href: '/profiles', activePath: '/profiles' },
+  { label: 'Community', icon: '👤', href: '/community', activePath: '/community' },
   { label: 'More', icon: '☰', href: '/about', activePath: '/about' },
 ];
 
