@@ -7,11 +7,10 @@ import ThemeToggle from './ThemeToggle';
 export default function PublicHeader() {
   const pathname = usePathname();
 
-  // Do not show on dashboard (page.tsx has its own header) or protected routes
+  // Only hide on the root CommandCenter page (it has its own built-in navbar)
   const isDashboard = pathname === '/';
-  const isProtected = pathname.startsWith('/dashboard') || pathname.startsWith('/admin') || pathname.startsWith('/incidents') || pathname.startsWith('/profiles') || pathname.startsWith('/map');
   
-  if (isDashboard || isProtected) {
+  if (isDashboard) {
     return null;
   }
 

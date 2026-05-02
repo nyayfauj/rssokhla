@@ -76,6 +76,7 @@ export default function ReportIncidentPage() {
       locationId: area,
       landmark: landmark,
       tags: tags.split(',').map(t => t.trim()).filter(Boolean),
+      media: media.map(m => m.blob),
     };
 
     if (isOffline) {

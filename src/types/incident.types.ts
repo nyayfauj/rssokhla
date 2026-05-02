@@ -45,6 +45,7 @@ export interface CreateIncidentData {
   category: IncidentCategory;
   severity: IncidentSeverity;
   mediaUrls?: string[];
+  media?: Blob[];
   isAnonymous: boolean;
   coordinates?: number[];
   tags?: string[];

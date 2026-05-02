@@ -136,12 +136,21 @@ export default function IncidentDetailPage() {
               Captured Evidence // {incident.mediaUrls.length} FILES
             </h2>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-              {incident.mediaUrls.map((url, i) => (
-                <div key={i} className="aspect-square bg-zinc-900/50 border border-zinc-800 rounded-2xl flex flex-col items-center justify-center group cursor-pointer hover:border-red-600/50 transition-all">
-                  <span className="text-3xl group-hover:scale-110 transition-transform">📄</span>
-                  <span className="text-[8px] font-black text-zinc-700 mt-2 uppercase tracking-widest">Open Evidence</span>
-                </div>
-              ))}
+              {incident.mediaUrls.map((url, i) => {
+                const isImage = url.match(/\.(jpeg|jpg|gif|png|webp)/i) || url.includes('/view');
+                return (
+                  <a key={i} href={url} target="_blank" rel="noopener noreferrer" className="aspect-square bg-zinc-900/50 border border-zinc-800 rounded-2xl flex flex-col items-center justify-center group overflow-hidden hover:border-red-600/50 transition-all">
+                    {isImage ? (
+                      <img src={url} alt={`Evidence ${i+1}`} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                    ) : (
+                      <>
+                        <span className="text-3xl group-hover:scale-110 transition-transform">📄</span>
+                        <span className="text-[8px] font-black text-zinc-700 mt-2 uppercase tracking-widest">Open Evidence</span>
+                      </>
+                    )}
+                  </a>
+                );
+              })}
             </div>
           </div>
         )}

@@ -55,7 +55,11 @@ export function proxy(request: NextRequest) {
   const allCookies = request.cookies.getAll();
   const appwriteSessionCookie = allCookies.find(c => c.name.startsWith('a_session_'));
   const isAuthenticated = !!appwriteSessionCookie?.value;
-  const isPublicRoute = PUBLIC_ROUTES.includes(pathname) || pathname.startsWith('/p/');
+  const isPublicRoute = 
+    PUBLIC_ROUTES.includes(pathname) || 
+    pathname.startsWith('/p/') || 
+    pathname.startsWith('/incidents/') ||
+    pathname.startsWith('/profiles/');
   const isAuthRoute = AUTH_ROUTES.includes(pathname);
 
   // Redirect authenticated users away from auth pages

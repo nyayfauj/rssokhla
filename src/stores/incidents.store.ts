@@ -2,8 +2,8 @@
 
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { databases, client, ID, Query } from '@/lib/appwrite/client';
-import { DATABASE_ID, COLLECTIONS } from '@/lib/appwrite/collections';
+import { databases, client, ID, Query, storage } from '@/lib/appwrite/client';
+import { DATABASE_ID, COLLECTIONS, STORAGE_BUCKET_ID } from '@/lib/appwrite/collections';
 import type { Incident, CreateIncidentData, IncidentFilters, PendingIncident } from '@/types/incident.types';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -109,21 +109,43 @@ export const useIncidentsStore = create<IncidentsState>()(
       },
 
       createIncident: async (data: CreateIncidentData, userId: string, isAnonymous: boolean) => {
-        const incidentData = {
-          ...data,
-          reporterId: userId,
-          timestamp: new Date().toISOString(),
-          status: 'reported',
-          isAnonymous,
-          verifiedBy: [],
-          verificationCount: 0,
-          mediaUrls: data.mediaUrls || [],
-          coordinates: data.coordinates || [],
-          tags: data.tags || [],
-        };
-
         try {
           set({ isLoading: true, error: null });
+
+          const uploadedMediaUrls: string[] = [...(data.mediaUrls || [])];
+
+          // 1. Upload media files if present
+          if (data.media && data.media.length > 0) {
+            const uploadPromises = data.media.map(async (blob) => {
+              const fileId = ID.unique();
+              const file = new File([blob], `media-${Date.now()}`, { type: blob.type });
+              await storage.createFile(STORAGE_BUCKET_ID, fileId, file);
+              
+              // Get view URL (publicly accessible since we set bucket perms to 'Any')
+              const url = `https://sgp.cloud.appwrite.io/v1/storage/buckets/${STORAGE_BUCKET_ID}/files/${fileId}/view?project=${client.config.project}`;
+              return url;
+            });
+
+            const results = await Promise.all(uploadPromises);
+            uploadedMediaUrls.push(...results);
+          }
+
+          const incidentData = {
+            ...data,
+            reporterId: userId,
+            timestamp: new Date().toISOString(),
+            status: 'reported',
+            isAnonymous,
+            verifiedBy: [],
+            verificationCount: 0,
+            mediaUrls: uploadedMediaUrls,
+            coordinates: data.coordinates || [],
+            tags: data.tags || [],
+          };
+
+          // Remove the raw media blobs before sending to database
+          delete (incidentData as any).media;
+
           await databases.createDocument(
             DATABASE_ID,
             COLLECTIONS.INCIDENTS,
@@ -133,14 +155,18 @@ export const useIncidentsStore = create<IncidentsState>()(
 
           // Refresh the list
           await get().fetchIncidents();
-        } catch {
-          // Queue for offline sync
+        } catch (err) {
+          console.error('[IncidentsStore] Error creating incident:', err);
+          
+          // Queue for offline sync (without media blobs for now as they are too large for localStorage)
           const pending: PendingIncident = {
             ...data,
             offlineId: uuidv4(),
             submittedAt: new Date().toISOString(),
             syncStatus: 'pending',
           };
+          delete (pending as any).media;
+
           set((state) => ({
             offlineQueue: [...state.offlineQueue, pending],
             isLoading: false,
