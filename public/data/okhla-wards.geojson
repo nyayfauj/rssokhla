@@ -1,0 +1,69 @@
+{
+  "type": "FeatureCollection",
+  "name": "Okhla_Wards",
+  "crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+  "features": [
+    {
+      "type": "Feature",
+      "properties": { "WARD_ID": "187", "WARD_NAME": "Sarita Vihar", "ZONE": "South", "AREA_TYPE": "Planned DDA" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [77.2750, 28.5200], [77.2900, 28.5200], [77.2950, 28.5300],
+          [77.3000, 28.5400], [77.2950, 28.5500], [77.2850, 28.5550],
+          [77.2750, 28.5500], [77.2700, 28.5400], [77.2750, 28.5200]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "WARD_ID": "189", "WARD_NAME": "Zakir Nagar", "ZONE": "South", "AREA_TYPE": "Dense Residential" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [77.2700, 28.5550], [77.2850, 28.5550], [77.2950, 28.5500],
+          [77.3000, 28.5650], [77.2950, 28.5750], [77.2800, 28.5800],
+          [77.2650, 28.5750], [77.2650, 28.5650], [77.2700, 28.5550]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "WARD_ID": "188", "WARD_NAME": "Abul Fazal Enclave", "ZONE": "South", "AREA_TYPE": "Riverbank Residential" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [77.2750, 28.5400], [77.2850, 28.5300], [77.3000, 28.5300],
+          [77.3100, 28.5400], [77.3150, 28.5500], [77.3100, 28.5600],
+          [77.3000, 28.5650], [77.2950, 28.5500], [77.2850, 28.5550],
+          [77.2750, 28.5500], [77.2700, 28.5400]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "WARD_ID": "186", "WARD_NAME": "Madanpur Khadar West", "ZONE": "South", "AREA_TYPE": "Village/Settlement" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [77.2850, 28.5000], [77.3100, 28.5000], [77.3200, 28.5200],
+          [77.3200, 28.5400], [77.3100, 28.5400], [77.3000, 28.5400],
+          [77.2950, 28.5300], [77.2850, 28.5300], [77.2800, 28.5200],
+          [77.2850, 28.5000]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "WARD_ID": "185", "WARD_NAME": "Madanpur Khadar East", "ZONE": "South", "AREA_TYPE": "Resettlement/JJ" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [77.2950, 28.4800], [77.3200, 28.4800], [77.3300, 28.5000],
+          [77.3200, 28.5200], [77.3100, 28.5400], [77.3000, 28.5400],
+          [77.2950, 28.5300], [77.2900, 28.5200], [77.2950, 28.4800]
+        ]]
+      }
+    }
+  ]
+}

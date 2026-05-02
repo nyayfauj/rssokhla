@@ -45,6 +45,7 @@ const nextConfig: NextConfig = {
 
   experimental: {
     optimizePackageImports: ['zustand', 'appwrite', 'chart.js', 'date-fns'],
+    turbopackFileSystemCacheForBuild: true,
   },
 };
 

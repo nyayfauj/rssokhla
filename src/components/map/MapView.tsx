@@ -10,6 +10,15 @@ import { OKHLA_CENTER, OKHLA_ZOOM } from '@/lib/map/config';
 import { OKHLA_WARDS } from '@/lib/utils/wards';
 import type { Incident } from '@/types/incident.types';
 
+// Ward colors for visual distinction
+const WARD_COLORS: Record<string, string> = {
+  '187': '#3b82f6', // Sarita Vihar - Blue
+  '189': '#ef4444', // Zakir Nagar - Red
+  '188': '#eab308', // Abul Fazal - Yellow
+  '186': '#22c55e', // Madanpur Khadar West - Green
+  '185': '#a855f7', // Madanpur Khadar East - Purple
+};
+
 export interface ActiveLayers {
   incidents: boolean;
   heatmap: boolean;
@@ -61,19 +70,52 @@ export default function MapView({ incidents }: Props) {
     // Add Zoom Control at bottom right
     L.control.zoom({ position: 'bottomright' }).addTo(map);
 
-    // Add Ward Boundaries (Simulated Circles for now)
-    OKHLA_WARDS.forEach(ward => {
-      L.circle([ward.center[0], ward.center[1]], {
-        color: '#dc2626',
-        fillColor: '#dc2626',
-        fillOpacity: 0.05,
-        radius: 800,
-        weight: 1,
-        dashArray: '5, 5'
+    // Add Ward Boundaries from GeoJSON
+    fetch('/data/okhla-wards.geojson')
+      .then(res => res.json())
+      .then(data => {
+        L.geoJSON(data, {
+          style: (feature) => {
+            const wardId = feature?.properties?.WARD_ID;
+            const color = WARD_COLORS[wardId] || '#dc2626';
+            return {
+              color: color,
+              fillColor: color,
+              fillOpacity: 0.08,
+              weight: 2,
+              dashArray: '5, 5',
+              opacity: 0.7,
+            };
+          },
+          onEachFeature: (feature, layer) => {
+            const name = feature?.properties?.WARD_NAME || 'Unknown Ward';
+            const id = feature?.properties?.WARD_ID || '';
+            layer.bindTooltip(
+              `<div style="background:#09090b;color:white;padding:6px 10px;border-radius:6px;border:1px solid #27272a;font-family:sans-serif;">
+                <p style="font-size:9px;font-weight:800;text-transform:uppercase;color:#ef4444;margin:0 0 2px 0;">Ward ${id}</p>
+                <p style="font-size:11px;font-weight:900;margin:0;text-transform:uppercase;">${name}</p>
+              </div>`,
+              { permanent: false, direction: 'center', className: 'ward-tooltip' }
+            );
+          }
+        }).addTo(map);
       })
-      .bindTooltip(ward.name, { permanent: false, direction: 'center', className: 'ward-tooltip' })
-      .addTo(map);
-    });
+      .catch(err => {
+        console.warn('Failed to load ward boundaries, falling back to circles:', err);
+        // Fallback to circles if GeoJSON fails to load
+        OKHLA_WARDS.forEach(ward => {
+          L.circle([ward.center[0], ward.center[1]], {
+            color: '#dc2626',
+            fillColor: '#dc2626',
+            fillOpacity: 0.05,
+            radius: 800,
+            weight: 1,
+            dashArray: '5, 5'
+          })
+          .bindTooltip(ward.name, { permanent: false, direction: 'center', className: 'ward-tooltip' })
+          .addTo(map);
+        });
+      });
 
     mapRef.current = map;
 

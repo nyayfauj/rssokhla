@@ -3,7 +3,7 @@
 import { NextResponse, type NextRequest } from 'next/server';
 
 // Routes that don't require authentication
-const PUBLIC_ROUTES = ['/', '/login', '/register', '/anonymous', '/p', '/incidents', '/profiles', '/about', '/incidents/report'];
+const PUBLIC_ROUTES = ['/', '/login', '/register', '/anonymous', '/p', '/incidents', '/profiles', '/about', '/incidents/report', '/map', '/docs', '/whitepaper', '/privacy', '/terms'];
 const AUTH_ROUTES = ['/login', '/register', '/anonymous'];
 
 // PWA assets that should always be accessible

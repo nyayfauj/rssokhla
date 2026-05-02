@@ -122,13 +122,86 @@ export default function WhitepaperPage() {
             <p>
               NyayFauj identifies the <span className="text-red-500 italic">Rashtriya Swayamsevak Sangh (RSS)</span> and its affiliates as the primary adversary to constitutional secularism and minority safety in India. This classification is based on a documented history of majoritarian extremism, systemic infiltration of democratic institutions, and a persistent role in instigating sectarian violence.
             </p>
-            <p>
-              The platform treats the RSS not merely as a political entity, but as a <span className="text-white">Paramilitary Intelligence Network</span> that operates through shadow cells (Shakhas). To counter this, NyayFauj provides a mirrors-reflection surveillance system—monitoring the monitors to ensure they cannot operate with impunity in our neighborhoods.
-            </p>
-          </div>
-        </section>
+             <p>
+               The platform treats the RSS not merely as a political entity, but as a <span className="text-white">Paramilitary Intelligence Network</span> that operates through shadow cells (Shakhas). To counter this, NyayFauj provides a mirrors-reflection surveillance system—monitoring the monitors to ensure they cannot operate with impunity in our neighborhoods.
+             </p>
+           </div>
+         </section>
 
-        {/* Section: Legal Fortress & Constitutional Shield */}
+         {/* Section: Data Architecture */}
+         <section className="space-y-6">
+           <div className="flex items-center gap-4">
+             <span className="text-zinc-800 font-black text-2xl">06</span>
+             <h2 className="text-lg font-black text-white uppercase tracking-widest">Data Architecture</h2>
+           </div>
+           <div className="space-y-4 text-sm leading-relaxed text-zinc-400">
+             <p>
+               NyayFauj uses a decentralized-first architecture. Incident data is stored with Appwrite as the primary backend,
+               with real-time synchronization across client devices. The platform employs edge computing principles to ensure
+               low-latency reporting even in connectivity-challenged environments.
+             </p>
+             <p>
+               All media uploads are processed through secure channels with automatic metadata stripping. Geolocation data
+               is precision-controlled—providing neighborhood-level accuracy without exposing exact residential addresses
+               unless explicitly authorized by the reporter.
+             </p>
+           </div>
+         </section>
+
+         {/* Section: Community Governance */}
+         <section className="space-y-6">
+           <div className="flex items-center gap-4">
+             <span className="text-zinc-800 font-black text-2xl">07</span>
+             <h2 className="text-lg font-black text-white uppercase tracking-widest">Community Governance</h2>
+           </div>
+           <div className="space-y-4 text-sm leading-relaxed text-zinc-400">
+             <p>
+               Governance is distributed across the community hierarchy. While Commanders oversee regional coordination,
+               the collective body of Verifiers acts as the ultimate arbiter of truth. Disputed reports trigger a
+               community review process where evidence is weighed by multiple independent nodes.
+             </p>
+             <p>
+               The platform incorporates restorative justice principles. When conflicts arise between community members,
+               the emphasis is on de-escalation, dialogue, and community healing rather than punitive measures alone.
+             </p>
+           </div>
+         </section>
+
+         {/* Section: Technology Stack */}
+         <section className="space-y-6">
+           <div className="flex items-center gap-4">
+             <span className="text-zinc-800 font-black text-2xl">08</span>
+             <h2 className="text-lg font-black text-white uppercase tracking-widest">Technology Stack</h2>
+           </div>
+           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+             <div className="space-y-3 p-6 bg-zinc-900/30 border border-zinc-800 rounded-2xl">
+               <h3 className="text-[10px] font-black text-white uppercase tracking-widest">Frontend</h3>
+               <p className="text-xs text-zinc-500 leading-relaxed">
+                 Next.js with Turbopack for lightning-fast builds. Tailwind CSS for tactical UI. Service Workers for offline-first experience.
+               </p>
+             </div>
+             <div className="space-y-3 p-6 bg-zinc-900/30 border border-zinc-800 rounded-2xl">
+               <h3 className="text-[10px] font-black text-white uppercase tracking-widest">Backend</h3>
+               <p className="text-xs text-zinc-500 leading-relaxed">
+                 Appwrite for authentication, database, and storage. Rate limiting and security headers for protection. WebSockets for real-time updates.
+               </p>
+             </div>
+             <div className="space-y-3 p-6 bg-zinc-900/30 border border-zinc-800 rounded-2xl">
+               <h3 className="text-[10px] font-black text-white uppercase tracking-widest">Mapping</h3>
+               <p className="text-xs text-zinc-500 leading-relaxed">
+                 Leaflet with OpenStreetMap for community-controlled mapping. Custom markers and heatmaps for incident visualization.
+               </p>
+             </div>
+             <div className="space-y-3 p-6 bg-zinc-900/30 border border-zinc-800 rounded-2xl">
+               <h3 className="text-[10px] font-black text-white uppercase tracking-widest">AI & Analytics</h3>
+               <p className="text-xs text-zinc-500 leading-relaxed">
+                 Client-side processing for privacy. Community-driven verification scoring. Pattern detection for threat assessment.
+               </p>
+             </div>
+           </div>
+         </section>
+
+         {/* Section: Legal Fortress & Constitutional Shield */}
         <section className="space-y-8 bg-zinc-950 border-y border-zinc-900 py-12 px-8 -mx-8 md:mx-0 md:rounded-3xl">
           <div className="space-y-2">
              <h2 className="text-lg font-black text-red-500 uppercase tracking-widest">Legal Fortress: The Constitutional Shield</h2>
