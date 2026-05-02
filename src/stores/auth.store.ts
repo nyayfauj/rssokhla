@@ -83,8 +83,19 @@ export const useAuthStore = create<AuthState>()(
       loginAnonymous: async () => {
         try {
           set({ isLoading: true, error: null });
-          const session = await account.createAnonymousSession();
-          const user = await account.get();
+          
+          let user;
+          let session;
+
+          try {
+            // Check if already logged in
+            user = await account.get();
+            session = await account.getSession('current').catch(() => null);
+          } catch {
+            // No active session, create anonymous one
+            session = await account.createAnonymousSession();
+            user = await account.get();
+          }
           
           // Generate Magic Token if not exists
           let magicToken = localStorage.getItem('nf_magic_token');
@@ -97,8 +108,8 @@ export const useAuthStore = create<AuthState>()(
             user,
             session,
             isAuthenticated: true,
-            isAnonymous: true,
-            role: 'anonymous_user',
+            isAnonymous: !user.email,
+            role: !user.email ? 'anonymous_user' : 'registered_user',
             isLoading: false,
           });
         } catch (err) {

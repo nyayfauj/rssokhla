@@ -20,8 +20,12 @@ export default function AnonymousAccess() {
       const url = `${window.location.origin}/access?t=${token}`;
       setMagicLink(url);
       addToast({ type: 'info', message: 'Identity Created' });
-    } catch {
-      addToast({ type: 'error', message: 'Could not create session' });
+    } catch (err) {
+      const authError = useAuthStore.getState().error;
+      addToast({ 
+        type: 'error', 
+        message: authError || 'Could not create session' 
+      });
     }
   };
 
