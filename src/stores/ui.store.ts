@@ -19,6 +19,7 @@ interface UIState {
   // Navigation
   isSidebarOpen: boolean;
   isMobileMenuOpen: boolean;
+  isMoreMenuOpen: boolean;
   activeTab: 'feed' | 'map' | 'report' | 'alerts' | 'profiles' | 'more';
 
   // Connectivity
@@ -36,6 +37,7 @@ interface UIState {
   toggleTheme: () => void;
   setSidebarOpen: (open: boolean) => void;
   setMobileMenuOpen: (open: boolean) => void;
+  setMoreMenuOpen: (open: boolean) => void;
   setActiveTab: (tab: UIState['activeTab']) => void;
   setOnline: (online: boolean) => void;
   addToast: (toast: Omit<Toast, 'id'>) => void;
@@ -51,6 +53,7 @@ export const useUIStore = create<UIState>()(
       theme: 'dark',
       isSidebarOpen: false,
       isMobileMenuOpen: false,
+      isMoreMenuOpen: false,
       activeTab: 'feed',
       isOnline: true,
       showOfflineBanner: false,
@@ -64,6 +67,8 @@ export const useUIStore = create<UIState>()(
       setSidebarOpen: (open) => set({ isSidebarOpen: open }),
 
       setMobileMenuOpen: (open) => set({ isMobileMenuOpen: open }),
+
+      setMoreMenuOpen: (open) => set({ isMoreMenuOpen: open }),
 
       setActiveTab: (tab) => set({ activeTab: tab }),
 

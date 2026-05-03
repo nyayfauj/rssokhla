@@ -4,34 +4,16 @@ import * as turf from '@turf/turf';
 import type { Incident } from '@/types/incident.types';
 import { GEOFENCE_ZONES, CATEGORY_MARKERS, SEVERITY_COLORS, type GeoZone } from './config';
 
-/** Convert incidents to GeoJSON FeatureCollection for Mapbox source */
 export function incidentsToGeoJSON(incidents: Incident[]) {
-  // Generate mock coordinates near area centers for demo
-  const AREA_COORDS: Record<string, [number, number]> = {
-    shaheen_bagh:       [77.2940, 28.5440],
-    batla_house:        [77.2790, 28.5590],
-    jamia_nagar:        [77.2800, 28.5620],
-    zakir_nagar:        [77.2830, 28.5650],
-    abul_fazal_enclave: [77.2850, 28.5530],
-    johri_farm:         [77.2900, 28.5560],
-    okhla_phase_1:      [77.2710, 28.5310],
-    okhla_phase_2:      [77.2750, 28.5270],
-    okhla_vihar:        [77.2820, 28.5340],
-    jasola:             [77.2600, 28.5400],
-  };
+  // Filter out incidents without actual coordinates to remove mock/fallback positions
+  const validIncidents = incidents.filter(
+    (inc) => inc.coordinates && inc.coordinates.length >= 2
+  );
 
   return {
     type: 'FeatureCollection' as const,
-    features: incidents.map((inc, i) => {
-      // Use real coordinates if available, otherwise fallback to area coordinates
-      const areaKey = inc.locationId || 'jamia_nagar';
-      const base = (inc.coordinates && inc.coordinates.length >= 2) 
-        ? [inc.coordinates[0], inc.coordinates[1]] 
-        : (AREA_COORDS[areaKey] || [77.2810, 28.5500]);
-        
-      // Only apply jitter if we're falling back to the center point
-      const hasRealCoords = inc.coordinates && inc.coordinates.length >= 2;
-      const jitter = (idx: number, offset: number) => hasRealCoords ? 0 : (((idx * 2654435761 + offset * 1597334677) >>> 0) % 400 - 200) / 100000;
+    features: validIncidents.map((inc) => {
+      const base = [inc.coordinates[0], inc.coordinates[1]];
       
       return {
         type: 'Feature' as const,
@@ -42,7 +24,7 @@ export function incidentsToGeoJSON(incidents: Incident[]) {
           category: inc.category,
           severity: inc.severity,
           status: inc.status,
-          area: areaKey,
+          area: inc.locationId || 'unknown',
           timestamp: inc.timestamp || inc.$createdAt,
           verificationCount: inc.verificationCount,
           color: CATEGORY_MARKERS[inc.category]?.color || '#6b7280',
@@ -51,7 +33,7 @@ export function incidentsToGeoJSON(incidents: Incident[]) {
         },
         geometry: {
           type: 'Point' as const,
-          coordinates: [base[0] + jitter(i, 1), base[1] + jitter(i, 2)],
+          coordinates: base,
         },
       };
     }),

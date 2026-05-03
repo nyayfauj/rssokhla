@@ -27,9 +27,9 @@ export default function ProfilesPage() {
             <div className="space-y-4">
               <div className="flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-red-600 shadow-[0_0_8px_rgba(220,38,38,0.5)]" />
-                <h1 className="text-3xl font-black tracking-tighter uppercase italic text-white">Adversary Monitor</h1>
+                <h1 className="text-3xl font-black tracking-tighter uppercase italic text-white">RSS Operative Monitor</h1>
               </div>
-              <p className="text-zinc-500 text-[10px] font-black uppercase tracking-[0.2em]">Tracking RSS operatives & monitored threats in Okhla</p>
+              <p className="text-zinc-500 text-[10px] font-black uppercase tracking-[0.2em]">Tracking monitored RSS personnel & potential threats in Okhla</p>
             </div>
 
           <div className="w-full md:w-64 relative group">
@@ -85,9 +85,20 @@ export default function ProfilesPage() {
               </GlassCard>
             ))
           ) : (
-            <div className="col-span-full py-24 text-center space-y-4">
-              <span className="text-4xl opacity-20">🕵️‍♂️</span>
-              <p className="text-zinc-500 text-xs font-bold uppercase tracking-widest">No operatives found matching your search</p>
+            <div className="col-span-full py-24 text-center space-y-6 border border-zinc-800 bg-zinc-950 rounded-2xl relative overflow-hidden">
+              <div className="absolute top-0 left-0 w-full h-1 bg-red-900/20" />
+              <div className="absolute top-0 right-0 p-3 opacity-30">
+                <span className="text-[8px] font-mono text-zinc-500">SYS_ID: OP_SCAN_FAIL</span>
+              </div>
+              <div className="w-16 h-16 border border-zinc-800 bg-zinc-900/50 rounded-xl flex items-center justify-center mx-auto mb-4">
+                <span className="w-2 h-2 bg-zinc-600 animate-pulse rounded-full" />
+              </div>
+              <div className="space-y-2">
+                <p className="text-zinc-400 text-sm font-black uppercase tracking-[0.3em]">NO TARGETS MATCHING QUERY</p>
+                <p className="text-zinc-600 text-[10px] font-mono uppercase tracking-widest max-w-sm mx-auto">
+                  Database scan complete. Zero profiles correspond to current search parameters. Modify query parameters to expand search radius.
+                </p>
+              </div>
             </div>
           )}
         </div>

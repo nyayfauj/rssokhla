@@ -70,12 +70,67 @@ export default function NewProfilePage() {
 
   const toggleAff = (a: Affiliation) => setAffiliations(prev => prev.includes(a) ? prev.filter(x => x !== a) : [...prev, a]);
   const toggleAct = (a: ActivityType) => setActivities(prev => prev.includes(a) ? prev.filter(x => x !== a) : [...prev, a]);
+  
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorDetails, setErrorDetails] = useState<string | null>(null);
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    // In production, this submits to Appwrite
-    alert('Profile saved (mock). In production this writes to Appwrite.');
-    router.push('/profiles');
+    setIsSubmitting(true);
+    setErrorDetails(null);
+    
+    try {
+      // Lazy load the server action
+      const { createProfile } = await import('@/app/actions/profile.actions');
+      
+      const payload = {
+        fullName,
+        aliases: aliases.split(',').map(s => s.trim()).filter(Boolean),
+        fatherName,
+        ageEstimate,
+        gender,
+        height,
+        build,
+        marks,
+        phones: phones.split(',').map(s => s.trim()).filter(Boolean),
+        emails: emails.split(',').map(s => s.trim()).filter(Boolean),
+        socialEntries: socialEntries.map(s => JSON.stringify(s)), // Appwrite arrays of strings
+        currentAddress,
+        currentArea,
+        previousAddress,
+        frequentLocations: frequentLocations.split(',').map(s => s.trim()).filter(Boolean),
+        rank,
+        affiliations,
+        shakhaLocation,
+        shakhaTimings,
+        involvementSince,
+        activities,
+        threatLevel,
+        currentOccupation,
+        employer,
+        previousOccupation,
+        vehicleType,
+        vehicleNumber,
+        vehicleDesc,
+        notes,
+        tags: tags.split(',').map(s => s.trim()).filter(Boolean),
+        status: 'active' as const
+      };
+
+      const result = await createProfile(payload);
+      
+      if (result.success) {
+        router.push('/profiles');
+      } else {
+        console.error('Action failed:', result.error, result.details);
+        setErrorDetails(result.error || 'Failed to save profile. Validation failed.');
+      }
+    } catch (error) {
+      console.error('Failed to save profile:', error);
+      setErrorDetails('An unexpected error occurred.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const Input = ({ label, value, onChange, placeholder, ...rest }: { label: string; value: string; onChange: (v: string) => void; placeholder?: string; [k: string]: unknown }) => (
@@ -100,7 +155,11 @@ export default function NewProfilePage() {
         ← Back
       </button>
       <h1 className="text-xl font-bold text-white mb-1">Add Karyakarta Profile</h1>
-      <p className="text-xs text-zinc-500 mb-4">Step {step + 1} of {steps.length}: <span className="text-zinc-300">{steps[step]}</span></p>
+      {errorDetails && (
+        <div className="bg-red-500/10 border border-red-500/20 text-red-400 p-3 rounded-xl mb-4 text-xs font-medium">
+          {errorDetails}
+        </div>
+      )}
 
       {/* Progress */}
       <div className="flex gap-1 mb-5">
@@ -263,8 +322,8 @@ export default function NewProfilePage() {
               Next
             </button>
           ) : (
-            <button type="submit" className="flex-1 py-2.5 bg-red-600 hover:bg-red-500 text-white rounded-xl text-sm font-semibold transition-colors">
-              Save Profile
+            <button type="submit" disabled={isSubmitting} className="flex-1 py-2.5 bg-red-600 hover:bg-red-500 disabled:bg-red-800 disabled:text-zinc-400 text-white rounded-xl text-sm font-semibold transition-colors">
+              {isSubmitting ? 'Saving Profile...' : 'Save Profile'}
             </button>
           )}
         </div>

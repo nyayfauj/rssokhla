@@ -14,6 +14,12 @@ export default function SangathanJoin() {
   const handleJoin = async () => {
     setIsProcessing(true);
     try {
+      if (!formData.inviteCode || formData.inviteCode.trim().length < 6) {
+        alert('ACCESS DENIED: A valid Commander-issued Invite Code is required to join the Sangathan network.');
+        setIsProcessing(false);
+        return;
+      }
+
       // Real registration with tactical role assignment
       await register(formData.email, formData.password, formData.name, formData.inviteCode);
       
@@ -63,8 +69,8 @@ export default function SangathanJoin() {
               </div>
               <input 
                 type="text" 
-                placeholder="TACTICAL ACCESS CODE (OPTIONAL)" 
-                className="w-full bg-black/50 border border-red-900/30 rounded-xl px-4 py-3 text-xs uppercase tracking-widest focus:border-red-500 outline-none transition-all"
+                placeholder="COMMANDER-ISSUED INVITE CODE (REQUIRED)" 
+                className="w-full bg-black/50 border border-red-900/50 rounded-xl px-4 py-3 text-xs uppercase tracking-widest focus:border-red-500 outline-none transition-all placeholder-red-900/50"
                 onChange={(e) => setFormData({ ...formData, inviteCode: e.target.value })}
               />
               <textarea 

@@ -11,7 +11,7 @@ export const INCIDENT_CATEGORIES = {
   meeting:       { label: 'Meeting',       icon: '🤝', color: '#eab308' },
   surveillance:  { label: 'Surveillance',  icon: '👁️', color: '#8b5cf6' },
   harassment:    { label: 'Harassment',    icon: '⚠️', color: '#dc2626' },
-  adversary_profile: { label: 'Operative Profile', icon: '👤', color: '#991b1b' },
+  adversary_profile: { label: 'RSS Operative Profile', icon: '🕵️', color: '#991b1b' },
   other:         { label: 'Other',         icon: '📋', color: '#6b7280' },
 } as const;
 

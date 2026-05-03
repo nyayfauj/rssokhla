@@ -35,10 +35,9 @@ interface Props {
 }
 
 export default function CommandCenter({ initialIncidents, initialAlerts, initialProfiles, initialOperatives }: Props) {
-  const [clock, setClock] = useState('');
   const { incidents, setIncidents } = useIncidentsStore();
   const { alerts, setAlerts } = useAlertsStore();
-  const { user, isAuthenticated } = useAuthStore();
+  const { user, isAuthenticated, role } = useAuthStore();
   const [profiles] = useState(initialProfiles);
   const [operatives] = useState(initialOperatives);
 
@@ -48,12 +47,6 @@ export default function CommandCenter({ initialIncidents, initialAlerts, initial
     if (initialAlerts.length > 0) setAlerts(initialAlerts);
   }, [initialIncidents, initialAlerts]);
 
-  useEffect(() => {
-    const tick = () => setClock(new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false }));
-    tick();
-    const id = setInterval(tick, 1000);
-    return () => clearInterval(id);
-  }, []);
 
   const stats = useMemo(() => {
     const currentIncidents = incidents.length > 0 ? incidents : initialIncidents;
@@ -68,57 +61,52 @@ export default function CommandCenter({ initialIncidents, initialAlerts, initial
     <div className="min-h-screen bg-[#050606] text-zinc-100 overflow-x-hidden selection:bg-red-500/30">
       <ActivityTicker incidents={displayIncidents} />
 
-      <nav className="sticky top-0 z-50 bg-[#050606]/80 backdrop-blur-xl border-b border-zinc-800/40">
-        <div className="container mx-auto px-4 h-14 flex items-center justify-between">
-          <div className="flex items-center gap-2.5 sm:gap-4">
-            <div className="flex items-center gap-2">
-              <span className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-gradient-to-br from-red-600 to-red-900 flex items-center justify-center font-black text-xs sm:text-sm italic">NF</span>
-              <div>
-                <h1 className="text-[11px] sm:text-sm font-black tracking-tighter uppercase leading-none">Nyay<span className="text-red-500">Fauj</span></h1>
-                <p className="text-[7px] sm:text-[8px] text-zinc-600 font-bold tracking-[0.2em] uppercase">Intelligence</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-4">
-            <ThemeToggle />
-            <div className="flex flex-col items-end hidden sm:flex">
-              <span className="text-[10px] font-mono text-zinc-500 leading-none mb-1">{clock} IST</span>
-              <span className="text-[9px] text-green-500 font-bold uppercase tracking-widest flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
-                Live Feed
-              </span>
-            </div>
-            {!isAuthenticated ? (
-              <Link href="/login" className="px-4 py-1.5 bg-zinc-100 text-[#050606] text-[10px] font-black uppercase tracking-widest rounded-lg">
-                Access
-              </Link>
-            ) : (
-              <div className="w-8 h-8 rounded-full border border-zinc-800 bg-zinc-900 flex items-center justify-center text-[10px] font-bold">
-                {user?.name?.charAt(0) || 'O'}
-              </div>
-            )}
-          </div>
-        </div>
-      </nav>
 
       <SectorHeatTicker incidents={displayIncidents} />
 
       <div className="container mx-auto px-4 py-6 sm:py-8 space-y-6 sm:space-y-8">
         <DailyIntelBriefing />
 
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
-          <MetricCard label="Active Reports" value={stats.critical + stats.high} subValue={`${stats.critical} critical`} color="text-red-500" icon="🚨" />
-          <MetricCard label="Total Reports" value={stats.total} subValue="Community reports" color="text-zinc-100" icon="📡" />
-          <MetricCard label="Operatives" value={operatives.length} subValue="Field agents" color="text-blue-500" icon="👤" />
-          <MetricCard label="Adversaries" value={profiles.length} subValue="Monitored targets" color="text-orange-500" icon="🕵️" />
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+          <MetricCard 
+            label="Active Reports" 
+            value={stats.critical + stats.high} 
+            subValue={`${stats.critical} critical threats`} 
+            color="text-red-500" 
+            icon="🚨" 
+            glow="bg-red-500/5"
+          />
+          <MetricCard 
+            label="Total Reports" 
+            value={stats.total} 
+            subValue="Verified stream documents" 
+            color="text-zinc-100" 
+            icon="📡" 
+            glow="bg-zinc-100/5"
+          />
+          <MetricCard 
+            label="Field Strength" 
+            value={operatives.length || 'DEPLOYED'} 
+            subValue="Verified Sangathan nodes" 
+            color="text-blue-500" 
+            icon="🛡️" 
+            glow="bg-blue-500/5"
+          />
+          <MetricCard 
+            label="RSS Targets" 
+            value={profiles.length || 'SCANNING'} 
+            subValue="Monitored personnel" 
+            color="text-orange-500" 
+            icon="🕵️" 
+            glow="bg-orange-500/5"
+          />
         </div>
 
         <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 sm:gap-8">
           <div className="xl:col-span-8 space-y-6 sm:space-y-8">
             <GlassCard title="Operational Theater Overview" icon="🗺️">
               <div className="h-[350px] sm:h-[450px] -mx-4 -mb-4">
-                <MapView incidents={displayIncidents} />
+                <MapView incidents={displayIncidents} profiles={profiles} />
               </div>
             </GlassCard>
             <GlassCard title="Zone Threat Assessment" icon="📊">
@@ -130,13 +118,13 @@ export default function CommandCenter({ initialIncidents, initialAlerts, initial
             <GlassCard title="Activity Timeline" icon="📈">
               <ActivityTimeline incidents={displayIncidents} />
             </GlassCard>
-            <div className="bg-gradient-to-br from-zinc-800 to-zinc-950 border border-red-500/10 rounded-2xl p-6 relative overflow-hidden group">
+            <div className="bg-gradient-to-br from-zinc-800 to-zinc-950 border border-red-500/10 rounded-2xl p-6 relative overflow-hidden group hover-scan">
               <div className="absolute top-0 right-0 p-2 opacity-20">
                 <span className="text-[8px] font-black uppercase tracking-wider text-red-500 border border-red-500/50 px-2 py-0.5 rounded">Community Verified</span>
               </div>
               <h4 className="text-lg font-black italic leading-none text-white uppercase tracking-tighter">Submit Intel</h4>
-              <p className="text-[10px] text-zinc-500 font-bold tracking-widest uppercase mt-2">Strengthen the network</p>
-              <Link href="/incidents/report" className="mt-6 block w-full py-4 bg-red-600 text-white text-center text-[10px] font-black uppercase tracking-[0.2em] rounded-xl shadow-lg shadow-red-900/20 active:scale-95 transition-all">
+              <p className="text-[10px] text-zinc-500 font-bold tracking-widest uppercase mt-2">Deploy Field Intelligence</p>
+              <Link href="/incidents/report" className="mt-6 block w-full py-4 bg-gradient-to-r from-red-600 to-red-800 text-white text-center text-[10px] font-black uppercase tracking-[0.2em] rounded-xl shadow-lg shadow-red-900/40 hover:shadow-red-600/20 active:scale-95 transition-all">
                 New Report →
               </Link>
             </div>
@@ -151,15 +139,17 @@ export default function CommandCenter({ initialIncidents, initialAlerts, initial
   );
 }
 
-function MetricCard({ label, value, subValue, color, icon }: any) {
+function MetricCard({ label, value, subValue, color, icon, glow }: any) {
   return (
-    <div className="bg-zinc-900/30 border border-zinc-800/40 rounded-2xl p-5 group transition-all hover:bg-zinc-900/50">
-      <span className="text-xs text-zinc-700">{icon}</span>
-      <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest mt-4 mb-1">{label}</p>
-      <div className="flex items-baseline gap-2">
-        <h4 className={`text-3xl font-black tracking-tighter ${color}`}>{value}</h4>
-        <span className="text-[9px] text-zinc-600 font-bold uppercase">{subValue}</span>
+    <div className={`relative overflow-hidden bg-zinc-900/30 border border-zinc-800/40 rounded-2xl p-5 sm:p-6 group transition-all hover:bg-zinc-900/50 hover:border-zinc-700/60`}>
+      <div className={`absolute top-0 right-0 w-24 h-24 blur-[60px] pointer-events-none ${glow}`} />
+      <span className="text-xs text-zinc-700 group-hover:scale-110 transition-transform inline-block">{icon}</span>
+      <p className="text-[9px] sm:text-[10px] text-zinc-500 font-black uppercase tracking-[0.2em] mt-5 mb-1.5">{label}</p>
+      <div className="flex flex-col sm:flex-row sm:items-baseline gap-1 sm:gap-3">
+        <h4 className={`text-3xl sm:text-4xl font-black tracking-tighter tabular-nums ${color}`}>{value}</h4>
+        <span className="text-[8px] sm:text-[9px] text-zinc-600 font-bold uppercase tracking-widest">{subValue}</span>
       </div>
+      <div className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-zinc-800/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
     </div>
   );
 }

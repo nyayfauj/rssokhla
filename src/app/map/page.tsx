@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
-import MapClient from '@/components/map/MapClient';
 import Link from 'next/link';
+import MapWrapper from '@/components/map/MapWrapper';
 
 export const metadata: Metadata = {
   title: 'Safety Map — Okhla Community Monitor',
@@ -25,7 +25,7 @@ export default function MapPage() {
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           <div className="lg:col-span-3">
-            <MapClient />
+            <MapWrapper />
           </div>
 
           <aside className="space-y-6">

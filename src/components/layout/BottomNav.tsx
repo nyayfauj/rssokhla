@@ -10,8 +10,8 @@ const NAV_ITEMS = [
   { label: 'Monitor', icon: '📡', href: '/', activePath: '/' },
   { label: 'Map', icon: '🗺️', href: '/map', activePath: '/map' },
   { label: 'Report', icon: '➕', href: '/incidents/report', activePath: '/incidents/report', primary: true },
-  { label: 'Community', icon: '👤', href: '/community', activePath: '/community' },
-  { label: 'More', icon: '☰', href: '/about', activePath: '/about' },
+  { label: 'Operatives', icon: '🕵️', href: '/profiles', activePath: '/profiles' },
+  { label: 'More', icon: '☰', href: '#', activePath: '/more' },
 ];
 
 const HIDDEN_PATHS = ['/login', '/register', '/anonymous'];
@@ -20,6 +20,8 @@ export default function BottomNav() {
   const pathname = usePathname();
   const router = useRouter();
   const setActiveTab = useUIStore((s) => s.setActiveTab);
+  const setMoreMenuOpen = useUIStore((s) => s.setMoreMenuOpen);
+  const isMoreMenuOpen = useUIStore((s) => s.isMoreMenuOpen);
   const activeAlerts = useAlertsStore((s) => s.activeAlerts);
   const criticalCount = activeAlerts.filter((a) => a.severity === 'critical').length;
 
@@ -58,11 +60,17 @@ export default function BottomNav() {
           }
 
           return (
-            <Link
-              key={item.href}
-              href={item.href}
+            <button
+              key={item.label}
+              onClick={() => {
+                if (item.label === 'More') {
+                  setMoreMenuOpen(true);
+                } else {
+                  router.push(item.href);
+                }
+              }}
               className={`flex flex-col items-center justify-center gap-0.5 min-w-[64px] py-1 transition-colors ${
-                isActive ? 'text-red-500' : 'text-zinc-500'
+                isActive || (item.label === 'More' && isMoreMenuOpen) ? 'text-red-500' : 'text-zinc-500'
               }`}
               aria-label={item.label}
               aria-current={isActive ? 'page' : undefined}
@@ -79,7 +87,7 @@ export default function BottomNav() {
               {isActive && (
                 <span className="absolute bottom-0 w-1 h-1 rounded-full bg-red-500" />
               )}
-            </Link>
+            </button>
           );
         })}
       </div>

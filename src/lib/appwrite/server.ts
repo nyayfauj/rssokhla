@@ -26,27 +26,39 @@ export function createAdminClient() {
 const ENDPOINT = process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT;
 const PROJECT_ID = process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID;
 
-async function appwriteFetch(collectionId: string) {
-  const url = `${ENDPOINT}/databases/${DATABASE_ID}/collections/${collectionId}/documents`;
-  const res = await fetch(url, {
+async function appwriteFetch(collectionId: string, queries: string[] = []) {
+  const baseUrl = `${ENDPOINT}/databases/${DATABASE_ID}/collections/${collectionId}/documents`;
+  
+  // Construct query string
+  const url = new URL(baseUrl);
+  queries.forEach(q => url.searchParams.append('queries[]', q));
+
+  const res = await fetch(url.toString(), {
     headers: {
       'x-appwrite-project': PROJECT_ID!,
       'Content-Type': 'application/json',
+      // If we had a server API key we'd pass 'x-appwrite-key' here, but this is hitting the public read endpoint
     },
     next: { revalidate: 60 } // ISR for each fetch
   });
   
-  if (!res.ok) return { documents: [] };
+  if (!res.ok) {
+    console.error(`[Appwrite] Failed to fetch collection ${collectionId}: ${res.statusText}`);
+    return { documents: [] };
+  }
   return res.json();
 }
 
 export async function getServerSideData() {
   try {
     const [incidents, alerts, profiles, operatives] = await Promise.all([
-      appwriteFetch(COLLECTIONS.INCIDENTS),
-      appwriteFetch(COLLECTIONS.ALERTS),
-      appwriteFetch(COLLECTIONS.PROFILES),
-      appwriteFetch(COLLECTIONS.OPERATIVES),
+      // Only fetch the latest 100 incidents ordered by creation
+      appwriteFetch(COLLECTIONS.INCIDENTS, ['limit(100)', 'orderDesc("$createdAt")']),
+      // Fetch active alerts
+      appwriteFetch(COLLECTIONS.ALERTS, ['limit(50)', 'orderDesc("$createdAt")']),
+      // Profiles and operatives usually don't need all records at once on server load, just recent ones
+      appwriteFetch(COLLECTIONS.PROFILES, ['limit(100)', 'orderDesc("$createdAt")']),
+      appwriteFetch(COLLECTIONS.OPERATIVES, ['limit(100)', 'orderDesc("reputation")']),
     ]);
 
     return {

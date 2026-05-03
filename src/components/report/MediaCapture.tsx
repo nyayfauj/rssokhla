@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect, useCallback } from 'react';
+import { compressImage } from '@/lib/utils/image';
 
 export interface MediaItem {
   id: string;
@@ -47,14 +48,25 @@ export default function MediaCapture({ media, onAdd, onRemove, voiceText, onVoic
     onRemove(id);
   }, [media, onRemove]);
 
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files) return;
-    Array.from(files).forEach(file => {
-      const type = file.type.startsWith('video') ? 'video' : file.type.startsWith('audio') ? 'audio' : 'photo';
+    
+    for (const originalFile of Array.from(files)) {
+      const type = originalFile.type.startsWith('video') ? 'video' : originalFile.type.startsWith('audio') ? 'audio' : 'photo';
+      const file = type === 'photo' ? await compressImage(originalFile) : originalFile;
       const preview = type === 'photo' ? URL.createObjectURL(file) : '';
-      onAdd({ id: `m-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`, type, blob: file, preview, name: file.name, size: file.size });
-    });
+      
+      onAdd({ 
+        id: `m-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`, 
+        type, 
+        blob: file, 
+        preview, 
+        name: file.name, 
+        size: file.size 
+      });
+    }
+    
     if (fileRef.current) fileRef.current.value = '';
   };
 

@@ -6,9 +6,13 @@
 import { useRef, useEffect, useState } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import 'leaflet.markercluster/dist/MarkerCluster.css';
+import 'leaflet.markercluster/dist/MarkerCluster.Default.css';
 import { OKHLA_CENTER, OKHLA_ZOOM } from '@/lib/map/config';
 import { OKHLA_WARDS } from '@/lib/utils/wards';
 import type { Incident } from '@/types/incident.types';
+import type { KaryakartaProfile } from '@/types/karyakarta.types';
+import { RANK_LABELS } from '@/types/karyakarta.types';
 
 // Ward colors for visual distinction
 const WARD_COLORS: Record<string, string> = {
@@ -39,9 +43,10 @@ const fixLeafletIcons = () => {
 
 interface Props {
   incidents: Incident[];
+  profiles?: KaryakartaProfile[];
 }
 
-export default function MapView({ incidents }: Props) {
+export default function MapView({ incidents, profiles = [] }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<L.Map | null>(null);
   const [isMounted, setIsMounted] = useState(false);
@@ -130,10 +135,25 @@ export default function MapView({ incidents }: Props) {
     const map = mapRef.current;
     if (!map) return;
 
-    // Clear existing markers (excluding the tile layer and circles)
+    // Clear existing marker clusters if any
     map.eachLayer((layer) => {
-      if (layer instanceof L.Marker) {
+      // @ts-ignore
+      if (layer instanceof L.MarkerClusterGroup || layer instanceof L.Marker) {
         map.removeLayer(layer);
+      }
+    });
+
+    // @ts-ignore
+    const clusterGroup = L.markerClusterGroup({
+      showCoverageOnHover: false,
+      maxClusterRadius: 40,
+      iconCreateFunction: function(cluster: any) {
+        const count = cluster.getChildCount();
+        return L.divIcon({
+          html: `<div style="background-color: #ef4444; width: 30px; height: 30px; border: 2px solid #050606; border-radius: 50%; box-shadow: 0 0 15px #ef444466; display: flex; align-items: center; justify-content: center; color: white; font-weight: 900; font-size: 12px;">${count}</div>`,
+          className: 'custom-cluster-icon',
+          iconSize: [30, 30]
+        });
       }
     });
 
@@ -152,7 +172,7 @@ export default function MapView({ incidents }: Props) {
           iconAnchor: [6, 6]
         });
 
-        L.marker([incident.coordinates[1], incident.coordinates[0]], { icon: customIcon })
+        const marker = L.marker([incident.coordinates[1], incident.coordinates[0]], { icon: customIcon })
           .bindPopup(`
             <div style="background: #09090b; color: white; padding: 8px; border-radius: 8px; border: 1px solid #27272a; font-family: sans-serif;">
               <p style="font-size: 10px; font-weight: 800; text-transform: uppercase; color: #ef4444; margin: 0 0 4px 0;">${incident.severity.toUpperCase()} // ${incident.category.toUpperCase()}</p>
@@ -160,11 +180,44 @@ export default function MapView({ incidents }: Props) {
               <p style="font-size: 11px; color: #a1a1aa; margin: 0 0 12px 0; line-height: 1.4;">${incident.description.slice(0, 80)}...</p>
               <a href="/incidents/${incident.$id}" style="font-size: 10px; font-weight: 800; text-transform: uppercase; color: #ef4444; text-decoration: none;">Review Case →</a>
             </div>
-          `, { className: 'dark-popup' })
-          .addTo(map);
+          `, { className: 'dark-popup' });
+          
+        clusterGroup.addLayer(marker);
       }
     });
-  }, [incidents, isMounted]);
+
+    // Add Target Profiles
+    profiles.forEach(profile => {
+      const location = profile.addresses?.[0]?.coordinates || [OKHLA_CENTER[0] + (Math.random() - 0.5) * 0.02, OKHLA_CENTER[1] + (Math.random() - 0.5) * 0.02];
+      
+      if (location && location.length === 2) {
+        const color = profile.threatLevel === 'critical' ? '#ef4444' : '#f97316';
+        
+        const targetIcon = L.divIcon({
+          className: 'target-div-icon',
+          html: `<div style="background-color: transparent; width: 20px; height: 20px; border: 2px solid ${color}; border-radius: 4px; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 10px ${color}44;">
+                  <div style="background-color: ${color}; width: 6px; height: 6px; border-radius: 50%;"></div>
+                 </div>`,
+          iconSize: [20, 20],
+          iconAnchor: [10, 10]
+        });
+
+        const marker = L.marker([location[0], location[1]], { icon: targetIcon })
+          .bindPopup(`
+            <div style="background: #09090b; color: white; padding: 10px; border-radius: 12px; border: 1px solid ${color}44; font-family: sans-serif; min-width: 160px;">
+              <p style="font-size: 8px; font-weight: 800; text-transform: uppercase; color: ${color}; margin: 0 0 4px 0;">RSS TARGET // ${RANK_LABELS[profile.rank].label.toUpperCase()}</p>
+              <h4 style="font-size: 14px; font-weight: 900; margin: 0 0 8px 0; text-transform: uppercase; color: white;">${profile.fullName}</h4>
+              <p style="font-size: 10px; color: #a1a1aa; margin: 0 0 12px 0; line-height: 1.4; border-left: 2px solid ${color}66; padding-left: 8px;">Zone: ${profile.primaryArea || 'Unknown'}</p>
+              <a href="/profiles/${profile.$id}" style="display: block; text-align: center; background: ${color}22; padding: 6px; border-radius: 6px; font-size: 9px; font-weight: 800; text-transform: uppercase; color: ${color}; text-decoration: none; border: 1px solid ${color}44;">Review Dossier →</a>
+            </div>
+          `, { className: 'dark-popup' });
+          
+        clusterGroup.addLayer(marker);
+      }
+    });
+    
+    map.addLayer(clusterGroup);
+  }, [incidents, profiles, isMounted]);
 
   return (
     <div className="relative h-full w-full">

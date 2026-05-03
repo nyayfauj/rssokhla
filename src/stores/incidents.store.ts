@@ -153,18 +153,47 @@ export const useIncidentsStore = create<IncidentsState>()(
             uploadedMediaUrls.push(...results);
           }
 
+          let finalSeverity = data.severity || 'low';
+          const finalTags = [...(data.tags || [])];
+
+          // Run Edge AI Analysis
+          try {
+            const aiRes = await fetch('/api/analyze-intel', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ title: data.title, description: data.description }),
+            });
+            if (aiRes.ok) {
+              const { analysis } = await aiRes.json();
+              
+              if (analysis.severityUpgrade) {
+                finalSeverity = 'critical';
+                finalTags.push('AI_UPGRADED', 'PANIC_DETECTED');
+              }
+              if (analysis.crossReferences.length > 0) {
+                analysis.crossReferences.forEach((ref: string) => finalTags.push(`THREAT:${ref.toUpperCase()}`));
+              }
+              if (analysis.translationNeeded) {
+                finalTags.push('TRANSLATION_QUEUED');
+              }
+            }
+          } catch (e) {
+            console.warn('[AI] Analysis failed, proceeding with standard creation', e);
+          }
+
           const incidentData = {
             ...data,
             reporterId: userId,
             timestamp: new Date().toISOString(),
             status: 'reported',
+            severity: finalSeverity,
             isAnonymous,
             verifiedBy: [],
             verificationCount: 0,
             trustPoints: 0,
             mediaUrls: uploadedMediaUrls,
             coordinates: data.coordinates || [],
-            tags: data.tags || [],
+            tags: Array.from(new Set(finalTags)), // Deduplicate tags
           };
 
           // Remove the raw media blobs before sending to database
@@ -320,6 +349,7 @@ export const useIncidentsStore = create<IncidentsState>()(
       name: 'rssokhla-incidents',
       partialize: (state) => ({
         offlineQueue: state.offlineQueue,
+        incidents: state.incidents.slice(0, 100), // Cellular Blackout Mode: Cache 100 incidents
       }),
     }
   )

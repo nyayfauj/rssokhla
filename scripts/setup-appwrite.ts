@@ -104,6 +104,20 @@ async function setup() {
     console.log('\n📦 Setting up Reports (Retrying failed)...');
     await safeCreateAttribute(COLLECTIONS.REPORTS, 'isVerified', 'boolean', false, false, false);
 
+    console.log('\n📦 Setting up Adversary Profiles...');
+    await safeCreateAttribute(COLLECTIONS.PROFILES, 'fullName', 'string', true);
+    await safeCreateAttribute(COLLECTIONS.PROFILES, 'aliases', 'string', false, true);
+    await safeCreateAttribute(COLLECTIONS.PROFILES, 'rank', 'string', false, false, 'swayamsevak');
+    await safeCreateAttribute(COLLECTIONS.PROFILES, 'threatLevel', 'string', false, false, 'medium');
+    await safeCreateAttribute(COLLECTIONS.PROFILES, 'primaryArea', 'string', false);
+    await safeCreateAttribute(COLLECTIONS.PROFILES, 'shakhaLocation', 'string', false);
+    await safeCreateAttribute(COLLECTIONS.PROFILES, 'isActive', 'boolean', false, false, true);
+    await safeCreateAttribute(COLLECTIONS.PROFILES, 'internalNotes', 'large-string', false);
+    await safeCreateAttribute(COLLECTIONS.PROFILES, 'photoUrls', 'string', false, true);
+    await safeCreateAttribute(COLLECTIONS.PROFILES, 'phoneNumbers', 'string', false, true);
+    await safeCreateAttribute(COLLECTIONS.PROFILES, 'lastSeenDate', 'string', false);
+    await safeCreateAttribute(COLLECTIONS.PROFILES, 'lastSeenLocation', 'string', false);
+
     console.log('\n✨ Database setup complete!');
   } catch (err: any) {
     console.error('❌ Setup failed:', err.message);

@@ -148,17 +148,6 @@ export default async function PublicIncidentPage({ params }: PageProps) {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
 
       <main className="min-h-screen bg-[#060808] text-white">
-        {/* Header */}
-        <header className="border-b border-zinc-800/40 bg-[#060808]/90">
-          <div className="max-w-2xl mx-auto px-4 h-12 flex items-center justify-between">
-            <a href="/" className="flex items-center gap-2">
-              <span className="text-base">🛡️</span>
-              <span className="font-bold text-sm">Nyay<span className="text-red-500">Fauj</span></span>
-            </a>
-            <span className="text-[10px] text-zinc-600 uppercase tracking-widest">Public Alert</span>
-          </div>
-        </header>
-
         <div className="max-w-2xl mx-auto px-4 py-6 sm:py-8">
           {/* Category & Severity badges */}
           <div className="flex items-center gap-2 mb-3">

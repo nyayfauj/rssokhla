@@ -20,8 +20,13 @@ export default function IncidentsPage() {
   }, [fetchIncidents]);
 
   const filtered = useMemo(() => {
-    if (filter === 'all') return incidents;
-    return incidents.filter(i => i.severity === filter);
+    let result = incidents;
+    if (filter === 'profiles') {
+      result = incidents.filter(i => i.category === 'adversary_profile');
+    } else if (filter !== 'all') {
+      result = incidents.filter(i => i.severity === filter && i.category !== 'adversary_profile');
+    }
+    return result;
   }, [incidents, filter]);
 
   return (
@@ -39,6 +44,7 @@ export default function IncidentsPage() {
           <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
             {[
               { id: 'all', label: 'All Units' },
+              { id: 'profiles', label: 'Profiles' },
               { id: 'critical', label: 'Critical' },
               { id: 'high', label: 'High' },
               { id: 'medium', label: 'Medium' },
@@ -71,9 +77,9 @@ export default function IncidentsPage() {
               <div key={incident.$id} className="group relative">
                 <div className="absolute -inset-0.5 bg-gradient-to-br from-red-600/10 to-transparent blur opacity-0 group-hover:opacity-100 transition-all duration-500 rounded-[2rem]" />
                 <GlassCard 
-                  title={incident.locationId ? OKHLA_AREAS[incident.locationId as OkhlaArea]?.label : 'UNSPECIFIED SECTOR'} 
+                  title={incident.category === 'adversary_profile' ? 'TARGET PROFILE' : (incident.locationId ? OKHLA_AREAS[incident.locationId as OkhlaArea]?.label : 'UNSPECIFIED SECTOR')} 
                   subtitle={incident.timestamp ? formatDistanceToNow(new Date(incident.timestamp)) + ' ago' : ''}
-                  icon="📡"
+                  icon={incident.category === 'adversary_profile' ? '🕵️' : '📡'}
                 >
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
@@ -94,12 +100,14 @@ export default function IncidentsPage() {
                       <span className="text-[9px] font-black text-zinc-700 uppercase tracking-widest">{incident.category}</span>
                     </div>
                     
-                    <h3 className="text-base font-black text-white uppercase tracking-tight leading-tight line-clamp-2 group-hover:text-red-500 transition-colors">
-                      {incident.title}
+                    <h3 className={`text-base font-black uppercase tracking-tight leading-tight line-clamp-2 transition-colors ${
+                      incident.category === 'adversary_profile' ? 'text-orange-500 group-hover:text-red-500' : 'text-white group-hover:text-red-500'
+                    }`}>
+                      {incident.category === 'adversary_profile' && 'ID: '}{incident.title}
                     </h3>
                     
-                    <p className="text-[11px] text-zinc-500 leading-relaxed line-clamp-3 font-medium">
-                      {incident.description}
+                    <p className="text-[11px] text-zinc-500 leading-relaxed line-clamp-3 font-medium italic">
+                      {incident.category === 'adversary_profile' ? `[PROFILE LOG] ${incident.description}` : incident.description}
                     </p>
                     
                     <div className="pt-5 border-t border-zinc-800/40 flex items-center justify-between">
@@ -125,16 +133,22 @@ export default function IncidentsPage() {
               </div>
             ))
           ) : (
-            <div className="col-span-full py-24 text-center space-y-6 border border-dashed border-zinc-800/60 rounded-[3rem] bg-zinc-900/10">
-              <div className="w-16 h-16 bg-zinc-900 rounded-full flex items-center justify-center mx-auto">
-                <span className="text-3xl" aria-hidden="true">📭</span>
+            <div className="col-span-full py-24 text-center space-y-6 border border-zinc-800 bg-zinc-950 rounded-2xl relative overflow-hidden">
+              <div className="absolute top-0 left-0 w-full h-1 bg-red-900/20" />
+              <div className="absolute top-0 right-0 p-3 opacity-30">
+                <span className="text-[8px] font-mono text-zinc-500">SYS_ID: NULL_00</span>
               </div>
-              <div className="space-y-1">
-                <p className="text-zinc-200 text-sm font-black uppercase tracking-widest">No Intelligence Data</p>
-                <p className="text-zinc-600 text-[10px] font-bold uppercase tracking-[0.2em]">Reports for this sector or priority are not yet indexed</p>
+              <div className="w-16 h-16 border border-red-900/50 bg-red-950/20 rounded-xl flex items-center justify-center mx-auto mb-4">
+                <span className="w-2 h-2 bg-red-600 animate-ping rounded-full" />
               </div>
-              <Link href="/incidents/report" className="inline-flex px-8 py-3 bg-red-600 text-white text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-red-500 transition-all shadow-xl shadow-red-900/20">
-                Submit Intel Report
+              <div className="space-y-2">
+                <p className="text-red-500 text-sm font-black uppercase tracking-[0.3em]">NO INTELLIGENCE DATA DETECTED</p>
+                <p className="text-zinc-600 text-[10px] font-mono uppercase tracking-widest max-w-sm mx-auto">
+                  Sensors indicate zero actionable intelligence for this specific sector and classification level. Sector is temporarily secure.
+                </p>
+              </div>
+              <Link href="/incidents/report" className="inline-flex mt-4 px-8 py-4 bg-red-600 text-white text-[10px] font-black uppercase tracking-[0.2em] rounded-xl hover:bg-red-500 active:scale-95 transition-all shadow-lg shadow-red-900/20 border border-red-500 hover:border-white/20">
+                DEPLOY INTEL REPORT
               </Link>
             </div>
           )}

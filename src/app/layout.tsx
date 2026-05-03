@@ -5,11 +5,12 @@ import ServiceWorkerRegistrar from '@/components/ServiceWorkerRegistrar';
 import ErrorBoundary from '@/components/ErrorBoundary';
 import ToastContainer from '@/components/ui/Toast';
 import AppwritePing from '@/components/AppwritePing';
-import PublicHeader from '@/components/layout/PublicHeader';
+import TacticalHeader from '@/components/layout/TacticalHeader';
 import CommandPalette from '@/components/ui/CommandPalette';
 import AlertToasts from '@/components/ui/AlertToasts';
 import Footer from '@/components/layout/Footer';
 import CookieConsent from '@/components/layout/CookieConsent';
+import OfflineSyncManager from '@/components/OfflineSyncManager';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -59,6 +60,9 @@ export const viewport: Viewport = {
 };
 
 import BottomNav from '@/components/layout/BottomNav';
+import MoreMenu from '@/components/layout/MoreMenu';
+import InstallPrompt from '@/components/ui/InstallPrompt';
+import SOSButton from '@/components/ui/SOSButton';
 
 export default function RootLayout({
   children,
@@ -80,16 +84,20 @@ export default function RootLayout({
           <ErrorBoundary>
             <ServiceWorkerRegistrar />
             <AppwritePing />
+            <OfflineSyncManager />
             <ToastContainer />
             <CommandPalette />
             <AlertToasts />
-            <PublicHeader />
+            <TacticalHeader />
             <main className="flex-1 pb-20 sm:pb-0" role="main">
               {children}
             </main>
             <Footer />
             <CookieConsent />
             <BottomNav />
+            <MoreMenu />
+            <SOSButton />
+            <InstallPrompt />
           </ErrorBoundary>
         </div>
       </body>

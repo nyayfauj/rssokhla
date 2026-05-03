@@ -65,9 +65,9 @@ export default function SettingsPage() {
           <button 
             onClick={() => router.push('/sangathan')}
             aria-label="Create an account to join the community"
-            className="w-full mt-6 py-4 bg-white text-black text-sm font-semibold rounded-xl hover:bg-red-600 hover:text-white transition-all shadow-xl active:scale-[0.98]"
+            className="w-full mt-6 py-4 bg-zinc-100 text-black text-[10px] font-black uppercase tracking-[0.2em] rounded-xl hover:bg-red-600 hover:text-white transition-all shadow-[0_0_15px_rgba(255,255,255,0.1)] hover:shadow-[0_0_20px_rgba(220,38,38,0.3)] active:scale-95"
           >
-            Join the Sangathan
+            JOIN SANGATHAN PROTOCOL
           </button>
         )}
       </Card>
@@ -117,6 +117,42 @@ export default function SettingsPage() {
           </Button>
         </div>
       </Card>
+
+      {/* Sector Geofencing */}
+      {!isAnonymous && (
+        <Card padding="md" className="border-red-900/30">
+          <h2 className="text-[10px] font-black text-red-500 uppercase tracking-[0.3em] mb-4 flex items-center gap-2">
+            <span className="w-1.5 h-4 bg-red-600 rounded-full" /> Sector Geofencing
+          </h2>
+          <div className="space-y-4">
+            <p className="text-xs text-zinc-400 leading-relaxed">
+              Subscribe to specific operational zones. You will only receive push notifications for incidents that occur within your active geofenced sectors.
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {['batla_house', 'zakir_nagar', 'abul_fazal', 'shaheen_bagh', 'jamia_nagar', 'okhla_vihar', 'jasola'].map((sector) => {
+                const isSubbed = typeof window !== 'undefined' && localStorage.getItem(`geofence_${sector}`) === 'true';
+                return (
+                  <button
+                    key={sector}
+                    onClick={() => {
+                      if (isSubbed) localStorage.removeItem(`geofence_${sector}`);
+                      else localStorage.setItem(`geofence_${sector}`, 'true');
+                      window.dispatchEvent(new Event('storage')); // trigger re-render hack for local dev without complex store
+                    }}
+                    className={`px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest rounded-lg border transition-all ${
+                      isSubbed 
+                        ? 'bg-red-900/30 border-red-500/50 text-red-400 shadow-[0_0_10px_rgba(220,38,38,0.2)]' 
+                        : 'bg-zinc-900 border-zinc-800 text-zinc-500 hover:border-zinc-600'
+                    }`}
+                  >
+                    {sector.replace('_', ' ')}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </Card>
+      )}
 
       {/* Appearance */}
       <Card padding="md">
@@ -175,9 +211,12 @@ export default function SettingsPage() {
       </Card>
 
       {/* Sign Out */}
-      <Button variant="danger" fullWidth size="lg" onClick={() => setShowLogoutConfirm(true)}>
-        Sign Out
-      </Button>
+      <button 
+        onClick={() => setShowLogoutConfirm(true)}
+        className="w-full py-4 mt-8 bg-red-950/40 text-red-500 border border-red-900/50 hover:bg-red-900/40 hover:text-red-400 text-[10px] font-black uppercase tracking-[0.2em] rounded-2xl transition-all active:scale-95"
+      >
+        TERMINATE SESSION
+      </button>
 
       {/* Logout Confirmation Modal */}
       <Modal isOpen={showLogoutConfirm} onClose={() => setShowLogoutConfirm(false)} title="Sign Out?">
