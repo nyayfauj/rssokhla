@@ -130,18 +130,16 @@ export default function MapView({ incidents, profiles = [] }: Props) {
     };
   }, [isMounted]);
 
-  // Update Markers when incidents change
+  const clusterGroupRef = useRef<any>(null);
+
   useEffect(() => {
     const map = mapRef.current;
     if (!map) return;
 
     // Clear existing marker clusters if any
-    map.eachLayer((layer) => {
-      // @ts-ignore
-      if (layer instanceof L.MarkerClusterGroup || layer instanceof L.Marker) {
-        map.removeLayer(layer);
-      }
-    });
+    if (clusterGroupRef.current) {
+      map.removeLayer(clusterGroupRef.current);
+    }
 
     // @ts-ignore
     const clusterGroup = L.markerClusterGroup({
@@ -215,8 +213,8 @@ export default function MapView({ incidents, profiles = [] }: Props) {
         clusterGroup.addLayer(marker);
       }
     });
-    
     map.addLayer(clusterGroup);
+    clusterGroupRef.current = clusterGroup;
   }, [incidents, profiles, isMounted]);
 
   return (
